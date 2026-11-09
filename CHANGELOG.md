@@ -1,5 +1,17 @@
 # What's new
 
+## 1.5.1 — 9 November 2026
+A small reading fix: the "In short" text in the explanation window is now narrower and easier to read.
+
+**Changed**
+- Before: when you pressed a panel heading, the "In short" text ran across the whole window, about 724 px wide, which is roughly 90 letters per line.
+- Changed: the "In short" text is now at most 60 letters wide per line, about 600 px.
+- Now: its lines break earlier and are easier to read. "Learn more" is unchanged and keeps its full width.
+- The version is now 1.5.1.
+
+**Good to know**
+- This is purely visual. No numbers, panels, buttons or settings changed, and your data is untouched.
+
 ## 1.5.0 — 9 November 2026
 Calm & spacious: a new look for the whole board, the one you picked from three options. Nothing moves and nothing is removed. All seven colour schemes still work, and the frame (top bar, left blocks, footer) stays as it was.
 

@@ -1,4 +1,4 @@
-# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026; board 1.5.0)
+# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026; board 1.5.1)
 
 ## 1. Purpose
 Read-only MCP server giving Claude access to the owner's Garmin Connect data via Garmin's official Personal API (spec: `docs/garmin-personal-openapi.json`, title "Garmin Connect Personal API" 1.0.0, 26 paths, all GET). Base URL `https://personal.connectapi.garmin.com` (the spec also lists `.garmin.cn`; unused). Nothing is ever written to Garmin.
@@ -84,7 +84,7 @@ Note: `/weight-service/weight/all/{startDate}/{endDate}` has no dedicated tool; 
 - GitHub Actions runs `npm test` on every push.
 
 ## 9. Board
-"AMS Garmin Board" 1.5.0: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
+"AMS Garmin Board" 1.5.1: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
 
 ### Files
 - `board/board-data.js` — `buildBoard(client, { today, now, settings, log, travel })` returns one JSON object. Uses `GarminClient`.
@@ -116,6 +116,7 @@ Since 1.5.0 each scheme also defines `--card` (panel surface), `--edge` (hairlin
 - Small text is normal case in the system font: captions 11 → 13 px, notes 11 → 14 px, axis labels about 9 → 12 drawing units. Headings, frame and big numbers stay Antonio uppercase.
 - `board.js` gives SVG text elements the classes `t-hero` (main number, Antonio), `t-unit`, `t-sub`, `t-tick` (axis), `t-mark` (marker labels), `t-val` (bar value labels) and `t-legend`. All SVG text except `t-hero` uses the system font in normal case.
 - Notes are sentences (for example "No plan set · Edit to add one"); the steps comparison under the gauge is a plain text line, not a pill.
+- Explain sheet (1.5.1): `#explain-summary { max-width: 60ch; }` — the "In short" paragraph is at most 60 characters wide (about 600 px, down from about 724 px or 90 letters) so it is easier to read; `explain-more` (Learn more) is unchanged.
 
 The footer `<select id="palette-select">` has exactly these seven option values. The choice is saved in `localStorage` under `ams-garmin-board.scheme` and applied before first paint by a small inline script in `<head>`.
 
@@ -150,7 +151,7 @@ Panels in order inside `<main class="panels">` (12-column grid, sN = span N):
 25. `activity-detail-panel` (s12, hidden until a workout row is pressed): `detail-title`, `detail-summary`, `detail-splits`, `detail-hr-chart`, `detail-map`, `detail-close`. Workout rows: `class="act"`, `id="act-<activityId>"`, `data-id`.
 26. `year-panel` (s12): `year-tiles` with `year-tile-01` … `year-tile-12` (steps, workouts, resting pulse, goal days; future months dimmed). New in 1.4.0: under the tiles `last-year-line` (`<div class="sub-label">`; `SAME TIME LAST YEAR · NOVEMBER 2025 TO DAY 9 · STEPS 61 200 → 68 500 (▲ +12 %) · WORKOUTS 4 → 4 (=) · 2025 TO 9 NOV · 1 230 000 STEPS ▲ +3 %`; without data `NO DATA FOR NOVEMBER 2025`), and in each tile a faint ghost bar and `<span class="tk ly" id="year-last-01">2025 · 48 200</span>` (ids `year-last-01` … `year-last-12`; `—` when that month had no data).
 
-Footer bar: `palette-select`, `kiosk-button`, `help-button`, `report-button`, `share-button` (SHARE, key S; new in 1.4.0), `settings-button`, `footer-version` ("1.5.0"), plus the link status and refresh controls.
+Footer bar: `palette-select`, `kiosk-button`, `help-button`, `report-button`, `share-button` (SHARE, key S; new in 1.4.0), `settings-button`, `footer-version` ("1.5.1"), plus the link status and refresh controls.
 
 Sheets (overlays, `hidden` by default; Escape closes = Cancel; the main button is full colour):
 - `explain-sheet`: `explain-title`, `explain-summary` (IN SHORT), `explain-more` (LEARN MORE), `explain-close`.

@@ -9,9 +9,11 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (...p) => readFile(join(ROOT, ...p), 'utf8');
 const SCHEMES = ['calm-dusk', 'calm-dark', 'calm-day', 'ice', 'ember', 'forest', 'graphite'];
 
-test('1.5 A: package.json is 1.5.0 and the changelog has a 1.5.0 heading', async () => {
+// Since 1.5.1 this reads the version from package.json instead of pinning 1.5.0.
+test('1.5 A: package.json has a version and the changelog has a heading for it', async () => {
   const pkg = JSON.parse(await read('package.json'));
-  assert.equal(pkg.version, '1.5.0');
+  assert.match(pkg.version, /^\d+\.\d+\.\d+$/);
+  assert.match(await read('CHANGELOG.md'), new RegExp('^## ' + pkg.version.replace(/\./g, '\\.'), 'm'));
   assert.match(await read('CHANGELOG.md'), /^## 1\.5\.0/m);
 });
 
@@ -20,7 +22,6 @@ test('1.5 B: the footer version shows the package version', async () => {
   const html = await read('board', 'public', 'index.html');
   const v = pkg.version.replace(/\./g, '\\.');
   assert.match(html, new RegExp('id="footer-version"[^>]*>[^<]*' + v));
-  assert.match(html, /id="footer-version"[^>]*>[^<]*1\.5\.0/);
 });
 
 test('1.5 C: every scheme defines --card, --edge and --shadow', async () => {

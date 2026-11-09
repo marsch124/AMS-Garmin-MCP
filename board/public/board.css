@@ -643,6 +643,10 @@ svg text.t-hero { font-family: var(--font); text-transform: uppercase; letter-sp
   .month-nav-bar .month-label { font-size: 22px; }
 }
 
+/* ---------- 1.5.1 · narrower In short ---------- */
+/* The In short paragraph of an explanation stays at a readable line length, so lines break earlier. Learn more is unchanged. */
+#explain-summary { max-width: 60ch; }
+
 /* ---------- print (⌘P) ---------- */
 @media print {
   @page { size: A4 portrait; margin: 10mm; }
