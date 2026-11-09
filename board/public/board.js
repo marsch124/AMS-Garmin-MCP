@@ -640,7 +640,7 @@
     const d = c.delta || 0;
     const arrow = d > 0 ? '▲' : d < 0 ? '▼' : '▶';
     if (d > 0) el.classList.add('up'); else if (d < 0) el.classList.add('down');
-    el.innerHTML = `${arrow} ${d > 0 ? '+' : ''}${fmtInt(d)}${isNum(c.pct) ? ` (${c.pct > 0 ? '+' : ''}${c.pct} %)` : ''}<small>${weekdayOf(c.date)} ${fmtDay(c.date).toUpperCase()} · ${fmtInt(c.steps)}</small>`;
+    el.innerHTML = `${arrow} ${d > 0 ? '+' : ''}${fmtInt(d)}${isNum(c.pct) ? ` (${c.pct > 0 ? '+' : c.pct < 0 ? '−' : ''}${Math.abs(c.pct)} %)` : ''}<small>${weekdayOf(c.date)} ${fmtDay(c.date).toUpperCase()} · ${fmtInt(c.steps)}</small>`;
     el.title = `Today ${fmtInt((c.steps || 0) + d)} steps against ${fmtInt(c.steps)} on ${fmtDay(c.date)}, the same weekday four weeks ago`;
   }
 
