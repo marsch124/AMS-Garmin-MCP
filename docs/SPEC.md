@@ -1,4 +1,4 @@
-# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026)
+# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026; board 1.3.0)
 
 ## 1. Purpose
 Read-only MCP server giving Claude access to the owner's Garmin Connect data via Garmin's official Personal API (spec: `docs/garmin-personal-openapi.json`, title "Garmin Connect Personal API" 1.0.0, 26 paths, all GET). Base URL `https://personal.connectapi.garmin.com` (the spec also lists `.garmin.cn`; unused). Nothing is ever written to Garmin.
@@ -84,7 +84,7 @@ Note: `/weight-service/weight/all/{startDate}/{endDate}` has no dedicated tool; 
 - GitHub Actions runs `npm test` on every push.
 
 ## 9. Board
-"AMS Garmin Board" 1.2.0: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
+"AMS Garmin Board" 1.3.0: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
 
 ### Files
 - `board/board-data.js` — `buildBoard(client, { today, now, settings, log, travel })` returns one JSON object. Uses `GarminClient`.
@@ -119,15 +119,15 @@ Every panel heading is a `<button type="button" class="label" id="explain-<key>"
 Panels in order inside `<main class="panels">` (12-column grid, sN = span N):
 1. `red-alert` (s12, `hidden` unless alerts): `red-alert-text`.
 2. `chrono-panel` (s3): clocks, `sunrise-value`, `sunset-value`, `travel-row` (hidden at home) with `travel-days`, `travel-km`, `travel-zone`.
-3. `steps-panel` (s3). 4. `body-battery-panel` (s2). 5. `heart-panel` (s4).
+3. `steps-panel` (s3): also `steps-chip` (today's steps against the same weekday four weeks ago, e.g. "▲ +1 240 · MON 12 OCT"; "—" without data). 4. `body-battery-panel` (s2). 5. `heart-panel` (s4).
 6. `intensity-panel` (s3). 7. `energy-panel` (s2).
 8. `bb-curve-panel` (s4): `bb-curve-chart` (today's line; sleep and workout spans shaded).
 9. `fitness-panel` (s3): `vo2max-value`, `vo2max-trend`, `fitness-age-value`, `fitness-age-trend`, `chrono-age-value`.
 10. `sleep-panel` (s3). 11. `hrv-panel` (s2).
-12. `sleep-debt-panel` (s3): `sleep-debt-value`, `sleep-debt-chart`, `sleep-debt-note`.
+12. `sleep-debt-panel` (s3): `sleep-debt-value`, `sleep-debt-chart`, `sleep-debt-note`. With `missingRecent` = 3 the note reads "WEAR THE WATCH TONIGHT · 3 EMPTY NIGHTS" and `sleep-nudge` (a small note inside `sleep-panel`) is shown.
 13. `weight-panel` (s4): `weight-thermo`, `weight-trend-chart` (90 days, dots, 7-day average line, goal line), `weight-date`, `weight-delta`, `weight-goal`.
 14. `training-panel` (s3): `training-load-bar`, `training-acute`, `training-chronic`, `training-ratio`, `training-status`.
-15. `zones-panel` (s3): `zones-chart` (stacked bar, five zones), `zones-total`.
+15. `zones-panel` (s3): `zones-chart` (stacked bar, five zones), `zones-total`, `zones-total-label` ("IN ZONES" or "IN ZONES · LAST 7 DAYS"), `zones-note` (heading note; with `period` 'last7': "LAST 7 DAYS · NO WORKOUT YET THIS WEEK").
 16. `streaks-panel` (s3): `streak-steps-current`, `streak-steps-longest`, `streak-workout-current`, `streak-workout-longest`.
 17. `weather-panel` (s3): `weather-place`, `weather-temp`, `weather-text`, `weather-wind`, `weather-rain`, `weather-hours`, `weather-locate-button`.
 18. `targets-panel` (s4): `targets-list` with `target-bar-steps`, `target-bar-workouts`, `target-bar-swims`, `target-bar-runs`, `target-bar-training-minutes`, `target-bar-distance-km`; `targets-edit-button`.
@@ -137,7 +137,7 @@ Panels in order inside `<main class="panels">` (12-column grid, sN = span N):
 25. `activity-detail-panel` (s12, hidden until a workout row is pressed): `detail-title`, `detail-summary`, `detail-splits`, `detail-hr-chart`, `detail-map`, `detail-close`. Workout rows: `class="act"`, `id="act-<activityId>"`, `data-id`.
 26. `year-panel` (s12): `year-tiles` with `year-tile-01` … `year-tile-12` (steps, workouts, resting pulse, goal days; future months dimmed).
 
-Footer bar: `palette-select`, `kiosk-button`, `help-button`, `report-button`, `settings-button`, `footer-version` ("1.2.0"), plus the link status and refresh controls.
+Footer bar: `palette-select`, `kiosk-button`, `help-button`, `report-button`, `settings-button`, `footer-version` ("1.3.0"), plus the link status and refresh controls.
 
 Sheets (overlays, `hidden` by default; Escape closes = Cancel; the main button is full colour):
 - `explain-sheet`: `explain-title`, `explain-summary` (IN SHORT), `explain-more` (LEARN MORE), `explain-close`.
@@ -198,6 +198,16 @@ lastSyncAt: iso | null
 ```
 `compare` "before" = the previous month through the same day of the month; `beforeFull` = the whole previous month. Months in the future have steps 0, workouts 0 and daysWithData 0 in `year`. Target progress is computed on the page from `month` and `activities`.
 
+Added in 1.3.0:
+```
+zones.period: 'week' | 'last7'     // 'last7' when no workout since Monday; then the last 7 days are summed
+zones.since: 'YYYY-MM-DD'          // first day counted
+today.stepsCompare: { date, steps, delta, pct|null }   // same weekday 4 weeks ago (28 days back); delta = today's steps − steps
+sleepDebt.missingRecent: 0..3      // of the last 3 nights, how many have no sleep recorded
+report JSON (/api/report): summary { steps, stepGoalDays, days, workouts, trainingSeconds, distanceKm, restingHrAvg, intensityMinutes, sleepAvgMin }
+```
+The report text gains a sleep line: average hours over the recorded nights, or "no nights recorded" (`sleepAvgMin` null). `report.sh` also writes `~/Library/Mobile Documents/com~apple~CloudDocs/AMS Garmin/<title>.md` (the report text) and `<title>.json` (the report JSON with `summary`) next to the Apple Notes note, creating the folder if needed. AMS WorkoutCompanion reading these files is a separate release of that app.
+
 ### Garmin calls per board build
 - `/usersummary-service/v2/dailysummaries` — from the earlier of 1 January and the 1st of the previous month, to today, in chunks of at most 365 days. Core call.
 - `/activitylist-service/activities/search/activities` — same range, limit 99, paged.
@@ -238,7 +248,7 @@ Directory (injectable `storeDir`): `~/Library/Application Support/AMS Garmin MCP
 
 ### Launch agents and scripts
 - `scripts/install-agents.sh` installs two LaunchAgents in `~/Library/LaunchAgents/`: `com.ams.garmin.board.server.plist` (RunAtLoad and KeepAlive: starts `node board/server.js --port 7788` at login and restarts it if it stops; log `~/Library/Logs/AMS Garmin Board.log`) and `com.ams.garmin.board.report.plist` (StartCalendarInterval: Monday 07:30 and the 1st of the month 07:35, running `scripts/report.sh`). `--remove` uninstalls both.
-- `scripts/report.sh`: on a Monday writes the week report, on the 1st the month report, into Apple Notes (folder "AMS Garmin", one note per report, title = report title) with `osascript`. It asks `/api/report` on 127.0.0.1:7788, starting the server first if needed (as `open-board.sh` does).
+- `scripts/report.sh`: on a Monday writes the week report, on the 1st the month report, into Apple Notes (folder "AMS Garmin", one note per report, title = report title) with `osascript`. It asks `/api/report` on 127.0.0.1:7788 (and, since 1.3.0, saves the text and JSON into iCloud Drive as described under Board JSON), starting the server first if needed (as `open-board.sh` does).
 - `scripts/open-board.sh`, `scripts/build-board-app.sh`: unchanged.
 
 ### Tests

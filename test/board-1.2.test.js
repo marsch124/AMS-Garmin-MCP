@@ -112,13 +112,12 @@ const put = (url, body, headers = {}) => fetch(url, { method: 'PUT', headers: { 
 const post = (url, body) => fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
 
 // ---------- A. version and docs ----------
-test('1.2 A: package.json version is 1.2.0', async () => {
-  assert.equal(JSON.parse(await read('package.json')).version, '1.2.0');
+test('1.2 A: package.json version is at least 1.2.0', async () => {
+  assert.ok(JSON.parse(await read('package.json')).version >= '1.2.0');
 });
-test('1.2 A: CHANGELOG starts with a 1.2.0 entry', async () => {
+test('1.2 A: CHANGELOG has a 1.2.0 entry', async () => {
   const lines = (await read('CHANGELOG.md')).split('\n');
-  const first = lines.find((l) => l.startsWith('## '));
-  assert.match(first, /^## 1\.2\.0/);
+  assert.ok(lines.some((l) => /^## 1\.2\.0/.test(l)));
 });
 test('1.2 A: SPEC mentions palette-select and /api/month', async () => {
   const spec = await read('docs', 'SPEC.md');
@@ -429,7 +428,7 @@ test('1.2 F: /api/docs gives the guide, the history and the version', async () =
   await withServer(makeClient(), async (base) => {
     const j = await (await fetch(base + '/api/docs')).json();
     assert.equal(j.ok, true);
-    assert.equal(j.version, '1.2.0');
+    assert.equal(j.version, JSON.parse(await read('package.json')).version);
     assert.ok(typeof j.howItWorks === 'string' && j.howItWorks.length > 0);
     assert.ok(typeof j.whatsNew === 'string' && j.whatsNew.length > 0);
   });

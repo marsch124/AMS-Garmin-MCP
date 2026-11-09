@@ -1,6 +1,6 @@
 {
   "name": "ams-garmin-mcp",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "AMS Garmin — Martin's own connection from Claude to his Garmin Connect workouts and health data (official Garmin Personal API).",
   "type": "module",
   "private": true,

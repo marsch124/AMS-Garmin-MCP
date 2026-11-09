@@ -1,5 +1,28 @@
 # What's new
 
+## 1.3.0 — 9 November 2026
+Small helpers that make the board more useful on a quiet week, and reports that can travel to your iPhone.
+
+**New**
+- Steps compared with four weeks ago: a small chip beside the steps gauge shows today's steps against the same weekday four weeks back, for example "▲ +1 240 · MON 12 OCT". A green-ish up arrow means more steps, a red-ish down arrow fewer. It shows "—" when there is no data for that day.
+- The Monday and month reports now also carry a short set of numbers: steps, step-goal days, workouts, training time, distance, resting pulse, intensity minutes and the sleep average. They are stored in a form other apps can read.
+- Reports in iCloud Drive: besides Apple Notes, every report is now also saved as a text file and a data file in iCloud Drive, in the folder "AMS Garmin". On the iPhone you find them in the Files app.
+- A sleep line in the report text: the average hours slept over the nights that were recorded, or "no nights recorded".
+- Sleep nudge: when the last three nights have no sleep recorded, the sleep-debt panel says "WEAR THE WATCH TONIGHT · 3 EMPTY NIGHTS" and the sleep panel shows a small note.
+
+**Changed**
+- Heart-rate zones: when the new week has no workout yet (for example on a Monday morning), the panel now shows the last 7 days instead of an empty bar, and says so in the heading note: "LAST 7 DAYS · NO WORKOUT YET THIS WEEK". The label under the total then reads "IN ZONES · LAST 7 DAYS".
+- The version is now 1.3.0.
+- If the board gets a new version while the page is open, the page reloads by itself.
+
+**Good to know**
+- AMS WorkoutCompanion cannot read the report files yet. It needs its own small update to do that, which will be a separate release of that app. Until then you can open the files in the Files app.
+- The iCloud Drive files are written by the same install step as the Notes reports (Monday morning and the 1st of the month).
+- Sleep notes fill again as soon as the watch is worn at night.
+
+**Quality**
+- New automatic tests check the new parts by their names: the zones note and label, the steps chip, the sleep nudge, the report numbers and the files in iCloud Drive.
+
 ## 1.2.0 — 9 November 2026
 The board grows up: calmer colours, an explanation behind every heading, and much more to look at.
 

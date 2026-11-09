@@ -13,14 +13,14 @@ The board is a live instrument panel for your Garmin data, in the style of a Sta
 **What it shows**
 - Red alert: a red bar at the top, only when needed: resting pulse 10 percent above the month average, Body Battery under 20, or no watch sync for 24 hours.
 - Clocks: local time, world time (UTC), the date, the week number, a playful stardate, and sunrise and sunset. Away from home, a travel line shows days away, distance and time zone.
-- Steps today against your goal, distance, floors, calories, resting, lowest and highest heart rate, stress, and Body Battery.
+- Steps today against your goal, with a small chip comparing today with the same weekday four weeks ago (▲ or ▼ and the difference; "—" when there is no data), distance, floors, calories, resting, lowest and highest heart rate, stress, and Body Battery.
 - Intensity minutes this week against your goal. Hard minutes count double.
 - Body Battery today as a line, with sleep and workouts shaded.
 - Fitness: VO2 max and fitness age next to your real age, with trend arrows.
-- Sleep and HRV from last night, and sleep debt over the last 7 nights. If the watch has no sleep data, the board says so: wear the watch at night.
+- Sleep and HRV from last night, and sleep debt over the last 7 nights. If the watch has no sleep data, the board says so: wear the watch at night. After three empty nights in a row, the sleep-debt panel says "WEAR THE WATCH TONIGHT · 3 EMPTY NIGHTS" and the sleep panel shows a small note.
 - Weight: your last weigh-in, plus 90 days of dots, a 7-day average and your goal line.
 - Training load: the last 7 days against your usual week, with one word: RECOVERY, MAINTAINING, PRODUCTIVE or OVERREACHING.
-- Heart-rate zones this week, from Monday.
+- Heart-rate zones this week, from Monday. When the week has no workout yet, the panel shows the last 7 days instead and says so ("LAST 7 DAYS · NO WORKOUT YET THIS WEEK").
 - Streaks: days in a row at your step goal and with a workout, and the longest this year.
 - Weather for the next 12 hours.
 - Targets: your own monthly goals with progress bars.
@@ -53,7 +53,7 @@ Press **F** or the FULL SCREEN button for a calm wall display. The cursor hides 
 Without a code, the board works on this Mac only. Only the Mac can change settings.
 
 **Reports in Apple Notes**
-Every Monday morning, a summary of last week lands in Apple Notes (folder "AMS Garmin"). On the 1st of the month, the summary of last month does too. The REPORT button shows them any time. Both need the install step below.
+Every Monday morning, a summary of last week lands in Apple Notes (folder "AMS Garmin"). On the 1st of the month, the summary of last month does too. The REPORT button shows them any time. The report also has a sleep line (average hours over the recorded nights) and a short set of numbers for other apps. Each report is also saved as a text file and a data file in iCloud Drive, folder "AMS Garmin", so you can open it in the Files app on the iPhone. AMS WorkoutCompanion will need its own small update to read it. All of this needs the install step below.
 
 **Install step (auto-start and reports)**
 Run `scripts/install-agents.sh` once. It makes the board start at login and sets up the Monday and month reports. Run it with `--remove` to undo.
@@ -124,4 +124,5 @@ Make a new key on the same Garmin page (see above) and run the save-key dialog a
 Your data goes from Garmin straight to Claude on this Mac. The code repository is public so that GitHub runs the tests for free; it contains no data and no keys, and never will.
 
 ## Version
+1.3.0 — 9 Nov 2026
 1.2.0 — 9 Nov 2026

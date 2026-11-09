@@ -332,6 +332,7 @@ function sleepDebtView(raw, today) {
   const counted = nights.filter((n) => n.recorded && num(n.needMin) !== null);
   return {
     recorded: counted.length > 0,
+    missingRecent: nights.slice(-3).filter((n) => !n.recorded).length,
     nights,
     debtMin: counted.length ? counted.reduce((a, n) => a + (n.needMin - n.sleptMin - n.napMin), 0) : null,
   };
@@ -472,17 +473,37 @@ export function trainingView(acts, today) {
   return { acute, chronic, ratio, status, days };
 }
 
-/** Seconds in each heart-rate zone this week, with the zone floors from the watch. */
-function zonesView(weekActs, zonesRaw) {
-  const secondsInZone = [0, 1, 2, 3, 4].map((i) => Math.round(sum(weekActs, (a) => a.zones?.[i])));
+/** Seconds in each heart-rate zone this week; when the week has no zone time yet, the last 7 days instead. */
+function zonesView(weekActs, zonesRaw, { acts = weekActs, today = null, weekStart: wStart = null } = {}) {
+  const secondsOf = (list) => [0, 1, 2, 3, 4].map((i) => Math.round(sum(list, (a) => a.zones?.[i])));
+  let secondsInZone = secondsOf(weekActs);
+  let period = 'week', since = wStart;
+  if (today && secondsInZone.every((v) => v === 0)) {
+    const from = addDays(today, -6);
+    const last7 = acts.filter((a) => a.date && a.date >= from && a.date <= today);
+    const alt = secondsOf(last7);
+    if (alt.some((v) => v > 0)) { secondsInZone = alt; period = 'last7'; since = from; }
+  }
   const list = Array.isArray(zonesRaw) ? zonesRaw : (zonesRaw && typeof zonesRaw === 'object' ? [zonesRaw] : []);
   const z = list.find((x) => x?.sport === 'DEFAULT') ?? list[0] ?? null;
   return {
+    period,
+    since,
     secondsInZone,
     total: secondsInZone.reduce((a, b) => a + b, 0),
     floors: z ? [1, 2, 3, 4, 5].map((n) => pos(z[`zone${n}Floor`])) : [],
     maxHr: pos(z?.maxHeartRateUsed),
   };
+}
+
+/** Today's steps against the same weekday four weeks ago. */
+function stepsCompareView(byDate, today) {
+  const date = addDays(today, -28);
+  const then = byDate.get(date);
+  const steps = then?.hasData ? num(then.steps) : null;
+  const todaySteps = num(byDate.get(today)?.steps) ?? 0;
+  if (steps === null) return { date, steps: null, delta: null, pct: null };
+  return { date, steps, delta: todaySteps - steps, pct: steps > 0 ? Math.round(((todaySteps - steps) / steps) * 100) : null };
 }
 
 const trendOf = (value, prev) => (num(value) === null || num(prev) === null ? null : value > prev ? 'up' : value < prev ? 'down' : 'flat');
@@ -601,7 +622,7 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
       ok: true,
       tokenExpiresAt: num(token?.expiresAt) ? new Date(token.expiresAt).toISOString() : null,
     },
-    today: strip(todayDay),
+    today: { ...strip(todayDay), stepsCompare: stepsCompareView(byDate, today) },
     month,
     week: {
       start: wStart,
@@ -619,7 +640,7 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
       yesterday: byDate.get(addDays(today, -1)) ?? null,
     }),
     training: trainingView(acts, today),
-    zones: zonesView(weekActs, zonesRaw),
+    zones: zonesView(weekActs, zonesRaw, { acts, today, weekStart: wStart }),
     fitness: fitnessView(acts, fitnessRaw),
     bodyBatteryCurve: bodyBatteryCurveView(bbRaw, today),
     sleepDebt: sleepDebtView(nightsRaw, today),
@@ -632,7 +653,7 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
     warnings,
   };
   // Kept for the report writer; not part of the JSON.
-  Object.defineProperty(board, 'context', { value: { allDays, acts, weightTrend, weeklyGoal }, enumerable: false });
+  Object.defineProperty(board, 'context', { value: { allDays, acts, weightTrend, weeklyGoal, nights: board.sleepDebt.nights }, enumerable: false });
   return board;
 }
 
@@ -724,6 +745,15 @@ export function reportText(kind, board, today = board.date) {
   } else {
     lines.push('Weight: no weigh-in.');
   }
+  const nights = (ctx.nights ?? []).filter((n) => n.recorded && n.date >= start && n.date <= end);
+  const sleepAvgMin = nights.length ? Math.round(sum(nights, (n) => n.sleptMin) / nights.length) : null;
+  lines.push(sleepAvgMin !== null ? `Sleep: ${fmtDur(sleepAvgMin * 60)} a night on average over ${plural(nights.length, 'recorded night', 'recorded nights')}.` : 'Sleep: no nights recorded.');
   lines.push(`Days with data: ${withData.length} of ${days.length}.`);
-  return { kind, title, text: lines.join('\n') };
+  const summary = {
+    start, end,
+    steps, stepGoalDays: days.filter(goalMet).length, days: days.length, daysWithData: withData.length,
+    workouts: acts.length, trainingSeconds: sum(acts, (a) => a.seconds), distanceKm: round1(sum(acts, (a) => a.distanceM) / 1000),
+    restingHrAvg: hr.avg, intensityMinutes: im, intensityGoal: goalMinutes, sleepAvgMin,
+  };
+  return { kind, title, text: lines.join('\n'), summary };
 }

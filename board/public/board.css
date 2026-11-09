@@ -415,3 +415,10 @@ svg text { font-family: var(--font); text-transform: uppercase; }
   .detail { grid-template-columns: 1fr; }
   .target { grid-template-columns: 80px minmax(0, 1fr) 90px; }
 }
+
+/* 1.3.0 */
+.chip-row { display: flex; justify-content: center; margin: -2px 0 4px; }
+.chip.cmp { background: var(--track); color: var(--text); font-size: 12px; font-weight: 600; }
+.chip.cmp.up { color: var(--c5); } .chip.cmp.down { color: var(--c7); }
+.chip.cmp small { color: var(--dim); font-weight: 500; font-size: 10px; margin-left: 4px; }
+.nudge { margin: 0 12px 10px; padding: 4px 10px; border-radius: 6px; background: var(--track); color: var(--pc); font-size: 11px; letter-spacing: .04em; }

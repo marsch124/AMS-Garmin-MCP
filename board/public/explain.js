@@ -147,7 +147,7 @@ globalThis.AMS_EXPLAIN = {
   },
   "zones": {
     title: "HEART-RATE ZONES THIS WEEK",
-    summary: "How long your workouts this week, since Monday, kept your heart in each of five zones. Most people aim for a lot of easy time and a little hard time.",
+    summary: "How long your workouts this week, since Monday, kept your heart in each of five zones. Early in the week, before the first workout, it shows the last 7 days instead and says so. Most people aim for a lot of easy time and a little hard time.",
     more: [
       "The zones split your heart rate into five bands, from gentle to maximum. The floors come from the watch's settings: where zone 1 starts, where zone 2 starts, and so on up to zone 5, and your maximum heart rate. Change them in Garmin Connect if they are wrong for you.",
       "Zone 1 is very easy, like a slow walk. Zone 2 is easy and steady, where you can still talk. Zone 3 is moderate and breathing is heavy. Zone 4 is hard, near your threshold. Zone 5 is all-out effort that you can only hold for short bursts.",

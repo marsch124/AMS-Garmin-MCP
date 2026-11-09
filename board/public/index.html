@@ -85,6 +85,7 @@
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-steps">STEPS · TODAY</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="gauge" id="steps-gauge"></div>
+        <div class="chip-row"><span class="chip cmp" id="steps-chip" title="Today against the same weekday four weeks ago">—</span></div>
         <div class="kv-row">
           <div class="kv"><span class="k">STEPS</span><span class="v" id="steps-value">—</span></div>
           <div class="kv"><span class="k">GOAL</span><span class="v" id="steps-goal">—</span></div>
@@ -171,6 +172,7 @@
     <section class="panel p-c4 s3" id="sleep-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-sleep">SLEEP · LAST NIGHT</button><span class="line"></span></div>
       <div class="panel-body" id="sleep-body"><div class="nodata">—</div></div>
+      <div class="nudge" id="sleep-nudge" hidden></div>
     </section>
 
     <section class="panel p-c5 s2" id="hrv-panel">
@@ -215,9 +217,9 @@
     </section>
 
     <section class="panel p-c7 s3" id="zones-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-zones">HEART ZONES · WEEK</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-zones">HEART ZONES · WEEK</button><span class="line"></span><span class="head-note" id="zones-note"></span></div>
       <div class="panel-body">
-        <div class="big-row"><div class="big"><span class="v" id="zones-total">—</span><span class="k">IN ZONES THIS WEEK</span></div></div>
+        <div class="big-row"><div class="big"><span class="v" id="zones-total">—</span><span class="k" id="zones-total-label">IN ZONES THIS WEEK</span></div></div>
         <div class="chart" id="zones-chart"></div>
       </div>
     </section>

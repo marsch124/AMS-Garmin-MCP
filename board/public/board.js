@@ -468,6 +468,7 @@
     });
     setText('steps-value', fmtInt(t.steps));
     setText('steps-goal', fmtInt(t.stepGoal));
+    renderStepsChip(t.stepsCompare);
     setText('distance-value', fmtKm(t.distanceM));
 
     const bb = t.bodyBattery || {};
@@ -561,15 +562,19 @@
 
   function renderSleepDebt(b) {
     const d = b.sleepDebt || { recorded: false, nights: [] };
+    const nudge = $('sleep-nudge');
+    nudge.hidden = d.missingRecent !== 3;
+    nudge.textContent = d.missingRecent === 3 ? 'WEAR THE WATCH TONIGHT · THE LAST 3 NIGHTS ARE EMPTY' : '';
     if (!d.recorded) {
       setText('sleep-debt-value', 'NO NIGHTS YET');
-      setText('sleep-debt-note', 'FILLS ONCE THE WATCH IS WORN AT NIGHT');
+      setText('sleep-debt-note', d.missingRecent === 3 ? 'WEAR THE WATCH TONIGHT · 3 EMPTY NIGHTS' : 'FILLS ONCE THE WATCH IS WORN AT NIGHT');
       $('sleep-debt-chart').innerHTML = '';
       return;
     }
     const debt = d.debtMin;
     setText('sleep-debt-value', `${debt > 0 ? '−' : '+'}${fmtMin(Math.abs(debt))}`);
-    setText('sleep-debt-note', debt > 0 ? `SHORT OF YOUR NEED · ${d.nights.filter((n) => n.recorded).length} NIGHTS COUNTED` : `AHEAD OF YOUR NEED · ${d.nights.filter((n) => n.recorded).length} NIGHTS COUNTED`);
+    if (d.missingRecent === 3) setText('sleep-debt-note', 'WEAR THE WATCH TONIGHT · 3 EMPTY NIGHTS');
+    else setText('sleep-debt-note', debt > 0 ? `SHORT OF YOUR NEED · ${d.nights.filter((n) => n.recorded).length} NIGHTS COUNTED` : `AHEAD OF YOUR NEED · ${d.nights.filter((n) => n.recorded).length} NIGHTS COUNTED`);
     drawSleepDebt($('sleep-debt-chart'), d.nights);
   }
 
@@ -626,9 +631,25 @@
     setText('training-ratio', isNum(t.ratio) ? t.ratio.toLocaleString(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—');
   }
 
+  const weekdayOf = (iso) => ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][new Date(iso + 'T12:00:00').getDay()];
+  /** Today against the same weekday four weeks ago. */
+  function renderStepsChip(c) {
+    const el = $('steps-chip');
+    el.classList.remove('up', 'down');
+    if (!c || !isNum(c.steps)) { el.textContent = '—'; el.title = 'No steps recorded on the same weekday four weeks ago'; return; }
+    const d = c.delta || 0;
+    const arrow = d > 0 ? '▲' : d < 0 ? '▼' : '▶';
+    if (d > 0) el.classList.add('up'); else if (d < 0) el.classList.add('down');
+    el.innerHTML = `${arrow} ${d > 0 ? '+' : ''}${fmtInt(d)}${isNum(c.pct) ? ` (${c.pct > 0 ? '+' : ''}${c.pct} %)` : ''}<small>${weekdayOf(c.date)} ${fmtDay(c.date).toUpperCase()} · ${fmtInt(c.steps)}</small>`;
+    el.title = `Today ${fmtInt((c.steps || 0) + d)} steps against ${fmtInt(c.steps)} on ${fmtDay(c.date)}, the same weekday four weeks ago`;
+  }
+
   function renderZones(b) {
     const z = b.zones || { secondsInZone: [0, 0, 0, 0, 0], total: 0, floors: [], maxHr: null };
+    const last7 = z.period === 'last7';
     setText('zones-total', z.total ? fmtDur(z.total) : '—');
+    setText('zones-total-label', last7 ? 'IN ZONES · LAST 7 DAYS' : 'IN ZONES THIS WEEK');
+    setText('zones-note', last7 ? 'LAST 7 DAYS · NO WORKOUT YET THIS WEEK' : '');
     drawZones($('zones-chart'), z);
   }
 
