@@ -1,4 +1,5 @@
-/* AMS Garmin Board — an LCARS-inspired instrument board. Seven looks; the default is LCARS Calm on a dusk-grey background. */
+/* AMS Garmin Board — an LCARS-inspired instrument board. Seven looks; the default is LCARS Calm on a dusk-grey background.
+   1.5.0: Calm & spacious — panels on soft cards, bigger numbers, small words in normal letters (the block near the end). */
 
 :root {
   color-scheme: dark;
@@ -479,6 +480,169 @@ svg text { font-family: var(--font); text-transform: uppercase; }
 .share-body canvas { width: 100%; height: auto; max-height: calc(100vh - 200px); object-fit: contain; border-radius: 10px; background: var(--bg); box-shadow: 0 6px 24px rgba(0,0,0,.35); }
 .share-body .hint { font-size: 13px; color: var(--dim); margin: 0; text-align: center; }
 
+/* ---------- 1.5.0 · Calm & spacious ---------- */
+/* Every panel on its own soft card; big numbers bigger; small words in normal letters and the system font; more air.
+   The frame (top bar, left blocks, footer) and every panel's place stay as they were. */
+
+:root { --card: #45414c; --edge: rgba(255,255,255,.07); --shadow: 0 10px 26px rgba(0,0,0,.22); --dim: #cdc3b5; }
+:root[data-scheme="calm-dusk"] { --card: #45414c; --edge: rgba(255,255,255,.07); --shadow: 0 10px 26px rgba(0,0,0,.22); --dim: #cdc3b5; }
+:root[data-scheme="calm-dark"] { --card: #121012; --edge: rgba(255,255,255,.08); --shadow: 0 10px 26px rgba(0,0,0,.45); --dim: #b0a496; }
+:root[data-scheme="calm-day"] { --card: #fff8f0; --edge: rgba(0,0,0,.08); --shadow: 0 8px 22px rgba(60,40,20,.12); --dim: #6b6056; }
+:root[data-scheme="ice"] { --card: #0c1320; --edge: rgba(255,255,255,.07); --shadow: 0 10px 26px rgba(0,0,0,.45); --dim: #9aa9bd; }
+:root[data-scheme="ember"] { --card: #140e07; --edge: rgba(255,255,255,.07); --shadow: 0 10px 26px rgba(0,0,0,.45); --dim: #b08c58; }
+:root[data-scheme="forest"] { --card: #111a16; --edge: rgba(255,255,255,.07); --shadow: 0 10px 26px rgba(0,0,0,.45); --dim: #9aaaa0; }
+:root[data-scheme="graphite"] { --card: #151516; --edge: rgba(255,255,255,.08); --shadow: 0 10px 26px rgba(0,0,0,.45); --dim: #9a9a9a; }
+
+/* cards */
+.panels { gap: 20px 18px; padding: 10px 0 10px 12px; }
+.panel { background: var(--card); border: 1px solid var(--edge); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; }
+#month-nav { background: transparent; border: 0; box-shadow: none; border-radius: 0; overflow: visible; }
+.panel-head { height: auto; padding: 10px 14px 0 12px; gap: 0; }
+.panel-head .cap { width: 24px; height: 24px; border-radius: 12px 0 0 12px; }
+.panel-head .label, .sheet-head .label { height: 24px; line-height: 24px; font-size: 15px; padding: 0 12px; border-radius: 0 12px 12px 0; }
+.panel-head .line { background: transparent; opacity: 0; height: 24px; }
+.panel-head .head-note { font-size: 13px; padding-left: 0; }
+.panel-head .head-btn, .panel-head .head-chip { height: 24px; line-height: 24px; border-radius: 12px; font-size: 13px; }
+.panel-body { padding: 14px 16px 16px; }
+.panel.alert { border-color: var(--c7); }
+.panel.alert .panel-body { border-radius: 0; margin-top: 10px; padding: 14px 18px; }
+.panel.alert .alert-text { font-size: 26px; }
+.strip { margin: 10px 14px 0; padding: 4px 12px; font-size: 13px; }
+.nudge { margin: 0 16px 14px; padding: 6px 12px; border-radius: 8px; font-family: var(--prose); text-transform: none; letter-spacing: 0; font-size: 13px; }
+
+/* small words: normal letters, the system font, one size up */
+.kv .k, .big .k, .sub-label, .clock-small .k, .chrono .clock-sub, .tile .tk, .tile .ly, .legend, .tot-list .k, .tot-list .d,
+.target .tk, .plan-row .pk, .act .when, .act .te, .log-line .d, .nodata small, .wx-h, .kv .v small, .big .v small, .chip.cmp small,
+.splits .h, .form label, .form .form-title, .form .check, .act-empty, .wx-now .txt, .seg.info .k, .totals-line, .nodata.soft, .detail-summary, .panel-head .head-note, .log-row input::placeholder {
+  font-family: var(--prose); text-transform: none; letter-spacing: 0;
+}
+.kv .k, .big .k, .clock-small .k { font-size: 13px; }
+.sub-label { font-size: 14px; line-height: 1.35; margin-top: 10px; }
+.chrono .clock-sub { font-size: 13px; margin-top: 4px; }
+.legend { font-size: 12px; gap: 12px; }
+.legend i { width: 10px; height: 10px; }
+.tile .tk, .tile .ly { font-size: 12px; }
+.wx-h { font-size: 12px; } .wx-h b { font-size: 13px; }
+.wx-now .txt { font-size: 16px; }
+.nodata small { font-size: 14px; line-height: 1.35; }
+.form label { font-size: 13px; }
+.form .form-title { font-size: 13px; font-weight: 600; color: var(--c1); }
+.form .check { font-size: 14px; }
+.act .when, .act .te { font-size: 13px; }
+.splits .h { font-size: 12px; }
+
+/* numbers: the main one bigger and in the panel's colour, the side ones bigger and in the plain text colour */
+.kv-row { gap: 14px 18px; margin-top: 6px; }
+.kv .v { font-size: 28px; color: var(--text); }
+.kv .v small { font-size: 13px; }
+.big-row { gap: 16px 20px; margin-bottom: 8px; }
+.big .v { font-size: 52px; }
+.big .v .trend { font-size: 22px; color: var(--dim); margin-left: 6px; }
+.big .k { margin-top: 4px; }
+.chrono .clock-time { font-size: 68px; }
+.clock-row { gap: 8px 14px; margin-top: 12px; }
+.clock-small .v { font-size: 26px; color: var(--text); }
+.chrono .clock-date { font-size: 16px; margin-top: 12px; }
+.travel-row { margin-top: 12px; padding-top: 10px; }
+.wx-now .temp { font-size: 52px; }
+.wx-hours { margin-top: 12px; gap: 6px 6px; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+#streaks-panel .kv .v { font-size: 24px; }
+#streaks-panel .kv .v small { display: block; margin: 2px 0 0; }
+.clock-small { min-width: 0; }
+.nodata { font-size: 30px; padding: 8px 0; }
+.nodata.soft { font-size: 20px; }
+.tot-list { gap: 6px 12px; font-size: 15px; }
+.tot-list .v { font-size: 24px; color: var(--text); }
+.tot-list .d { font-size: 13px; }
+.month-nav-bar .month-label { font-size: 26px; }
+.month-nav-bar .nav { height: 30px; font-size: 18px; padding: 0 16px; }
+.totals-line { font-size: 16px; margin-bottom: 8px; }
+.act { font-size: 15px; line-height: 28px; gap: 10px; }
+.act .name { font-family: var(--prose); text-transform: none; letter-spacing: 0; font-size: 15px; }
+.act .tag { font-size: 12px; line-height: 22px; border-radius: 11px; }
+.plan-row { font-size: 15px; line-height: 28px; }
+.plan-row .ticks { font-size: 20px; }
+.target { font-size: 14px; line-height: 24px; grid-template-columns: 110px minmax(0, 1fr) 120px; }
+.target .bar { height: 12px; border-radius: 6px; }
+.stack { height: 16px; border-radius: 8px; margin: 10px 0 6px; }
+.tile { padding: 10px 12px; border-radius: 12px; gap: 2px; }
+.tile .tm { font-size: 14px; }
+.tile .tv { font-size: 22px; }
+.tile .tbar { height: 6px; margin: 6px 0 3px; }
+.log-row input { font-size: 16px; padding: 6px 14px; }
+.log-line { font-size: 15px; line-height: 24px; grid-template-columns: 64px minmax(0, 1fr); }
+.detail-summary { font-size: 15px; }
+.splits { font-size: 14px; line-height: 22px; }
+.gauge { max-width: 300px; }
+.gauge path { stroke-width: 18px; }
+.thermo { max-width: 170px; }
+.dial { width: 200px; }
+.weight-body .thermo { width: 140px; }
+.hydration-body .gauge { width: 170px; }
+.stress-body .stress-today .stack { height: 20px; border-radius: 10px; }
+
+/* the steps comparison: a line of text, not a pill */
+.chip-row { justify-content: flex-start; margin: 2px 0 8px; }
+.chip.cmp { background: transparent; box-shadow: none; padding: 0; font-family: var(--prose); text-transform: none; letter-spacing: 0; font-size: 14px; font-weight: 500; color: var(--text); line-height: 20px; }
+.chip.cmp.up { color: var(--c5); } .chip.cmp.down { color: var(--c7); }
+.chip.cmp small { font-size: 13px; color: var(--dim); margin-left: 6px; }
+
+/* text inside the drawings: everything in the system font and normal letters, except the main number */
+svg text { font-family: var(--prose); text-transform: none; letter-spacing: 0; }
+svg text.t-hero { font-family: var(--font); text-transform: uppercase; letter-spacing: .01em; font-variant-numeric: tabular-nums; }
+.chart svg text, .curve svg text { font-size: 12px; }
+.gauge svg text { font-size: 13px; }
+.gauge .t-hero { font-size: 50px; } .gauge .t-unit { font-size: 13px; } .gauge .t-sub { font-size: 15px; }
+.dial svg text { font-size: 10px; }
+.dial .t-hero { font-size: 36px; } .dial .t-unit { font-size: 11px; }
+.thermo svg text { font-size: 12px; }
+.thermo .t-hero { font-size: 28px; } .thermo .t-hero tspan { font-size: 13px; }
+.hbar svg text { font-size: 10px; }
+.chart .t-mark, .curve .t-mark { font-size: 11px; }
+.chart .t-val { font-size: 11px; }
+.chart .t-legend { font-size: 10px; }
+.chart .t-empty, .curve .t-empty { font-size: 15px; }
+.curve .t-hero { font-size: 14px; }
+
+/* sheets */
+.sheet-box { border: 1px solid var(--edge); background: var(--card); }
+.sheet-head { height: 32px; }
+.sheet-head .cap { height: 32px; width: 28px; border-radius: 16px 0 0 16px; }
+.sheet-head .label { height: 32px; line-height: 32px; font-size: 18px; border-radius: 0; }
+.sheet-head .line { height: 8px; opacity: .45; background: var(--pc); }
+.sheet-head .tab, .sheet-head .sheet-x { height: 32px; }
+.prose { font-size: 16px; line-height: 1.5; }
+.form input { font-size: 20px; }
+
+@media (min-width: 1251px) {
+  .act { grid-template-columns: 58px 112px minmax(0, 1fr) 82px 72px 72px 124px; }
+}
+
+/* smaller windows: the same look, a little smaller */
+@media (max-width: 1250px) {
+  .target { grid-template-columns: 96px minmax(0, 1fr) 110px; }
+}
+@media (max-width: 860px) {
+  .chrono .clock-time { font-size: 54px; }
+  .big .v { font-size: 44px; }
+  .panels { gap: 16px 14px; }
+}
+@media (max-width: 560px) {
+  .panels { gap: 14px; padding: 8px 0; }
+  .panel-head { padding: 8px 12px 0 10px; }
+  .panel-body { padding: 12px 14px 14px; }
+  .chrono .clock-time { font-size: 56px; }
+  .clock-small .v { font-size: 22px; }
+  .big .v { font-size: 44px; }
+  .kv .v { font-size: 24px; }
+  .act { font-size: 14px; line-height: 26px; gap: 8px; }
+  .act .name { font-size: 14px; }
+  .target { grid-template-columns: 84px minmax(0, 1fr) 96px; }
+  .nodata { font-size: 26px; }
+  .wx-now .temp { font-size: 44px; }
+  .month-nav-bar .month-label { font-size: 22px; }
+}
+
 /* ---------- print (⌘P) ---------- */
 @media print {
   @page { size: A4 portrait; margin: 10mm; }
@@ -488,7 +652,7 @@ svg text { font-family: var(--font); text-transform: uppercase; }
   .frame-top { height: 40px; }
   .lcars { display: block; padding: 0; min-height: 0; }
   .panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; padding: 0; }
-  .panel { break-inside: avoid; page-break-inside: avoid; grid-column: span 1 !important; border: 1px solid #ddd; border-radius: 8px; padding: 4px; }
+  .panel { break-inside: avoid; page-break-inside: avoid; grid-column: span 1 !important; border: 1px solid #ddd; border-radius: 8px; padding: 4px; background: #fff !important; box-shadow: none !important; }
   #red-alert, #bb-curve-panel, #month-steps-panel, #month-hr-panel, #activities-panel, #year-panel, #stress-panel, #resting-trend-panel, #log-panel { grid-column: span 2 !important; }
   .panel-head .label { background: #eee !important; color: #111 !important; }
   .kv .v, .big .v, .tile .tv, .tot-list .v, .clock-small .v, .chrono .clock-time { color: #111 !important; }

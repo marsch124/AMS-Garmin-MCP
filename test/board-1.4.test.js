@@ -119,17 +119,20 @@ async function withServer(client, fn, { storeDir, remoteAddressOf, notify } = {}
 const put = (url, body, headers = {}) => fetch(url, { method: 'PUT', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(body) });
 
 // ---------- A. version and docs ----------
-test('1.4 A: package.json version is 1.4.0', async () => {
-  assert.equal(JSON.parse(await read('package.json')).version, '1.4.0');
+// Since 1.5.0 these read the version from package.json instead of pinning 1.4.0.
+test('1.4 A: package.json has a version of the form x.y.z', async () => {
+  assert.match(JSON.parse(await read('package.json')).version, /^\d+\.\d+\.\d+$/);
 });
-test('1.4 A: /api/health reports 1.4.0', async () => {
+test('1.4 A: /api/health reports the package version', async () => {
+  const { version } = JSON.parse(await read('package.json'));
   await withServer(makeClient(), async (base) => {
-    assert.equal((await (await fetch(base + '/api/health')).json()).version, '1.4.0');
+    assert.equal((await (await fetch(base + '/api/health')).json()).version, version);
   });
 });
-test('1.4 A: CHANGELOG starts with a 1.4.0 entry', async () => {
+test('1.4 A: CHANGELOG starts with the package version', async () => {
+  const { version } = JSON.parse(await read('package.json'));
   const first = (await read('CHANGELOG.md')).split('\n').find((l) => l.startsWith('## '));
-  assert.match(first, /^## 1\.4\.0/);
+  assert.ok(first.startsWith(`## ${version}`), first);
 });
 
 // ---------- B. sleep strip data ----------
@@ -431,9 +434,10 @@ test('1.4 K: index.html carries every new element id', async () => {
   const html = await read('board', 'public', 'index.html');
   assert.deepEqual(NEW_IDS.filter((id) => !html.includes(`id="${id}"`)), []);
 });
-test('1.4 K: the footer shows 1.4.0 and the page has exactly 30 explain buttons', async () => {
+test('1.4 K: the footer shows the package version and the page has exactly 30 explain buttons', async () => {
   const html = await read('board', 'public', 'index.html');
-  assert.match(html, /id="footer-version"[^>]*>[^<]*1\.4\.0/);
+  const { version } = JSON.parse(await read('package.json'));
+  assert.match(html, new RegExp(`id="footer-version"[^>]*>[^<]*${version.replace(/\./g, '\\.')}`));
   const buttons = [...html.matchAll(/id="explain-[a-z-]+"/g)].filter((m) => !/explain-(sheet|title|summary|more|close)"/.test(m[0]));
   assert.equal(buttons.length, 30);
 });

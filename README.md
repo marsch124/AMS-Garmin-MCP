@@ -4,7 +4,7 @@
 AMS Garmin lets Claude read your own Garmin Connect workouts and health data, using Garmin's official Personal API. You ask in plain words ("how did I sleep last night?") and Claude fetches the answer from Garmin. It only reads. Nothing is ever written to Garmin.
 
 ## The board
-The board is a live instrument panel for your Garmin data, in the style of a Star Trek control screen: soft orange, peach, lavender and red bars on a warm grey background, with tall capital letters. It opens in your normal browser.
+The board is a live instrument panel for your Garmin data, in the style of a Star Trek control screen: soft orange, peach, lavender and red bars on a warm grey background. Since 1.5.0 the look is calm and spacious: every panel sits on its own soft card with rounded corners, the main numbers are bigger, and the small words (captions, notes, chart numbers) are written in normal letters that are easier to read. Headings and big numbers keep the tall capital letters. It opens in your normal browser.
 
 **How to open it**
 - Double-click **AMS Garmin Bridge Board** on your Desktop, or type "AMS Garmin Bridge Board" in Raycast.
@@ -135,6 +135,7 @@ Make a new key on the same Garmin page (see above) and run the save-key dialog a
 Your data goes from Garmin straight to Claude on this Mac. The code repository is public so that GitHub runs the tests for free; it contains no data and no keys, and never will.
 
 ## Version
+1.5.0 — 9 Nov 2026
 1.4.0 — 9 Nov 2026
 1.3.0 — 9 Nov 2026
 1.2.0 — 9 Nov 2026

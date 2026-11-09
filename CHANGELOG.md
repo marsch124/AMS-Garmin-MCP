@@ -1,5 +1,34 @@
 # What's new
 
+## 1.5.0 — 9 November 2026
+Calm & spacious: a new look for the whole board, the one you picked from three options. Nothing moves and nothing is removed. All seven colour schemes still work, and the frame (top bar, left blocks, footer) stays as it was.
+
+**New**
+- Cards: every panel now sits on its own soft card. The card is a surface slightly lighter than the background, with a fine 1-pixel edge, rounded corners (18 px) and a soft shadow. Before, panels sat flat on the background. Each colour scheme has its own card colour, edge and shadow, for example a warm lighter grey in Calm · Dusk and a very light cream in Calm · Day.
+- Panel heading as a pill: the coloured cap and the label now sit together as a pill at the top left of the card.
+
+**Changed**
+- The month navigation bar is the one thing without a card.
+- The long coloured line that used to stretch across the top of each panel is gone. The buttons and notes on the right of a heading stay exactly where they were.
+- Bigger main numbers: the steps gauge 40 → 50, the resting-pulse dial 30 → 36, and the Body Battery and weight thermometer 22 → 28 (in drawing units, so they scale with the panel). Big figures such as calories and fitness age 34 → 52 px, the clock 56 → 68 px, the weather temperature 40 → 52 px.
+- Calmer side numbers: the small groups of numbers (Min / Max / Month avg, the month totals, the small clocks) grew from 20 to 28 px and are now in the plain text colour. The eye goes first to the main number, which keeps the colour of its panel.
+- Easier to read: all small words are now written in normal letters instead of CAPITALS, in the system font (San Francisco on Apple devices), and one size up: captions under numbers 11 → 13 px, notes under charts 11 → 14 px, chart axis numbers about 9 → 12 drawing units. This covers captions, notes, axis numbers, legends, the workout names in the mission log, the year-tile captions and the labels in Settings. Headings, the frame and the big numbers keep the narrow tall Antonio letters.
+- Lighter dimmed text: the dimmed text colour is lighter in every colour scheme, for more contrast. For example in Calm · Dusk #b3a899 → #cdc3b5.
+- Notes are now sentences, for example "No plan set · Edit to add one", "No sleep data — wear the watch at night, the night appears here in the morning", "No water logged · log it in Garmin Connect or on the watch", "Weakest Monday · 7 491 a day · strongest Saturday · 13 117 · all days 9 774".
+- The comparison under the steps gauge is now a plain line of text instead of a pill, for example "▼ −820 (−19 %) Mon 12 Oct · 4 228".
+- More air: the gap between panels grew from 10 to 20 px vertically and is 18 px horizontally. The padding inside each card is 14 to 16 px instead of 6 px. The year tiles have more padding and their value is 22 px.
+- The version is now 1.5.0.
+
+**Fixed**
+- Nothing was fixed in this version.
+
+**Good to know**
+- Only the look changed. No numbers, panels, buttons or settings were added, moved or removed, and your data is untouched.
+- The colour scheme switcher in the footer still offers Calm · Dusk, Dark, Day, Ice, Ember, Forest and Graphite.
+
+**Quality**
+- New automatic tests check the new look by names: the version, the card, edge and shadow colours in every scheme, the card and pill rules, the lighter dimmed colour, the text classes of the drawings, the sentence notes and the steps comparison line. They run on every push to GitHub.
+
 ## 1.4.0 — 9 November 2026
 Nine new things on the board: a look at last night, last year, your weekly rhythm and plan, resting pulse, water and stress, a Mac alert, a card to share, and printing.
 
