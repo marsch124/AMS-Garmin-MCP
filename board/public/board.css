@@ -1,4 +1,4 @@
-/* AMS Garmin Board — an LCARS-inspired instrument board. Seven looks; the default is LCARS Calm on a dusk-grey background.
+/* AMS Garmin Board — an LCARS-inspired instrument board. Eight looks; the default is LCARS Calm on a dusk-grey background. 1.7.0 adds the bright Rebel console.
    1.5.0: Calm & spacious — panels on soft cards, bigger numbers, small words in normal letters (the block near the end). */
 
 :root {
@@ -663,6 +663,33 @@ svg text.t-hero { font-family: var(--font); text-transform: uppercase; letter-sp
 .peek-avg, .peek-empty { margin-top: 6px; color: var(--dim); white-space: pre-line; }
 .peek-updated { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--edge, rgba(255,255,255,.1)); color: var(--dim); }
 @media print { #peek-card { display: none !important; } }
+
+/* ---------- 1.7.0 · Rebel console (bright) ---------- */
+/* An eighth look, Martin's pick: pale cool blue-white, deep navy text, cyan-blue lines and headings, amber main numbers
+   and diamond markers, square frames with a cut top-left corner, condensed lettering, very faint scan lines. Inspiration only. */
+:root[data-scheme="rebel"] {
+  color-scheme: light;
+  --bg: #e6eef5; --ink: #f6fbff; --text: #0f2238; --dim: #5b7389; --track: #cfdde8; --grid: #bfd0de;
+  --c1: #0b86bd; --c2: #d48a0f; --c3: #2a6f97; --c4: #0b86bd; --c5: #d48a0f; --c6: #1593a8; --c7: #c4453a; --c8: #2a6f97; --ok: #2e8b57;
+  --card: #f6fafd; --edge: rgba(11, 94, 140, .38); --shadow: none;
+  --font: 'Barlow Condensed', 'Antonio', 'Arial Narrow', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --r: 0px;
+}
+[data-scheme="rebel"] .panel { position: relative; border-radius: 0; box-shadow: none; clip-path: polygon(14px 0, 100% 0, 100% 100%, 0 100%, 0 14px); }
+[data-scheme="rebel"] .panel::after { content: ""; position: absolute; left: -2px; top: 7px; width: 20px; height: 1px; background: var(--edge); transform: rotate(-45deg); pointer-events: none; }
+[data-scheme="rebel"] .panel-head .cap, [data-scheme="rebel"] .sheet-head .cap { width: 9px; height: 9px; border-radius: 0; background: var(--c2); transform: rotate(45deg); margin: 0 8px 0 6px; }
+[data-scheme="rebel"] .panel-head .label, [data-scheme="rebel"] .sheet-head .label { background: transparent; color: var(--pc); border-radius: 0; padding: 0 8px 0 0; letter-spacing: .08em; }
+[data-scheme="rebel"] .panel-head .line, [data-scheme="rebel"] .sheet-head .line { opacity: 1; height: 1px; background: var(--pc); }
+[data-scheme="rebel"] .panel-head .head-btn { border-radius: 0; }
+[data-scheme="rebel"] .elbow, [data-scheme="rebel"] .elbow::after, [data-scheme="rebel"] .elbow-bottom, [data-scheme="rebel"] .elbow-bottom::after,
+[data-scheme="rebel"] .seg.end, [data-scheme="rebel"] .seg.btn, [data-scheme="rebel"] select.seg, [data-scheme="rebel"] .chip,
+[data-scheme="rebel"] .sheet-head .sheet-x, [data-scheme="rebel"] .sheet-head .tab, [data-scheme="rebel"] .sheet-actions button,
+[data-scheme="rebel"] .sheet-box, [data-scheme="rebel"] #peek-card, [data-scheme="rebel"] .panel.alert .panel-body,
+[data-scheme="rebel"] .tile, [data-scheme="rebel"] .strip, [data-scheme="rebel"] .nudge, [data-scheme="rebel"] .act, [data-scheme="rebel"] .log-row { border-radius: 0; }
+[data-scheme="rebel"] .sheet-box { clip-path: polygon(14px 0, 100% 0, 100% 100%, 0 100%, 0 14px); box-shadow: none; }
+[data-scheme="rebel"] #peek-card { clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px); box-shadow: none; }
+[data-scheme="rebel"] body::after { content: ""; position: fixed; inset: 0; z-index: 1000; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(15, 34, 56, .05) 0 1px, transparent 1px 3px); }
+@media print { [data-scheme="rebel"] body::after { display: none; } [data-scheme="rebel"] .panel { clip-path: none; } }
 
 /* ---------- print (⌘P) ---------- */
 @media print {

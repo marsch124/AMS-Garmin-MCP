@@ -1,5 +1,26 @@
 # What's new
 
+## 1.7.0 — 9 November 2026
+A new, eighth look: "Rebel console". A bright look: pale blue-white screens with navy text, cyan-blue lines and amber numbers, like the computer screens of a rebel base in a space film.
+
+**New**
+- Before: the board had seven looks. Now: eight. The new one is called "Rebel console".
+- What it looks like: a pale cool blue-white background with near-white cards and deep navy text; every panel has square corners with the top-left corner cut off at an angle and a thin cyan-blue edge. A panel heading is a cyan-blue line with a small amber diamond in front, instead of the rounded pill. The frame bars (top bar, left blocks, footer) are square instead of rounded. Headings and big numbers are in tall, narrow capital letters. Main numbers and diamond markers are amber, lines and headings are cyan-blue. It is a light look, like Calm Day. A very faint horizontal line texture, like an old screen, lies over the page. Nothing glows.
+- How to switch: use the colour switcher in the footer and choose "Rebel console". The board remembers your choice on this Mac, the same way as for the other looks.
+
+**Changed**
+- The page now also loads the font "Barlow Condensed" (weights 500 and 700) from Google Fonts. Only this look uses it.
+- The version is now 1.7.0.
+
+**Good to know**
+- The look is only inspired by such screens. The board never shows a film, a franchise, a character name or a logo.
+- The seven other looks (Calm Dusk, Calm Dark, Calm Day, Ice, Ember, Forest, Graphite) are unchanged. Calm Dusk is still the standard.
+- The Peek card and the sheets (explanation, settings, share) follow the look, like they follow every other look.
+- No numbers, panels or buttons changed, and your data is untouched.
+
+**Quality**
+- New tests (test/board-1.7.test.js) check by name: the version and first entry here; that the rebel look defines every colour and the font; the cut corner on panels and the scan-line texture; that this look has no glow; the eighth option in the switcher and the font link; the README; and that the served page carries the option. They were written and seen failing before the feature.
+
 ## 1.6.0 — 9 November 2026
 Peek: hover over a number on the Mac, or press and hold it on the iPhone, and a small card shows that number's history and when it was updated.
 

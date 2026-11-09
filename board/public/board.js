@@ -9,7 +9,7 @@
   const WEATHER_EVERY_MS = 30 * 60 * 1000;
   const SCHEME_KEY = 'ams-garmin-board.scheme';
   const LOCATION_KEY = 'ams-garmin-board.location';
-  const SCHEMES = ['calm-dusk', 'calm-dark', 'calm-day', 'ice', 'ember', 'forest', 'graphite'];
+  const SCHEMES = ['calm-dusk', 'calm-dark', 'calm-day', 'ice', 'ember', 'forest', 'graphite', 'rebel'];
   const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
   // ---------- formatting ----------

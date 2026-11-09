@@ -39,7 +39,7 @@ The board is a live instrument panel for your Garmin data, in the style of a Sta
 Every heading is a button. A window opens with the meaning in short, and below it the full story. The "In short" text is kept to a readable width, so its lines break earlier than the full story below. Escape closes it.
 
 **Colours**
-At the bottom there is a colour switcher with seven looks: Calm Dusk (standard), Calm Dark, Calm Day, Ice, Ember, Forest and Graphite. It remembers your choice on this Mac.
+At the bottom there is a colour switcher with eight looks: Calm Dusk (standard), Calm Dark, Calm Day, Ice, Ember, Forest, Graphite and Rebel console (a bright look: pale blue-white screens with navy text, cyan-blue lines, amber numbers, square panels with a cut corner and a faint scan-line texture; inspiration only, no names or logos). It remembers your choice on this Mac.
 
 **Looking back**
 The arrows beside the month name show earlier months. The right arrow stops at the current month, and a button jumps back to it. The workouts, totals and Captain's log follow the month you picked.
@@ -141,6 +141,7 @@ Make a new key on the same Garmin page (see above) and run the save-key dialog a
 Your data goes from Garmin straight to Claude on this Mac. The code repository is public so that GitHub runs the tests for free; it contains no data and no keys, and never will.
 
 ## Version
+1.7.0 — 9 Nov 2026
 1.6.0 — 9 Nov 2026
 1.5.1 — 9 Nov 2026
 1.5.0 — 9 Nov 2026

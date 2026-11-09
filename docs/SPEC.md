@@ -1,4 +1,4 @@
-# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026; board 1.6.0)
+# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026; board 1.7.0)
 
 ## 1. Purpose
 Read-only MCP server giving Claude access to the owner's Garmin Connect data via Garmin's official Personal API (spec: `docs/garmin-personal-openapi.json`, title "Garmin Connect Personal API" 1.0.0, 26 paths, all GET). Base URL `https://personal.connectapi.garmin.com` (the spec also lists `.garmin.cn`; unused). Nothing is ever written to Garmin.
@@ -84,20 +84,20 @@ Note: `/weight-service/weight/all/{startDate}/{endDate}` has no dedicated tool; 
 - GitHub Actions runs `npm test` on every push.
 
 ## 9. Board
-"AMS Garmin Board" 1.6.0: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
+"AMS Garmin Board" 1.7.0: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
 
 ### Files
 - `board/board-data.js` — `buildBoard(client, { today, now, settings, log, travel })` returns one JSON object. Uses `GarminClient`.
 - `board/server.js` — HTTP server on Node's built-in `http`. `createBoardServer({ client, now, cacheMs, today, storeDir, fetchFn, remoteAddressOf, homeZone, notify })`. `notify({ title, text, alerts })` is called when a red alert fires for the first time that day (see Formulas); `startBoard` defaults it to a Mac notification via `osascript` (`display notification … with title … sound name "Basso"`) and rebuilds the board every 30 minutes (`watchMs`); tests pass their own `notify` and none by default. CLI: `node board/server.js --port N` (default 7788).
 - `board/fit.js` — own tiny FIT decoder: file header, definition and data messages, little and big endian, record (20) and lap (19) messages; developer fields skipped; CRC not checked.
 - `board/store.js` — atomic JSON files (temporary file, then rename). Since 1.4.0 also `BoardStore.notified()` → `{ date, keys }` and `BoardStore.saveNotified(date, keys)` for `alerts-notified.json`, and `BoardStore.saveSettings({ targets, plan, notify, accessCode })`.
-- `board/public/index.html`, `board.css`, `board.js`, `explain.js` — the page. Fonts: Google Fonts "Antonio" with a system condensed fallback; since 1.5.0 small text uses the system font (see "Typography and panel cards"). `board.css` also defines per scheme `--card`, `--edge` and `--shadow`.
+- `board/public/index.html`, `board.css`, `board.js`, `explain.js` — the page. Fonts: Google Fonts "Antonio" (and, since 1.7.0, "Barlow Condensed" 500 and 700 for the rebel look only) with a system condensed fallback; since 1.5.0 small text uses the system font (see "Typography and panel cards"). `board.css` also defines per scheme `--card`, `--edge` and `--shadow`.
 - `scripts/open-board.sh` — if `/api/health` does not answer, starts the server; waits up to 5 s; opens `http://127.0.0.1:7788/`. Log: `~/Library/Logs/AMS Garmin Board.log`.
 - `scripts/build-board-app.sh` — builds `~/Applications/AMS Garmin Bridge Board.app` with `osacompile` (bundle id `com.ams.garmin.board`, heart icon from the AMS Icon Library, ad-hoc codesign) and a Desktop alias of the same name; it removes the pre-1.2 "AMS Garmin Board" app and alias.
 - `scripts/install-agents.sh`, `scripts/report.sh` — see "Launch agents".
 
 ### Colour schemes
-Chosen with `<html data-scheme="…">`. `board.css` has one `:root[data-scheme="…"]` block per scheme; the plain `:root` block holds the default (calm-dusk). `--ok` is #66cc99 (#2e8b57 in calm-day). `color-scheme` is light for calm-day, dark for the others.
+Chosen with `<html data-scheme="…">`. `board.css` has one `:root[data-scheme="…"]` block per scheme; the plain `:root` block holds the default (calm-dusk). `--ok` is #66cc99 (#2e8b57 in calm-day). `color-scheme` is light for calm-day and rebel, dark for the others.
 
 | scheme | bg | ink | text | dim | track | grid | c1 | c2 | c3 | c4 | c5 | c6 | c7 | c8 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -110,6 +110,13 @@ Chosen with `<html data-scheme="…">`. `board.css` has one `:root[data-scheme="
 | graphite | #0b0b0c | #000000 | #f0f0f0 | #9a9a9a | #1a1a1b | #262628 | #ff7a59 | #d9d9d9 | #a6a6a6 | #8c8c8c | #d9d9d9 | #ff7a59 | #ff7a59 | #e6e6e6 |
 Since 1.5.0 each scheme also defines `--card` (panel surface), `--edge` (hairline) and `--shadow`, and `--dim` is lighter (calm-dusk #b3a899 → #cdc3b5; calm-dark #b0a496, calm-day #6b6056, ice #9aa9bd, ember #b08c58, forest #9aaaa0, graphite #9a9a9a). `--card`: calm-dusk #45414c, calm-dark #121012, calm-day #fff8f0, ice #0c1320, ember #140e07, forest #111a16, graphite #151516. `--edge`: rgba(255,255,255,.07) on the dark schemes, rgba(0,0,0,.08) on calm-day. `--shadow` is a soft drop shadow per scheme.
 
+### Rebel console (1.7.0)
+Eighth scheme, `data-scheme="rebel"`, shown as "Rebel console" in `palette-select`; remembered under `ams-garmin-board.scheme` like the others. Inspired by rebel computer screens in a space film; the app never shows a franchise, character name or logo. Mock-up: `docs/looks/star-wars-options.html`, column A.
+- Variables (`--bg`, `--card`, `--edge`, `--shadow`, `--text`, `--dim`, `--track`, `--ink`, `--c1` … `--c7`, `--font`; exact values in `board.css`, block "1.7.0 · Rebel console"): bright look, `color-scheme: light` like calm-day: pale cool blue-white background (#e6eef5) with near-white cards, deep navy text, cyan-blue lines and headings, amber main numbers and diamond markers. The scheme also sets `--r` and `--grid`. `--font` is "Barlow Condensed" with a condensed system fallback.
+- Shape rules under `[data-scheme="rebel"]`: `.panel` has square corners and a chamfered top-left corner (`clip-path`) with a thin cyan-blue edge; the panel heading is a cyan-blue line with a small amber diamond marker instead of the rounded pill; frame segments (top bar, left blocks, footer) are square; headings and big numbers use condensed uppercase lettering in `--font`; `body::after` draws a very faint horizontal scan-line texture over the page with `pointer-events: none`. No glow: no `text-shadow`, no blur or drop-shadow filter in this block.
+- The Peek card and the sheets follow the scheme through the variables. The other seven schemes are unchanged. `package.json` and the footer version are 1.7.0.
+- Tests: `test/board-1.7.test.js` (version and first CHANGELOG entry; every variable in the rebel block; `clip-path` on the panel and the `body::after` rule; no glow; eight options and the `Barlow+Condensed` fonts link; README and CHANGELOG; the served page carries `value="rebel"`).
+
 ### Typography and panel cards (1.5.0)
 - Every panel is a card: `--card` background, 1 px `--edge` border, 18 px radius, `--shadow`, padding 14–16 px; gaps 20 px vertical, 18 px horizontal. `month-nav` has no card. The panel heading is a pill (coloured cap and label) at the top left; the long coloured line is gone, the right-hand buttons and notes stay.
 - Sizes: steps gauge 40 → 50, resting-pulse dial 30 → 36, Body Battery and weight thermometer 22 → 28 (drawing units); big figures (calories, fitness age) 34 → 52 px; clock 56 → 68 px; weather temperature 40 → 52 px; side numbers (Min / Max / Month avg, month totals, small clocks) 20 → 28 px in `--text`; year-tile value 22 px.
@@ -118,7 +125,7 @@ Since 1.5.0 each scheme also defines `--card` (panel surface), `--edge` (hairlin
 - Notes are sentences (for example "No plan set · Edit to add one"); the steps comparison under the gauge is a plain text line, not a pill.
 - Explain sheet (1.5.1): `#explain-summary { max-width: 60ch; }` — the "In short" paragraph is at most 60 characters wide (about 600 px, down from about 724 px or 90 letters) so it is easier to read; `explain-more` (Learn more) is unchanged.
 
-The footer `<select id="palette-select">` has exactly these seven option values. The choice is saved in `localStorage` under `ams-garmin-board.scheme` and applied before first paint by a small inline script in `<head>`.
+The footer `<select id="palette-select">` has exactly eight option values (the seven above plus `rebel`, "Rebel console", new in 1.7.0). The choice is saved in `localStorage` under `ams-garmin-board.scheme` and applied before first paint by a small inline script in `<head>`.
 
 ### Page: panels and element ids
 Existing ids (unchanged): `board`, `clock-local`, `clock-utc`, `clock-date`, `stardate`, `steps-gauge`, `steps-value`, `body-battery-bar`, `resting-hr`, `stress-bar`, `intensity-gauge`, `floors-value`, `calories-value`, `month-steps-chart`, `month-hr-chart`, `activities-list`, `activities-total`, `sleep-panel`, `hrv-panel`, `weight-thermo`, `link-status`, `last-refresh`, `refresh-button`, `version-label`.
