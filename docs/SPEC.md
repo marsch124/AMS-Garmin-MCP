@@ -1,4 +1,4 @@
-# AMS Garmin MCP — Specification (1.0.0, 9 Nov 2026)
+# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026)
 
 ## 1. Purpose
 Read-only MCP server giving Claude access to the owner's Garmin Connect data via Garmin's official Personal API (spec: `docs/garmin-personal-openapi.json`, title "Garmin Connect Personal API" 1.0.0, 26 paths, all GET). Base URL `https://personal.connectapi.garmin.com` (the spec also lists `.garmin.cn`; unused). Nothing is ever written to Garmin.
@@ -8,6 +8,10 @@ Read-only MCP server giving Claude access to the owner's Garmin Connect data via
 - `src/server.js` — entry point; creates the server, registers tools, connects stdio.
 - `src/garmin-client.js` — key lookup, token minting/caching, HTTP requests, error mapping.
 - `src/tools.js` — tool definitions (name, zod input schema, handler, endpoint mapping, trimming, chunking).
+- `board/board-data.js` — `buildBoard(client, { today, now })`, aggregates Garmin data into one JSON object (section 9).
+- `board/server.js` — local HTTP server for the board (Node `http`, no new dependencies).
+- `board/public/index.html`, `board.css`, `board.js` — the board page.
+- `scripts/open-board.sh`, `scripts/build-board-app.sh` — launcher and app builder for "AMS Garmin Board".
 - stdout is reserved for the MCP protocol; all logs go to stderr.
 
 ## 3. Authentication
@@ -78,3 +82,70 @@ Note: `/weight-service/weight/all/{startDate}/{endDate}` has no dedicated tool; 
 - A fake `fetch` replaces the network; no real Garmin calls, no keys in tests.
 - Every tool is found by its name and exercised (arguments, endpoint, chunking, trimming, error wording, 401 re-mint once).
 - GitHub Actions runs `npm test` on every push.
+
+## 9. Board
+"AMS Garmin Board": an LCARS-inspired instrument board (black background, rounded orange/lavender/blue bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only; nothing is stored.
+
+### Files
+- `board/board-data.js` — `buildBoard(client, { today, now })` returns one JSON object. Uses the existing `GarminClient`.
+- `board/server.js` — HTTP server on Node's built-in `http` module, no new dependencies. Binds `127.0.0.1` only, default port 7788; CLI: `node board/server.js --port N`.
+- `board/public/index.html`, `board.css`, `board.js` — the page. Fonts from Google Fonts "Antonio" with a system condensed fallback.
+- `scripts/open-board.sh` — if `/api/health` does not answer, starts the server; waits up to 5 s; then `open http://127.0.0.1:7788/`. Logs to `~/Library/Logs/AMS Garmin Board.log`.
+- `scripts/build-board-app.sh` — builds `~/Applications/AMS Garmin Board.app` with `osacompile`: bundle id `com.ams.garmin.board`, `LSUIElement` true, icon = the "heart" app-icon tile from the AMS Icon Library converted to `applet.icns`, `Assets.car` removed and `CFBundleIconName` deleted so the custom icon shows, `xattr -cr`, then ad-hoc `codesign`. Then a Finder alias on the Desktop named "AMS Garmin Board". Raycast finds the app by name.
+
+### Routes
+- `GET /` — `index.html`.
+- `GET /api/board` — JSON; cached 5 minutes; `?refresh=1` bypasses the cache.
+- `GET /api/health` — `{ ok: true, version }`.
+- Other static files from `board/public`; unknown paths: 404.
+- Errors from Garmin for the core data: HTTP 503 `{ ok: false, error: "plain words" }`. Errors for a side panel (sleep, HRV, weight, activities) do not fail the board: that part is reported as not recorded / empty and the error text is added to `warnings`.
+
+### Garmin calls per board build
+- `/usersummary-service/v2/dailysummaries` — startDate = the earlier of the 1st of the month and the Monday of the current week; endDate = today.
+- `/activitylist-service/activities/search/activities` — 1st of month to today, limit 99.
+- `/sleep-service/sleep/dailySleep` — date = today.
+- `/hrv-service/hrv/{today}`.
+- `/weight-service/weight/range/{today-60 days}/{today}`.
+- `tokenInfo()` for the expiry.
+
+### JSON shape
+```
+{ ok, version, generatedAt, date (today, YYYY-MM-DD), monthStart, weekStart,
+  link: { ok, tokenExpiresAt },
+  today: { date, steps, stepGoal, distanceM, floorsUp, floorsGoal,
+           caloriesTotal, caloriesActive, caloriesResting,
+           restingHr, minHr, maxHr, stressAvg, stressMax,
+           bodyBattery: { latest, min, max, charged, drained },
+           intensityModerate, intensityVigorous, intensityWeeklyGoal,
+           respirationAvg },
+  month: { days: [ same per-day fields ],
+           steps, avgSteps, stepGoalDays, daysWithData, distanceM,
+           floorsUp, intensityMinutes,
+           restingHrAvg, restingHrMin, restingHrMax },   // finished days only, today excluded
+  week: { start, intensityMinutes, goal },
+  activities: { count, seconds, distanceM, calories, elevationGain,
+                byType: { <type>: { count, seconds, distanceM } },
+                list: [ { id, name, type, start, seconds, distanceM, calories,
+                          avgHr, maxHr, elevationGain, trainingEffect,
+                          aerobic, anaerobic, load } ] },
+  sleep: { recorded: false } | { recorded: true, seconds, score, deepSeconds,
+           lightSeconds, remSeconds, awakeSeconds, start, end },
+  hrv:   { recorded: false } | { recorded: true, lastNight, weeklyAvg, status,
+           baselineLow, baselineHigh },
+  weight: null | { kg, date, deltaKg },
+  warnings: [string] }
+```
+- Intensity minutes = moderate + 2 x vigorous.
+- Stress -1 from Garmin means unknown and becomes null.
+- Weight comes from Garmin in grams and is shown in kg with one decimal.
+
+### Page
+- Clocks tick every second; data refreshes every 10 minutes and on the REFRESH button (`?refresh=1`).
+- No sleep: "NO SLEEP DATA — WEAR THE WATCH AT NIGHT"; no HRV: "NO HRV DATA". Dark by design in day and night.
+- Element ids (tests find things by them): `board`, `clock-local`, `clock-utc`, `clock-date`, `stardate` (year.dayOfYear, e.g. 2026.313), `steps-gauge`, `steps-value`, `body-battery-bar`, `resting-hr`, `stress-bar`, `intensity-gauge`, `floors-value`, `calories-value`, `month-steps-chart`, `month-hr-chart`, `activities-list`, `activities-total`, `sleep-panel`, `hrv-panel`, `weight-thermo`, `link-status`, `last-refresh`, `refresh-button`.
+
+### Tests
+`test/board.test.js` (`node --test`, fake Garmin client) covers the aggregation, the routes, caching, the 503 path and that the page carries every id above. They run with the others on every push via GitHub Actions.
+
+### Privacy
+The server listens on `127.0.0.1` only. Nothing is written to disk except the log line when the server starts. The repository holds no data.

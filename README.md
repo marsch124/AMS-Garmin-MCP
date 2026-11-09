@@ -3,6 +3,27 @@
 ## What this is
 AMS Garmin lets Claude read your own Garmin Connect workouts and health data, using Garmin's official Personal API. You ask in plain words ("how did I sleep last night?") and Claude fetches the answer from Garmin. It only reads. Nothing is ever written to Garmin.
 
+## The board
+The board is a live instrument panel for your Garmin data, in the style of a Star Trek control screen: black background, rounded orange, lavender and blue bars, tall capital letters. It opens in your normal browser.
+
+**How to open it**
+- Double-click **AMS Garmin Board** on your Desktop, or type its name in Raycast.
+- The first time after a restart it can take a few seconds to appear, because it has to wake up first.
+
+**What it shows**
+- Clocks: local time with seconds, world time (UTC), the date, the week number, and a playful "stardate".
+- Today: steps against your goal, distance, floors, calories, resting, lowest and highest heart rate, stress, Body Battery, and this week's intensity minutes against your weekly goal.
+- This month: a bar for every day's steps with your goal marked, a line for resting heart rate, and the month's totals.
+- Workouts this month: how many, total time, distance, calories and climbing, plus the list, newest first.
+- Sleep and HRV from last night. If your watch has no sleep data, the board says so clearly: wear the watch at night.
+- Weight: your last weigh-in and the change since before.
+- Link status: green when Garmin answers, red with the reason when it does not, plus when your key runs out and when the board last refreshed.
+
+**Good to know**
+- It refreshes itself every 10 minutes, and there is a REFRESH button for right now.
+- It only works on this Mac. Nobody else can open it, and it stores nothing.
+- It is dark on purpose, day and night.
+
 ## How to get your Garmin key
 1. On the Garmin Connect website, log in and go to https://connect.garmin.com/app/settings/personalApiToken
 2. Press **Create Key**.
@@ -55,4 +76,4 @@ Make a new key on the same Garmin page (see above) and run the save-key dialog a
 Your data goes from Garmin straight to Claude on this Mac. The code repository is public so that GitHub runs the tests for free; it contains no data and no keys, and never will.
 
 ## Version
-1.0.0 — 9 Nov 2026
+1.1.0 — 9 Nov 2026

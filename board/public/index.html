@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>AMS Garmin Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="board.css">
+</head>
+<body>
+<div id="board" class="lcars">
+
+  <header class="frame-top">
+    <div class="elbow c1"></div>
+    <div class="bar-top">
+      <span class="seg title c1">AMS GARMIN · BRIDGE</span>
+      <span class="seg c3 w2"></span>
+      <span class="seg c4 w6"></span>
+      <span class="seg c6 w1"></span>
+      <span class="seg c2 w3"></span>
+      <span class="seg c5 w1"></span>
+      <span class="seg c3 w4"></span>
+      <span class="seg c1 w2"></span>
+      <span class="seg c4 w1"></span>
+      <span class="seg end c2"><span id="version-label">BOARD</span></span>
+    </div>
+  </header>
+
+  <aside class="frame-left">
+    <div class="block c1 h2">BIO</div>
+    <div class="block c3 h1">MOTION</div>
+    <div class="block c4 h3">CARDIO</div>
+    <div class="block c6 h1">REST</div>
+    <div class="block c2 h2">OPS</div>
+    <div class="block c5 h1">LOG</div>
+    <div class="block c3 hfill">DECK 1</div>
+  </aside>
+
+  <main class="panels">
+
+    <section class="panel p-c6 s3" id="chrono-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">CHRONOMETER</span><span class="line"></span></div>
+      <div class="panel-body chrono">
+        <div class="clock-main">
+          <div class="clock-time" id="clock-local">--:--:--</div>
+          <div class="clock-sub" id="clock-local-zone">LOCAL</div>
+        </div>
+        <div class="clock-row">
+          <div class="clock-small"><span class="k">SWEDEN</span><span class="v" id="clock-home">--:--</span></div>
+          <div class="clock-small"><span class="k">UTC</span><span class="v" id="clock-utc">--:--</span></div>
+          <div class="clock-small"><span class="k">STARDATE</span><span class="v" id="stardate">----.---</span></div>
+          <div class="clock-small"><span class="k" id="week-number">WEEK --</span><span class="v" id="day-number">DAY ---</span></div>
+        </div>
+        <div class="clock-date" id="clock-date">—</div>
+      </div>
+    </section>
+
+    <section class="panel p-c2 s3" id="steps-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">STEPS · TODAY</span><span class="line"></span></div>
+      <div class="panel-body">
+        <div class="gauge" id="steps-gauge"></div>
+        <div class="kv-row">
+          <div class="kv"><span class="k">STEPS</span><span class="v" id="steps-value">—</span></div>
+          <div class="kv"><span class="k">GOAL</span><span class="v" id="steps-goal">—</span></div>
+          <div class="kv"><span class="k">DISTANCE</span><span class="v" id="distance-value">—</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel p-c5 s2" id="body-battery-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">BODY BATTERY</span><span class="line"></span></div>
+      <div class="panel-body">
+        <div class="thermo" id="body-battery-bar"></div>
+        <div class="kv-row">
+          <div class="kv"><span class="k">CHARGED</span><span class="v" id="bb-charged">—</span></div>
+          <div class="kv"><span class="k">DRAINED</span><span class="v" id="bb-drained">—</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel p-c7 s4" id="heart-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">CARDIO · TODAY</span><span class="line"></span></div>
+      <div class="panel-body heart">
+        <div class="dial" id="resting-hr"></div>
+        <div class="heart-side">
+          <div class="kv-row">
+            <div class="kv"><span class="k">MIN</span><span class="v" id="hr-min">—</span></div>
+            <div class="kv"><span class="k">MAX</span><span class="v" id="hr-max">—</span></div>
+            <div class="kv"><span class="k">MONTH AVG</span><span class="v" id="hr-month-avg">—</span></div>
+          </div>
+          <div class="sub-label">STRESS</div>
+          <div class="hbar" id="stress-bar"></div>
+          <div class="kv-row">
+            <div class="kv"><span class="k">AVG</span><span class="v" id="stress-avg">—</span></div>
+            <div class="kv"><span class="k">MAX</span><span class="v" id="stress-max">—</span></div>
+            <div class="kv"><span class="k">BREATHS</span><span class="v" id="respiration-value">—</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel p-c1 s3" id="intensity-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">INTENSITY · WEEK</span><span class="line"></span></div>
+      <div class="panel-body">
+        <div class="gauge" id="intensity-gauge"></div>
+        <div class="kv-row">
+          <div class="kv"><span class="k">THIS WEEK</span><span class="v" id="intensity-week">—</span></div>
+          <div class="kv"><span class="k">WEEKLY GOAL</span><span class="v" id="intensity-goal">—</span></div>
+          <div class="kv"><span class="k">THIS MONTH</span><span class="v" id="intensity-month">—</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel p-c3 s2" id="energy-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">ENERGY · TODAY</span><span class="line"></span></div>
+      <div class="panel-body">
+        <div class="big-row">
+          <div class="big"><span class="v" id="calories-value">—</span><span class="k">KCAL TOTAL</span></div>
+          <div class="big"><span class="v" id="calories-active">—</span><span class="k">KCAL ACTIVE</span></div>
+        </div>
+        <div class="big-row">
+          <div class="big"><span class="v" id="floors-value">—</span><span class="k">FLOORS UP</span></div>
+          <div class="big"><span class="v" id="floors-goal">—</span><span class="k">FLOOR GOAL</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel p-c4 s3" id="sleep-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">SLEEP · LAST NIGHT</span><span class="line"></span></div>
+      <div class="panel-body" id="sleep-body"><div class="nodata">—</div></div>
+    </section>
+
+    <section class="panel p-c5 s2" id="hrv-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">HRV · NIGHT</span><span class="line"></span></div>
+      <div class="panel-body" id="hrv-body"><div class="nodata">—</div></div>
+    </section>
+
+    <section class="panel p-c6 s2" id="weight-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">MASS</span><span class="line"></span></div>
+      <div class="panel-body">
+        <div class="thermo" id="weight-thermo"></div>
+        <div class="kv-row">
+          <div class="kv"><span class="k">WEIGHED</span><span class="v" id="weight-date">—</span></div>
+          <div class="kv"><span class="k">CHANGE</span><span class="v" id="weight-delta">—</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel p-c2 s7" id="month-steps-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">STEPS · THIS MONTH</span><span class="line"></span><span class="head-note" id="month-steps-note"></span></div>
+      <div class="panel-body"><div class="chart" id="month-steps-chart"></div></div>
+    </section>
+
+    <section class="panel p-c7 s5" id="month-hr-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">RESTING PULSE · THIS MONTH</span><span class="line"></span><span class="head-note" id="month-hr-note"></span></div>
+      <div class="panel-body"><div class="chart" id="month-hr-chart"></div></div>
+    </section>
+
+    <section class="panel p-c1 s8" id="activities-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">MISSION LOG · WORKOUTS THIS MONTH</span><span class="line"></span></div>
+      <div class="panel-body">
+        <div class="totals-line" id="activities-total">—</div>
+        <div class="act-list" id="activities-list"></div>
+      </div>
+    </section>
+
+    <section class="panel p-c3 s4" id="month-totals-panel">
+      <div class="panel-head"><span class="cap"></span><span class="label">MONTH TOTALS</span><span class="line"></span></div>
+      <div class="panel-body">
+        <div class="tot-list" id="month-totals"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="frame-bottom">
+    <div class="elbow-bottom c2"></div>
+    <div class="bar-bottom">
+      <span class="seg status c2" id="link-status"><span class="lamp"></span><span class="status-text">GARMIN LINK · STANDBY</span></span>
+      <span class="seg info c4"><span class="k">SYNC</span><span id="last-refresh">—</span></span>
+      <span class="seg info c3"><span class="k">TOKEN</span><span id="token-expiry">—</span></span>
+      <span class="seg c5 w1"></span>
+      <button type="button" class="seg btn c1" id="refresh-button">REFRESH</button>
+      <span class="seg end c6"></span>
+    </div>
+  </footer>
+
+</div>
+<script src="board.js"></script>
+</body>
+</html>
