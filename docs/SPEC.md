@@ -22,7 +22,7 @@ Read-only MCP server giving Claude access to the owner's Garmin Connect data via
 2. Key file `~/Library/Application Support/AMS Garmin MCP/api-key` (mode readable only by the user).
 
 ### File locations
-Directory `~/Library/Application Support/AMS Garmin MCP/`: `api-key`, `token.json`. A Mac dialog saves the key to `api-key`. The key never enters chat, logs or the repository.
+Directory `~/Library/Application Support/AMS Garmin MCP/`: `api-key`, `token.json`. A Mac dialog saves the key to `api-key`. The key never enters chat, logs or the (public) repository.
 
 ## 4. Errors (plain words)
 - Missing key: says no key is saved and how to create and save one.

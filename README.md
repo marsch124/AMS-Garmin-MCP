@@ -52,7 +52,7 @@ Pull-only and read-only: nothing is ever written to Garmin.
 Make a new key on the same Garmin page (see above) and run the save-key dialog again.
 
 ## Privacy
-Your data goes from Garmin straight to Claude on this Mac. The repository is private and contains no data and no keys.
+Your data goes from Garmin straight to Claude on this Mac. The code repository is public so that GitHub runs the tests for free; it contains no data and no keys, and never will.
 
 ## Version
 1.0.0 — 9 Nov 2026
