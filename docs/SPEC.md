@@ -11,7 +11,7 @@ Read-only MCP server giving Claude access to the owner's Garmin Connect data via
 - stdout is reserved for the MCP protocol; all logs go to stderr.
 
 ## 3. Authentication
-1. `POST https://personal.connectapi.garmin.com/personalapitoken-service/personal-api/personal-api-key/token` with header `Authorization: ApiKey <key>`.
+1. `POST https://personal.connectapi.garmin.com/personalapitoken-service/personal-api/personal-api-key/token` with header `Authorization: ApiKey <key>` and NO Accept header (Garmin answers HTTP 406 when asked for JSON). The answer is the bare access token as plain text (a JWT); the server reads its expiry from the JWT `exp` claim, falling back to 24 h.
 2. Response: access token valid 24 h or until the key expires. No refresh tokens.
 3. Data requests send the access token as bearer token.
 4. Cache: `token.json` next to the key file, used until 5 minutes before expiry (safety margin).

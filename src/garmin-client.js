@@ -71,17 +71,33 @@ export class FileTokenStore {
 }
 
 function pickToken(body) {
+  // Garmin answers the token request with the bare token as plain text (a JWT).
+  if (typeof body === 'string') return body.trim() || null;
   if (!body || typeof body !== 'object') return null;
   return body.access_token || body.accessToken || body.token || null;
 }
 
-function pickLifetimeMs(body) {
+/** Reads the expiry ("exp", seconds since 1970) out of a JWT, if the token is one. */
+export function jwtExpiryMs(token) {
+  try {
+    const parts = String(token).split('.');
+    if (parts.length < 2) return null;
+    const payload = JSON.parse(Buffer.from(parts[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8'));
+    return typeof payload.exp === 'number' ? payload.exp * 1000 : null;
+  } catch {
+    return null;
+  }
+}
+
+function pickLifetimeMs(body, token, nowMs) {
   const seconds = body?.expires_in ?? body?.expiresIn ?? body?.expires_in_seconds;
   if (typeof seconds === 'number' && seconds > 0) return seconds * 1000;
   if (typeof body?.expiresAt === 'string') {
     const t = Date.parse(body.expiresAt);
-    if (!Number.isNaN(t)) return Math.max(0, t - Date.now());
+    if (!Number.isNaN(t)) return Math.max(0, t - nowMs);
   }
+  const exp = jwtExpiryMs(token);
+  if (exp && exp > nowMs) return exp - nowMs;
   return DEFAULT_TOKEN_LIFETIME_MS;
 }
 
@@ -132,7 +148,8 @@ export class GarminClient {
   async #mintToken() {
     const response = await this.fetch(this.baseUrl + TOKEN_PATH, {
       method: 'POST',
-      headers: { Authorization: `ApiKey ${this.apiKey}`, Accept: 'application/json' },
+      // No Accept header on purpose: Garmin answers 406 when asked for JSON here.
+      headers: { Authorization: `ApiKey ${this.apiKey}` },
     });
     const body = await readBody(response);
     if (!response.ok) {
@@ -143,7 +160,7 @@ export class GarminClient {
     }
     const token = pickToken(body);
     if (!token) throw new GarminError('Garmin answered without an access token.', { code: 'TOKEN', status: response.status, body });
-    const value = { token, expiresAt: this.now() + pickLifetimeMs(body) };
+    const value = { token, expiresAt: this.now() + pickLifetimeMs(body, token, this.now()) };
     await this.tokenStore.save(value);
     return token;
   }

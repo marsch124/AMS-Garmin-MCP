@@ -173,3 +173,32 @@ test('tokenInfo returns the stored token', async () => {
   await client.getToken();
   assert.equal((await client.tokenInfo()).token, 'T');
 });
+
+// --- Garmin really answers the token request with plain text (found 9 Nov 2026) ---
+import { jwtExpiryMs } from '../src/garmin-client.js';
+
+function fakeJwt(expSeconds) {
+  const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
+  return `${b64({ alg: 'none' })}.${b64({ exp: expSeconds, sub: 'me' })}.sig`;
+}
+
+test('token endpoint: plain-text JWT body is accepted, no Accept header is sent, expiry read from the JWT', async () => {
+  const now = Date.UTC(2026, 10, 9, 8, 0, 0);
+  const jwt = fakeJwt(Math.floor(now / 1000) + 3600); // expires in one hour
+  const calls = [];
+  const fetch = async (url, init) => {
+    calls.push({ url, init });
+    return { ok: true, status: 200, headers: new Headers({ 'content-type': 'text/plain' }), text: async () => jwt + '\n' };
+  };
+  const client = new GarminClient({ apiKey: 'k', fetch, now: () => now });
+  const token = await client.getToken();
+  assert.equal(token, jwt);
+  assert.equal(calls[0].init.headers.Accept, undefined, 'the token request must not ask for JSON');
+  const info = await client.tokenInfo();
+  assert.equal(info.expiresAt, now + 3600 * 1000);
+});
+
+test('jwtExpiryMs reads exp and tolerates non-JWT tokens', () => {
+  assert.equal(jwtExpiryMs(fakeJwt(1_800_000_000)), 1_800_000_000 * 1000);
+  assert.equal(jwtExpiryMs('not-a-jwt'), null);
+});
