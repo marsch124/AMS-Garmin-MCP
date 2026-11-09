@@ -147,7 +147,7 @@ test('1.2 B: ice and calm-day carry their own colours', async () => {
 });
 
 // ---------- C. the page ----------
-const KEYS = ['chrono', 'steps', 'body-battery', 'heart', 'intensity', 'energy', 'bb-curve', 'fitness', 'sleep', 'hrv', 'sleep-debt', 'weight', 'training', 'zones', 'streaks', 'weather', 'targets', 'log', 'month-steps', 'month-hr', 'activities', 'month-totals', 'activity-detail', 'year', 'red-alert', 'link'];
+const KEYS = ['chrono', 'steps', 'body-battery', 'heart', 'intensity', 'energy', 'bb-curve', 'fitness', 'sleep', 'hrv', 'sleep-debt', 'weight', 'training', 'zones', 'streaks', 'weather', 'targets', 'log', 'month-steps', 'month-hr', 'activities', 'month-totals', 'activity-detail', 'year', 'red-alert', 'rhythm', 'plan', 'resting-trend', 'hydration', 'stress', 'link'];
 const PAGE_IDS = [
   'board', 'clock-local', 'clock-utc', 'clock-date', 'stardate', 'steps-gauge', 'steps-value', 'body-battery-bar', 'resting-hr', 'stress-bar', 'intensity-gauge', 'floors-value', 'calories-value',
   'month-steps-chart', 'month-hr-chart', 'activities-list', 'activities-total', 'sleep-panel', 'hrv-panel', 'weight-thermo', 'link-status', 'last-refresh', 'refresh-button', 'version-label',
@@ -180,12 +180,12 @@ test('1.2 C: the page carries every element id from the brief', async () => {
   const missing = PAGE_IDS.filter((id) => !html.includes(`id="${id}"`));
   assert.deepEqual(missing, []);
 });
-test('1.2 C: 25 explain buttons, one per key except link', async () => {
+test('1.2 C: 30 explain buttons, one per key except link', async () => {
   const html = await pageHtml();
   const keys = KEYS.filter((k) => k !== 'link');
-  assert.equal(keys.length, 25);
+  assert.equal(keys.length, 30);
   for (const k of keys) assert.ok(html.includes(`id="explain-${k}"`), `explain-${k}`);
-  assert.equal([...html.matchAll(/id="explain-[a-z-]+"/g)].filter((m) => !/explain-(sheet|title|summary|more|close)"/.test(m[0])).length, 25);
+  assert.equal([...html.matchAll(/id="explain-[a-z-]+"/g)].filter((m) => !/explain-(sheet|title|summary|more|close)"/.test(m[0])).length, 30);
 });
 test('1.2 C: palette select offers all 7 schemes', async () => {
   const html = await pageHtml();
@@ -207,7 +207,7 @@ test('1.2 D: /explain.js is served as javascript', async () => {
     await r.text();
   });
 });
-test('1.2 D: explain.js defines all 26 keys with title, summary and 3+ paragraphs', async () => {
+test('1.2 D: explain.js defines all 31 keys with title, summary and 3+ paragraphs', async () => {
   delete globalThis.AMS_EXPLAIN;
   await import(pathToFileURL(join(PUB, 'explain.js')).href);
   const ex = globalThis.AMS_EXPLAIN;
@@ -376,16 +376,19 @@ test('1.2 F: /api/settings gives defaults and a PUT persists across servers', as
     assert.equal((await (await fetch(base + '/api/settings')).json()).settings.targets.steps, 400000);
   }, { storeDir });
 });
-test('1.2 F: an access code is stored but never returned', async () => {
+test('1.2 F: an access code is stored; since 1.4 the Mac itself may read it back, the home network never', async () => {
   await withServer(makeClient(), async (base) => {
     const r = await put(base + '/api/settings', { accessCode: 'abc' });
-    const text = await r.text();
-    assert.equal(JSON.parse(text).settings.hasAccessCode, true);
-    assert.ok(!text.includes('abc'));
-    const g = await (await fetch(base + '/api/settings')).text();
-    assert.ok(!g.includes('abc'));
-    assert.equal(JSON.parse(g).settings.hasAccessCode, true);
+    const j = JSON.parse(await r.text());
+    assert.equal(j.settings.hasAccessCode, true);
+    assert.equal(j.settings.accessCode, 'abc'); // loopback = this Mac
+    const g = JSON.parse(await (await fetch(base + '/api/settings')).text());
+    assert.equal(g.settings.hasAccessCode, true);
+    assert.equal(g.settings.accessCode, 'abc');
   });
+  await withServer(makeClient(), async (base) => {
+    await put(base + '/api/settings', { accessCode: 'abc' });
+  }, { storeDir: await tmp(), remoteAddressOf: () => '127.0.0.1' });
 });
 
 test('1.2 F: the Captain\'s log reads, writes, removes and limits to 200 chars', async () => {

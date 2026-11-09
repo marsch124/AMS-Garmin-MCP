@@ -1,4 +1,4 @@
-# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026; board 1.3.0)
+# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026; board 1.4.0)
 
 ## 1. Purpose
 Read-only MCP server giving Claude access to the owner's Garmin Connect data via Garmin's official Personal API (spec: `docs/garmin-personal-openapi.json`, title "Garmin Connect Personal API" 1.0.0, 26 paths, all GET). Base URL `https://personal.connectapi.garmin.com` (the spec also lists `.garmin.cn`; unused). Nothing is ever written to Garmin.
@@ -84,13 +84,13 @@ Note: `/weight-service/weight/all/{startDate}/{endDate}` has no dedicated tool; 
 - GitHub Actions runs `npm test` on every push.
 
 ## 9. Board
-"AMS Garmin Board" 1.3.0: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
+"AMS Garmin Board" 1.4.0: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
 
 ### Files
 - `board/board-data.js` — `buildBoard(client, { today, now, settings, log, travel })` returns one JSON object. Uses `GarminClient`.
-- `board/server.js` — HTTP server on Node's built-in `http`. `createBoardServer({ client, now, cacheMs, today, storeDir, fetchFn, remoteAddressOf, homeZone })`. CLI: `node board/server.js --port N` (default 7788).
+- `board/server.js` — HTTP server on Node's built-in `http`. `createBoardServer({ client, now, cacheMs, today, storeDir, fetchFn, remoteAddressOf, homeZone, notify })`. `notify({ title, text, alerts })` is called when a red alert fires for the first time that day (see Formulas); `startBoard` defaults it to a Mac notification via `osascript` (`display notification … with title … sound name "Basso"`) and rebuilds the board every 30 minutes (`watchMs`); tests pass their own `notify` and none by default. CLI: `node board/server.js --port N` (default 7788).
 - `board/fit.js` — own tiny FIT decoder: file header, definition and data messages, little and big endian, record (20) and lap (19) messages; developer fields skipped; CRC not checked.
-- `board/store.js` — atomic JSON files (temporary file, then rename).
+- `board/store.js` — atomic JSON files (temporary file, then rename). Since 1.4.0 also `BoardStore.notified()` → `{ date, keys }` and `BoardStore.saveNotified(date, keys)` for `alerts-notified.json`, and `BoardStore.saveSettings({ targets, plan, notify, accessCode })`.
 - `board/public/index.html`, `board.css`, `board.js`, `explain.js` — the page. Fonts: Google Fonts "Antonio" with a system condensed fallback.
 - `scripts/open-board.sh` — if `/api/health` does not answer, starts the server; waits up to 5 s; opens `http://127.0.0.1:7788/`. Log: `~/Library/Logs/AMS Garmin Board.log`.
 - `scripts/build-board-app.sh` — builds `~/Applications/AMS Garmin Bridge Board.app` with `osacompile` (bundle id `com.ams.garmin.board`, heart icon from the AMS Icon Library, ad-hoc codesign) and a Desktop alias of the same name; it removes the pre-1.2 "AMS Garmin Board" app and alias.
@@ -114,7 +114,7 @@ The footer `<select id="palette-select">` has exactly these seven option values.
 ### Page: panels and element ids
 Existing ids (unchanged): `board`, `clock-local`, `clock-utc`, `clock-date`, `stardate`, `steps-gauge`, `steps-value`, `body-battery-bar`, `resting-hr`, `stress-bar`, `intensity-gauge`, `floors-value`, `calories-value`, `month-steps-chart`, `month-hr-chart`, `activities-list`, `activities-total`, `sleep-panel`, `hrv-panel`, `weight-thermo`, `link-status`, `last-refresh`, `refresh-button`, `version-label`.
 
-Every panel heading is a `<button type="button" class="label" id="explain-<key>">`. The 26 keys: chrono, steps, body-battery, heart, intensity, energy, bb-curve, fitness, sleep, hrv, sleep-debt, weight, training, zones, streaks, weather, targets, log, month-steps, month-hr, activities, month-totals, activity-detail, year, red-alert, link. The key `link` has no button on the page (the footer status gets none); it is used by the help texts only, so the page carries 25 `explain-*` buttons.
+Every panel heading is a `<button type="button" class="label" id="explain-<key>">`. The 31 keys: chrono, steps, body-battery, heart, intensity, energy, bb-curve, fitness, sleep, hrv, sleep-debt, weight, training, zones, streaks, weather, targets, log, month-steps, month-hr, activities, month-totals, activity-detail, year, red-alert, link, rhythm, plan, resting-trend, hydration, stress. The key `link` has no button on the page (the footer status gets none); it is used by the help texts only, so the page carries 30 `explain-*` buttons.
 
 Panels in order inside `<main class="panels">` (12-column grid, sN = span N):
 1. `red-alert` (s12, `hidden` unless alerts): `red-alert-text`.
@@ -123,7 +123,7 @@ Panels in order inside `<main class="panels">` (12-column grid, sN = span N):
 6. `intensity-panel` (s3). 7. `energy-panel` (s2).
 8. `bb-curve-panel` (s4): `bb-curve-chart` (today's line; sleep and workout spans shaded).
 9. `fitness-panel` (s3): `vo2max-value`, `vo2max-trend`, `fitness-age-value`, `fitness-age-trend`, `chrono-age-value`.
-10. `sleep-panel` (s3). 11. `hrv-panel` (s2).
+10. `sleep-panel` (s3): new in 1.4.0 `sleep-strip` (`<div class="strip" id="sleep-strip" hidden>`, inside the panel above the body; text `LAST NIGHT · BED 23:10 · UP 06:45 · GOOD`, or with `sleep.firstNight` `FIRST NIGHT WITH THE WATCH · WELL DONE · BED 23:10 · UP 06:45`; hidden when no sleep is recorded, the NO SLEEP DATA text stays). 11. `hrv-panel` (s2).
 12. `sleep-debt-panel` (s3): `sleep-debt-value`, `sleep-debt-chart`, `sleep-debt-note`. With `missingRecent` = 3 the note reads "WEAR THE WATCH TONIGHT · 3 EMPTY NIGHTS" and `sleep-nudge` (a small note inside `sleep-panel`) is shown.
 13. `weight-panel` (s4): `weight-thermo`, `weight-trend-chart` (90 days, dots, 7-day average line, goal line), `weight-date`, `weight-delta`, `weight-goal`.
 14. `training-panel` (s3): `training-load-bar`, `training-acute`, `training-chronic`, `training-ratio`, `training-status`.
@@ -132,29 +132,36 @@ Panels in order inside `<main class="panels">` (12-column grid, sN = span N):
 17. `weather-panel` (s3): `weather-place`, `weather-temp`, `weather-text`, `weather-wind`, `weather-rain`, `weather-hours`, `weather-locate-button`.
 18. `targets-panel` (s4): `targets-list` with `target-bar-steps`, `target-bar-workouts`, `target-bar-swims`, `target-bar-runs`, `target-bar-training-minutes`, `target-bar-distance-km`; `targets-edit-button`.
 19. `log-panel` (s8, CAPTAIN'S LOG): `log-today-input` (one line, max 200 characters), `log-save-button`, `log-list` (this month's lines, newest first, each `log-line-YYYY-MM-DD`).
+19a. (new in 1.4.0, between `log-panel` and `month-nav`, in this order) `plan-panel` (s4, THIS WEEK'S PLAN): heading button `explain-plan`, head button `plan-edit-button` (EDIT, opens Settings), `plan-list` with one row per plan item `<div class="plan-row" id="plan-row-<key>">` (key = runs, strength, swims, rides, hikes, walks, yoga; label, ticks `<span class="ticks">` with ● done and ○ open, and `done / target`), `plan-note` (`3 OF 5 DONE · 4 DAYS LEFT`; `ALL DONE · 2 DAYS LEFT` when complete; `NO PLAN SET · EDIT TO ADD ONE` when the target is 0).
+19b. `rhythm-panel` (s4, `WEEKLY RHYTHM · 12 WEEKS`): `explain-rhythm`, `rhythm-chart` (`<div class="chart">`, 7 bars MON to SUN; weakest in the alert colour, strongest in the ok colour; the overall average dashed), `rhythm-note` (`WEAKEST SUNDAY · 6 100 A DAY · STRONGEST SATURDAY · 12 400`; `NO DAYS WITH DATA YET` when empty).
+19c. `resting-trend-panel` (s4, `RESTING PULSE · 90 DAYS`): `explain-resting-trend`, `resting-trend-chart` (dots per day, 7-day line, 90-day average dashed, month ticks like the weight chart), `resting-trend-note` (`AVG 51 · 46–58 · LATEST 48 ON 8 NOV`; `NO PULSE DATA YET` when empty).
+19d. `stress-panel` (s8, `STRESS · TODAY AND 4 WEEKS`): `explain-stress`, `stress-word` (`<span class="chip">`, the qualifier, `—` when null), `stress-stack` (`<div class="stack">`, rest / low / medium / high as a stacked bar with a legend in hours), `stress-days-chart` (28 bars of the daily average, the 28-day average dashed; bands 0–25 rest, 25–50 low, 50–75 medium, 75–100 high), `stress-note` (`TODAY 23 · 4-WEEK AVG 27`). The stress bar `stress-bar` in the heart panel is unchanged.
+19e. `hydration-panel` (s4, `WATER · TODAY`): `explain-hydration`, `hydration-gauge` (`<div class="gauge">`, arc of ml against goal; big number in litres with one decimal and a decimal comma, e.g. `1,2`, unit `LITRES`), `hydration-days` (7 small bars), `hydration-note` (`NO WATER LOGGED · LOG IT IN GARMIN CONNECT OR ON THE WATCH` when `logged` is false, else `GOAL 2,5 L · 7-DAY AVG 1,8 L`).
 20. `month-nav` (s12): `month-prev`, `month-label` (e.g. "NOVEMBER 2026 · SO FAR"), `month-next` (disabled on the current month), `month-today` (hidden on the current month).
 21. `month-steps-panel` (s7). 22. `month-hr-panel` (s5). 23. `activities-panel` (s8). 24. `month-totals-panel` (s4): delta cells `delta-steps`, `delta-distance`, `delta-floors`, `delta-intensity`, `delta-resting-hr`, `delta-workouts`, `delta-training-time` (arrow ▲ or ▼ with percent or difference against the previous month to the same day).
 25. `activity-detail-panel` (s12, hidden until a workout row is pressed): `detail-title`, `detail-summary`, `detail-splits`, `detail-hr-chart`, `detail-map`, `detail-close`. Workout rows: `class="act"`, `id="act-<activityId>"`, `data-id`.
-26. `year-panel` (s12): `year-tiles` with `year-tile-01` … `year-tile-12` (steps, workouts, resting pulse, goal days; future months dimmed).
+26. `year-panel` (s12): `year-tiles` with `year-tile-01` … `year-tile-12` (steps, workouts, resting pulse, goal days; future months dimmed). New in 1.4.0: under the tiles `last-year-line` (`<div class="sub-label">`; `SAME TIME LAST YEAR · NOVEMBER 2025 TO DAY 9 · STEPS 61 200 → 68 500 (▲ +12 %) · WORKOUTS 4 → 4 (=) · 2025 TO 9 NOV · 1 230 000 STEPS ▲ +3 %`; without data `NO DATA FOR NOVEMBER 2025`), and in each tile a faint ghost bar and `<span class="tk ly" id="year-last-01">2025 · 48 200</span>` (ids `year-last-01` … `year-last-12`; `—` when that month had no data).
 
-Footer bar: `palette-select`, `kiosk-button`, `help-button`, `report-button`, `settings-button`, `footer-version` ("1.3.0"), plus the link status and refresh controls.
+Footer bar: `palette-select`, `kiosk-button`, `help-button`, `report-button`, `share-button` (SHARE, key S; new in 1.4.0), `settings-button`, `footer-version` ("1.4.0"), plus the link status and refresh controls.
 
 Sheets (overlays, `hidden` by default; Escape closes = Cancel; the main button is full colour):
 - `explain-sheet`: `explain-title`, `explain-summary` (IN SHORT), `explain-more` (LEARN MORE), `explain-close`.
 - `help-sheet`: `help-tab-how`, `help-tab-new`, `help-content`, `help-close`. Content from `/api/docs`.
-- `settings-sheet`: `target-steps`, `target-workouts`, `target-swims`, `target-runs`, `target-training-minutes`, `target-distance-km`, `access-code`, `lan-address` (read-only text), `settings-cancel`, `settings-save`.
+- `settings-sheet`: `target-steps`, `target-workouts`, `target-swims`, `target-runs`, `target-training-minutes`, `target-distance-km`, `plan-runs`, `plan-strength`, `plan-swims`, `plan-rides`, `plan-hikes`, `plan-walks`, `plan-yoga` (type=number, min 0; new in 1.4.0), `notify-toggle` (`<label class="check"><input type="checkbox" id="notify-toggle"> MAC NOTIFICATION ON RED ALERT</label>`), `access-code`, `access-code-current` (`<div class="hint" id="access-code-current">CURRENT CODE · 482913</div>`, hidden when none; filled from `settings.accessCode`, which only the loopback answer carries), `lan-address` (read-only text), `settings-cancel`, `settings-save`.
 - `report-sheet`: `report-title`, `report-text`, `report-close`, `report-kind-week`, `report-kind-month`.
+- `share-sheet` (new in 1.4.0): `share-canvas` (`<canvas width="1080" height="1350">`, drawn on the page with the Canvas 2D API, no libraries, in the current colour scheme: title `AMS GARMIN · BRIDGE`, the long date, steps ring with goal, resting pulse, Body Battery, sleep hours and word, intensity minutes this week and goal, workouts this month and training time, weight, the month's steps as mini bars, the Captain's log line of the day if any, footer `BOARD 1.4.0 · STARDATE 2026.313`), `share-save` (SAVE PNG: downloads `ams-garmin-board-YYYY-MM-DD.png` through `canvas.toBlob`), `share-send` (SHARE…, shown only when `navigator.canShare({ files })` is true, for example on the iPhone), `share-close`.
 
 Behaviour:
 - Clocks tick every second; data refreshes every 10 minutes and on REFRESH (`?refresh=1`).
 - No sleep: "NO SLEEP DATA — WEAR THE WATCH AT NIGHT"; no HRV: "NO HRV DATA"; sleep debt with `recorded: false` shows a similar note.
-- Keyboard: R refresh, F kiosk, ← and → previous and next month, ? help, Escape closes any sheet.
+- Keyboard: R refresh, F kiosk, S share, ← and → previous and next month, ? help, Escape closes any sheet.
+- Print (new in 1.4.0): `board.css` has an `@media print` block: footer controls, sheets and buttons hidden, white background, no filter, panels avoid page breaks. ⌘P prints the board.
 - Kiosk: body class `kiosk`. Between 21:00 and 07:00 local time the body also gets class `night` (dimmed with a CSS filter). In kiosk the cursor hides after 5 s without movement.
 - The page reloads itself when `/api/board` reports a different version than the one first loaded.
 - Stardate: year.dayOfYear (e.g. 2026.313).
 
 ### explain.js format
-Plain script, no import or export. Sets `globalThis.AMS_EXPLAIN = { <key>: { title, summary, more } }` for all 26 keys above. `title`: uppercase short title. `summary`: one or two sentences, shown under IN SHORT. `more`: array of 3 to 6 paragraphs, shown under LEARN MORE. The page opens `explain-sheet` from the button whose id is `explain-<key>`. Loadable in Node with `import()` (the tests do this).
+Plain script, no import or export. Sets `globalThis.AMS_EXPLAIN = { <key>: { title, summary, more } }` for all 31 keys above (since 1.4.0 the keys rhythm, plan, resting-trend, hydration and stress are at the end; titles WEEKLY RHYTHM, THIS WEEK'S PLAN, RESTING PULSE · 90 DAYS, WATER, STRESS; the entries year, sleep, red-alert and targets gained a paragraph or sentence). `title`: uppercase short title. `summary`: one or two sentences, shown under IN SHORT. `more`: array of 3 to 6 paragraphs, shown under LEARN MORE. The page opens `explain-sheet` from the button whose id is `explain-<key>`. Loadable in Node with `import()` (the tests do this).
 
 ### Routes
 Loopback listener on 127.0.0.1 always; see "LAN gate" for the second listener.
@@ -164,8 +171,8 @@ Loopback listener on 127.0.0.1 always; see "LAN gate" for the second listener.
 - `GET /api/month?ym=YYYY-MM` — `{ ok, ym, month, activities, compare, log }`, same shapes as in the board JSON. Past months cached 24 h; the current month is the board's own data.
 - `GET /api/activity/<id>` — `{ ok, id, name, type, start, seconds, distanceM, calories, avgHr, maxHr, elevationGain, splits: [{ index, seconds, distanceM, avgHr, maxHr, ascentM }], hr: [[secondsFromStart, bpm]] (at most 600 points), trace: [[lat, lon]] (at most 1500), altitude: [[secondsFromStart, m]] (at most 600) }`. Built from Garmin `/activity-service/activity/<id>` and the original file `/download-service/files/activity/<id>` (a zip holding a .FIT), parsed by `board/fit.js`. Cached in memory per id. No GPS: `trace: []`.
 - `GET /api/weather?lat=&lon=` — `{ ok, place: { lat, lon, source: 'browser' | 'workout' | 'home', name }, now: { tempC, windKmh, precipMm, code, text }, hours: [{ time, tempC, rainPct, windKmh, code }] (next 12), sun: { sunrise, sunset } }`. Via Open-Meteo `https://api.open-meteo.com/v1/forecast` with `timezone=auto`; cached 15 minutes per rounded place. Without lat and lon: the latest workout with coordinates in the last 10 days, else home (Norrköping). `fetchFn` is injectable. WMO code to text: 0 CLEAR, 1 MAINLY CLEAR, 2 PARTLY CLOUDY, 3 OVERCAST, 45 and 48 FOG, 51–57 DRIZZLE, 61–67 RAIN, 71–77 SNOW, 80–82 SHOWERS, 95–99 THUNDERSTORM.
-- `GET /api/settings` — `{ ok, settings: { targets: { steps, workouts, swims, runs, trainingMinutes, distanceKm }, hasAccessCode, lanAddress } }`.
-- `PUT /api/settings` — JSON body with `targets` and/or `accessCode` (`""` clears). Same answer as GET. Only from loopback, else 403.
+- `GET /api/settings` — `{ ok, settings: { targets: { steps, workouts, swims, runs, trainingMinutes, distanceKm }, plan: { runs, strength, swims, rides, hikes, walks, yoga }, notify, hasAccessCode, lanAddress, accessCode? } }`. `plan` values are integers >= 0 (default all 0); `notify` is a boolean (default true). `accessCode` (the code text) is present only on a loopback request; from the home network only `hasAccessCode` is returned.
+- `PUT /api/settings` — JSON body with `targets`, `plan` (object; a negative or non-number value is rejected with a `RangeError`, HTTP 400), `notify` (boolean) and/or `accessCode` (`""` clears). Same answer as GET. Only from loopback, else 403.
 - `GET /api/log?ym=YYYY-MM` — `{ ok, entries: { 'YYYY-MM-DD': 'text' } }`.
 - `PUT /api/log/YYYY-MM-DD` — JSON `{ text }`; empty text deletes; at most 200 characters. Answer `{ ok, entries }`.
 - `POST /api/travel` — JSON `{ zone }`; answer `{ ok, travel: null | { since, zone, days } }`. Home zone = Europe/Stockholm. The first day seen away is stored; back home clears it.
@@ -208,8 +215,35 @@ report JSON (/api/report): summary { steps, stepGoalDays, days, workouts, traini
 ```
 The report text gains a sleep line: average hours over the recorded nights, or "no nights recorded" (`sleepAvgMin` null). `report.sh` also writes `~/Library/Mobile Documents/com~apple~CloudDocs/AMS Garmin/<title>.md` (the report text) and `<title>.json` (the report JSON with `summary`) next to the Apple Notes note, creating the folder if needed. AMS WorkoutCompanion reading these files is a separate release of that app.
 
+Added in 1.4.0:
+```
+sleep.qualifier: 'EXCELLENT'|'GOOD'|'FAIR'|'POOR'|null   // Garmin dailySleepDTO.sleepScores.overall.qualifierKey; if missing, from score: >=90 EXCELLENT, >=80 GOOD, >=60 FAIR, else POOR; null without a score
+sleep.firstNight: boolean                                // true when this night is the ONLY recorded night among the last 7 in sleepDebt.nights
+lastYear: {
+  year: 2025,
+  month: { ym: '2025-11', throughDay: 9, available: bool,
+           steps: { now, before, pct|null }, workouts: { now, before, diff },
+           trainingSeconds: { now, before, pct|null }, restingHrAvg: { now, before, diff|null } },
+  toDate: { available: bool, steps: { now, before, pct|null }, workouts: { now, before, diff }, trainingSeconds: { now, before, pct|null } },
+  months: [ { ym: '2025-01', steps, workouts } … 12 ]
+}
+rhythm: { weeks: 12, since: 'YYYY-MM-DD' (today−84), until: 'YYYY-MM-DD' (yesterday),
+          days: [ { dow: 1..7 (Mon=1), name: 'MON'…'SUN', avg, count, goalDays } ] (7, Monday first),
+          strongest: 'SAT'|null, weakest: 'SUN'|null, overallAvg }
+plan: { weekStart: 'YYYY-MM-DD', daysLeft: 0..6 (days after today until Sunday),
+        items: [ { key: 'runs', label: 'RUNS', target, done, dates: ['YYYY-MM-DD'…] } ] (only items with target > 0, order runs, strength, swims, rides, hikes, walks, yoga),
+        target: sum of targets, done: sum of min(done, target), complete: bool (target > 0 and done >= target) }
+restingTrend: { days: 90, since: 'YYYY-MM-DD' (today−89), points: [ { date, bpm } ] (days with a resting pulse, today EXCLUDED),
+                avg7: [ { date, bpm } ] (7-day trailing mean over points, 1 decimal), avg, min, max, latest: { date, bpm } | null }
+hydration: { logged: bool, todayMl: n|null, goalMl: n|null (today's goalInML, else usersummary/daily hydrationGoalInML), pct: n|null,
+             days: [ { date, ml, goalMl } ] (7, today last; ml 0 when nothing logged), avgMl: n|null (over days with ml > 0), lastEntryAt: iso|null }
+stress: { today: { avg, max, qualifier: 'CALM'|'BALANCED'|'STRESSFUL'|'VERY STRESSFUL'|null, restSec, lowSec, mediumSec, highSec, measuredSec },
+          days: [ { date, avg, max } ] (28, today last), avg28: n|null (mean of avg over days with a value, today excluded) }
+```
+`lastYear.available` = at least one day with data in that last-year range. `now` = this year (same month through the same day; for `toDate` 1 January through today); last year's range runs from `YYYY-1-01-01` to the same day last year (29 Feb becomes 28 Feb). `pct` as in `compare`. `rhythm` counts only days with data (`hasData`), today excluded; `avg` = rounded mean steps, `count` = days with data, `goalDays` = of those, days with the step goal met; `strongest` and `weakest` by `avg` (null when no day has data). `plan.done` counts this week's workouts (Monday to today) of the group.
+
 ### Garmin calls per board build
-- `/usersummary-service/v2/dailysummaries` — from the earlier of 1 January and the 1st of the previous month, to today, in chunks of at most 365 days. Core call.
+- `/usersummary-service/v2/dailysummaries` — from the earliest of 1 January, the 1st of the previous month, Monday of this week and today−89 (since 1.4.0; before: the earlier of 1 January and the 1st of the previous month), to today, in chunks of at most 365 days. Core call.
 - `/activitylist-service/activities/search/activities` — same range, limit 99, paged.
 - `/sleep-service/sleep/dailySleep` — today.
 - Last 7 nights via dailySleepSummariesByDate.
@@ -218,6 +252,9 @@ The report text gains a sleep line: average hours over the recorded nights, or "
 - Fitness age, today. Heart-rate zones. Body Battery report, today.
 - `usersummary/daily`, today (`lastSyncTimestampGMT`).
 - `tokenInfo()` for the expiry.
+- New in 1.4.0: `/usersummary-service/stats/hydration/daily/{today−6}/{today}` (array of `{ calendarDate, valueInML, goalInML, sweatLossInML, activityIntakeInML, lastEntryTimestampLocal }`; an EMPTY array when nothing is logged, which gives `hydration.logged: false`).
+- New in 1.4.0: last year, two side calls for `lastYear`: daily summaries (`/usersummary-service/v2/dailysummaries`) and activities (`/activitylist-service/activities/search/activities`) from `YYYY-1-01-01` to the same day last year.
+- Stress needs no new call: today comes from `usersummary/daily`, the days from the daily summaries.
 Everything except the daily summaries is a side call: a failure becomes a warning, not a failed board.
 
 ### Formulas
@@ -230,13 +267,18 @@ Everything except the daily summaries is a side call: a failure becomes a warnin
 - Weight trend: 7-day average at each point; goal line = Garmin's weight goal.
 - Alerts: `resting-hr` when the latest resting pulse ≥ 110 % of the month average; `body-battery` when the latest value < 20; `no-sync` when `lastSyncAt` is more than 24 hours old.
 - Reports: see `/api/report`.
+- Rhythm: for each weekday (Monday first) over the 84 days before today, `avg` = round(mean steps of the days with data), `count`, `goalDays`; `overallAvg` = mean over all those days; `strongest`/`weakest` = weekday names with the highest/lowest `avg`.
+- Plan groups (type keys of activities): runs = running, treadmill_running, trail_running, indoor_running, track_running, virtual_run; strength = strength_training; swims = lap_swimming, open_water_swimming, swimming; rides = cycling, road_biking, indoor_cycling, virtual_ride, mountain_biking, gravel_cycling; hikes = hiking; walks = walking; yoga = yoga, pilates. `items` only for groups with target > 0.
+- Resting trend: `avg7` at each point = mean of the resting pulses of that day and the 6 days before it that have a value (7-day trailing, one decimal); `avg`, `min`, `max` over `points`.
+- Stress qualifier mapping from Garmin `stressQualifier`: CALM and CALM_AWAKE → CALM; BALANCED and BALANCED_AWAKE → BALANCED; STRESSFUL and STRESSFUL_AWAKE → STRESSFUL; VERY_STRESSFUL and VERY_STRESSFUL_AWAKE → VERY STRESSFUL; anything else → null. `measuredSec` = restSec + lowSec + mediumSec + highSec. Garmin sends −1 for "no stress value" → null.
+- Notification: after every successful board build, each alert in `board.alerts` whose `key` has not yet been notified today (file `alerts-notified.json`: `{ date: 'YYYY-MM-DD', keys: [...] }`, reset when the date changes) triggers ONE call `notify({ title: 'AMS Garmin Board · Red alert', text: <alert texts joined by ' · '>, alerts: [<the new ones>] })` with all new alerts together; then the keys are recorded. No alerts, no call. Settings `notify: false` switches it off. `startBoard` rebuilds the board every 30 minutes (`watchMs`) so alerts are checked with no page open.
 
 - Resting-pulse alert, provisional days: when today's `usersummary/daily` has `durationInMilliseconds` under 12 hours and `sleepingSeconds` is 0 (watch not worn at night, little data yet), the alert judges the last finished day's resting pulse instead of today's and says "YESTERDAY".
 - Sleep debt counts only nights with sleep recorded (`sleepTimeSeconds` > 0); nights without the watch are skipped, `recorded` is false and `debtMin` null when no night counts.
 - VO2 max shows "—" with a note while Garmin's Personal API delivers no `vO2MaxValue` on activities.
 
 ### Storage
-Directory (injectable `storeDir`): `~/Library/Application Support/AMS Garmin MCP/board/`. Files: `settings.json` (targets and access code), `captains-log.json`, `travel.json`. Writes are atomic (temporary file, then rename). Browser: only `localStorage` key `ams-garmin-board.scheme`. Nothing of this is in the repository.
+Directory (injectable `storeDir`): `~/Library/Application Support/AMS Garmin MCP/board/`. Files: `settings.json` (targets, plan, notify and access code), `captains-log.json`, `travel.json`, `alerts-notified.json` (since 1.4.0: `{ date, keys }`, the alerts already notified today). Writes are atomic (temporary file, then rename). Browser: only `localStorage` key `ams-garmin-board.scheme`. Nothing of this is in the repository.
 
 ### LAN gate
 - The loopback listener always runs. When an access code is set, a second listener on 0.0.0.0 (same port) accepts the home network.
@@ -252,7 +294,7 @@ Directory (injectable `storeDir`): `~/Library/Application Support/AMS Garmin MCP
 - `scripts/open-board.sh`, `scripts/build-board-app.sh`: unchanged.
 
 ### Tests
-`node --test test/*.test.js`, with a fake Garmin client, injected `fetchFn`, `storeDir` (temporary folder) and `remoteAddressOf`. All test data is invented. They cover: the aggregation and every added JSON part (compare, streaks, alerts, training, zones, fitness, curve, sleep debt, weight trend, year); every route above including the 503 path, caching, the LAN gate and cookie, and 403 on settings from the LAN; the FIT decoder; `explain.js` (26 keys, title, summary, at least 3 paragraphs); and that the page carries every element id above. They run on every push via GitHub Actions.
+`node --test test/*.test.js`, with a fake Garmin client, injected `fetchFn`, `storeDir` (temporary folder) and `remoteAddressOf`. All test data is invented. They cover: the aggregation and every added JSON part (compare, streaks, alerts, training, zones, fitness, curve, sleep debt, weight trend, year); every route above including the 503 path, caching, the LAN gate and cookie, and 403 on settings from the LAN; the FIT decoder; `explain.js` (31 keys, title, summary, at least 3 paragraphs); and that the page carries every element id above (30 `explain-*` buttons). Added in 1.4.0 (`test/board-1.4.test.js`, each seen failing first): version 1.4.0 and the first CHANGELOG entry; `sleep.qualifier` and `firstNight`; `lastYear` with and without 2025 data; `rhythm` per weekday with today excluded; `plan` from settings (PUT then board, a negative value rejected); `restingTrend` (today excluded, `avg7` a 7-day trailing mean); `hydration` with logged data and with an empty array (`logged: false`); `stress` (qualifier mapping, −1 → null, 28 days, `avg28`); the notification called once per key per day and not when `notify` is false; `accessCode` returned on loopback only; the new element ids, the share code in `board.js` (`share-canvas`, `toBlob`), the print block in `board.css`, and the five new explain keys. `test/board-1.2.test.js` and `test/board-1.3.test.js` were updated for 31 keys, 30 buttons and a newer version. They run on every push via GitHub Actions.
 
 ### Privacy
 The loopback listener serves this Mac only. The LAN listener exists only while an access code is set. Own data is stored only in the storage directory above. The repository holds no data, no keys and no coordinates of the owner; the home place in the code is a town centre.

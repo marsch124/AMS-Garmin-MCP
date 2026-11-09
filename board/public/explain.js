@@ -1,4 +1,4 @@
-// AMS Garmin Board 1.2.0 - the explanation texts behind every panel heading.
+// AMS Garmin Board 1.4.0 - the explanation texts behind every panel heading.
 // Plain script (no import/export). The page reads globalThis.AMS_EXPLAIN.
 // General education only. It is not medical advice: for health questions, ask a doctor.
 globalThis.AMS_EXPLAIN = {
@@ -98,7 +98,8 @@ globalThis.AMS_EXPLAIN = {
       "Most adults need seven to nine hours, and many people over 60 sleep a little less and wake more often. That is common. Roughly a fifth of the night in deep plus REM sleep is a good pattern, but it varies between people.",
       "Sleep stages from a wrist watch are estimates, not like a sleep lab. They are best for noticing patterns, such as a poor night after a late meal or alcohol, or a better night after a long walk.",
       "Habits that help: the same bedtime, a cool dark room, no screens late, daylight in the morning, and no heavy meals or alcohol near bedtime.",
-      "If you snore loudly, stop breathing at night, or feel very tired in the day, ask a doctor. Until you wear the watch at night, this panel shows a reminder instead."
+      "If you snore loudly, stop breathing at night, or feel very tired in the day, ask a doctor. Until you wear the watch at night, this panel shows a reminder instead.",
+      "The LAST NIGHT strip at the top of the panel gives the night in one line: when you went to bed, when you got up, and a word for the score. EXCELLENT is 90 to 100, GOOD is 80 to 89, FAIR is 60 to 79 and POOR is under 60. These are Garmin's own bands. If the watch has recorded only this one night out of the last seven, the strip says FIRST NIGHT WITH THE WATCH instead, because a single night says little. Judge your sleep by the pattern over weeks, not by one word."
     ]
   },
   "hrv": {
@@ -186,7 +187,8 @@ globalThis.AMS_EXPLAIN = {
       "Each bar shows how far you are this month. Steps come from the daily totals. Workouts, swims, runs, training minutes and distance come from your recorded activities of the month.",
       "Good targets are a little hard but possible. Look at last month's totals on the board and aim a little above them. A rise of about 5 to 10 percent is gentle enough to stay safe and still keep you moving forward.",
       "Press the edit button to change a target. Cancel leaves everything as it was. A bar that is behind early in the month is not a worry. Look again around the middle.",
-      "Targets should serve you, not rule you. If you are ill or hurt, change the target. Ask a doctor before raising your training a lot."
+      "Targets should serve you, not rule you. If you are ill or hurt, change the target. Ask a doctor before raising your training a lot.",
+      "The weekly workout plan, with how many runs, strength sessions and so on you want each week, has its own panel, THIS WEEK'S PLAN."
     ]
   },
   "log": {
@@ -263,7 +265,8 @@ globalThis.AMS_EXPLAIN = {
       "Look for seasons. Many people move more in summer and autumn, and less in the dark Swedish winter. Knowing this helps you plan indoor options, like the gym or the pool, for the weeks you know are hard.",
       "A falling resting pulse across the tiles, or more goal days, shows that your habits are working. A rise in pulse with fewer workouts can hint at a break in routine.",
       "A month with few data days, for example when the watch was off, has smaller totals. Compare only months with a similar number of days of data.",
-      "The tiles are built from the daily summaries since 1 January. They are for your own overview, not for any medical purpose."
+      "The tiles are built from the daily summaries since 1 January. They are for your own overview, not for any medical purpose.",
+      "Under the tiles, the SAME TIME LAST YEAR line compares this month, up to today's date, with the same stretch a year ago: steps, number of workouts and training time, with an arrow and a percent. A second part compares the year so far with the same days last year. Each tile also shows a faint bar and a small line for the same month last year, so you can see at a glance whether this year is ahead. If last year has no data, for example because the watch was new, the line says so instead. Compare like with like: one holiday week or one injury can move a month a lot."
     ]
   },
   "red-alert": {
@@ -274,7 +277,8 @@ globalThis.AMS_EXPLAIN = {
       "A high resting pulse is a general sign that the body is under strain. It can come from illness, poor sleep, stress, alcohol, heat or hard training. Rest and drink water, and watch how you feel.",
       "A very low Body Battery means little energy is left. Plan an easy day and an early night. It is only the watch's estimate.",
       "No sync for 24 hours means the numbers on the board may be old. Open the Garmin Connect app on your phone with the watch nearby and wait for it to sync.",
-      "The alert is not a diagnosis, and no alert does not mean you are healthy. If you feel unwell, have chest pain, faint feelings or trouble breathing, ask a doctor or call for help at once."
+      "The alert is not a diagnosis, and no alert does not mean you are healthy. If you feel unwell, have chest pain, faint feelings or trouble breathing, ask a doctor or call for help at once.",
+      "Since 1.4.0 the Mac also shows a notification the first time an alert fires, even when the board page is closed. Each alert gives one notification per day, so it will not nag you. The board checks every 30 minutes. You can switch the notification off in Settings."
     ]
   },
   "link": {
@@ -286,6 +290,61 @@ globalThis.AMS_EXPLAIN = {
       "The key lasts for the time you chose, 30 days up to one year. The footer shows when it runs out. Garmin emails you a week before. To renew it, make a new key on the same Garmin page and save it again.",
       "The board refreshes itself every 10 minutes. Press the refresh button, or the R key, to refresh at once. The time of the last refresh is shown beside it.",
       "The board only reads from Garmin. It never writes anything to Garmin. Your key stays in a private file on this Mac."
+    ]
+  },
+  "rhythm": {
+    title: "WEEKLY RHYTHM",
+    summary: "Your average steps for each weekday over the last 12 weeks, Monday to Sunday. The weakest day is marked in red, the strongest in green.",
+    more: [
+      "For each weekday the board takes every finished day with data over the last 12 weeks and averages the steps. Today is left out because it is not finished. A dashed line shows the average of all days.",
+      "This shows your habits. Many people walk most on the weekend and least on a working desk day, or the other way round when they hike or train on fixed days. Knowing your weakest day makes it easy to plan a walk or a workout there.",
+      "For an active man of 60, a spread of 7,000 to 13,000 steps between your quietest and busiest day is normal. A gap of more than a factor of two often means one day could use a short walk.",
+      "A day with only one or two data points, for example because the watch was off, can look odd. The board counts only days with data, so a long break in wearing the watch makes the picture less sure.",
+      "It is a habit picture, not a test. Weather, travel, illness and holidays all change it."
+    ]
+  },
+  "plan": {
+    title: "THIS WEEK'S PLAN",
+    summary: "Your own weekly workout plan, for example 3 runs and 2 strength sessions, with a tick for each one done since Monday.",
+    more: [
+      "You set how many workouts of each kind you want each week in Settings: runs, strength, swims, rides, hikes, walks and yoga. The plan is stored on this Mac only.",
+      "The board counts the workouts that Garmin recorded from Monday to today. Running includes treadmill and trail runs, rides include indoor and mountain biking, swims include open water, and yoga includes Pilates. A filled dot means done, an empty one means still open. A workout beyond the plan does not count extra.",
+      "The line below shows how many are done and how many days are left until Sunday. When all are done, it says so. If you have set no plan, the panel invites you to add one.",
+      "A good plan is one you keep. For a man of 60, a mix of two or three sessions of cardio, two of strength and some easy walking is a widely used pattern, with at least one rest day in a week. Start a little below what you think you can do.",
+      "A missed tick is not a failure. Illness, travel and tiredness are good reasons to move the plan. Ask a doctor before you raise your training a lot or if you feel pain or unusual breathlessness."
+    ]
+  },
+  "resting-trend": {
+    title: "RESTING PULSE · 90 DAYS",
+    summary: "Your resting heart rate for each of the last 90 days as dots, with a 7-day average line and the 90-day average dashed.",
+    more: [
+      "Resting pulse is how fast your heart beats when you are calm, as measured by the watch, usually during sleep. Each dot is one finished day. Today is left out until it is complete.",
+      "The line is the average of the last seven days at each point, which smooths out the ups and downs. The dashed line is the average of all the days shown. Below the chart the board gives the average, the lowest and highest, and the latest reading.",
+      "A fit, active man of 60 often has a resting pulse in the range of about 45 to 65 beats a minute. Your own level matters more than a table. A slow fall over months usually follows better fitness. Hard training, poor sleep, stress, alcohol, heat and illness all push it up for a few days.",
+      "Watch the line more than a single dot. A rise of five or more beats that lasts several days, with no clear reason, is worth noticing and resting for. Some medicines, such as beta blockers, lower the pulse by themselves.",
+      "The watch estimates the pulse and can be off if it sits loose. This is general information, not medical advice. If your resting pulse is very high or very low and you feel unwell, or you feel palpitations, ask a doctor."
+    ]
+  },
+  "hydration": {
+    title: "WATER",
+    summary: "The water you logged today as a gauge against your goal, and the last seven days as small bars. It shows 'no water logged' until you log some.",
+    more: [
+      "Garmin lets you log drinks in Garmin Connect or on the watch, and sets a daily goal. The board shows the litres logged today against that goal, and a bar for each of the last seven days with the average.",
+      "The board cannot see what you drink on its own. If you do not log water, the panel says NO WATER LOGGED and shows no figure. That is not a fault. It starts to fill as soon as you log water in Garmin Connect or on the watch.",
+      "How much to drink varies. A common guide for adults is about 1.5 to 2.5 litres of fluids a day, and more on hot days or after hard training, when you also lose water in sweat. Food, tea and coffee count too. Thirst is a reasonable guide for most healthy people.",
+      "Watch for dark urine, headaches or dizziness on long hikes or hot days, which can mean you need more. Older people feel thirst less, so a steady habit helps.",
+      "This is general information. If you have a heart, kidney or other condition, or take water tablets, ask a doctor how much to drink."
+    ]
+  },
+  "stress": {
+    title: "STRESS",
+    summary: "Garmin's stress reading for today with a word, how your day divides into rest and stress, and the daily average over 4 weeks.",
+    more: [
+      "Garmin measures stress from heart rate variability, the small changes in time between heartbeats. A calm body shows more variation. A strained one shows less. The scale runs from 0 to 100.",
+      "The word for today comes from Garmin: CALM, BALANCED, STRESSFUL or VERY STRESSFUL. The coloured bar divides the measured time into rest (0 to 25), low (25 to 50), medium (50 to 75) and high stress (75 to 100), with hours in the legend. The chart shows the daily average for 28 days, with the 4-week average dashed.",
+      "Averages of 25 to 40 are typical for a relaxed, active person. A day with plenty of rest time and a few medium hours is normal. Exercise also raises the reading for a while, because the body is under load. That is not bad stress.",
+      "Look for the trend. Several weeks of rising averages can come with poor sleep, long work days, illness or too much training without rest. Short walks, daylight, good sleep and slow breathing can help bring it down.",
+      "The numbers are estimates from a wrist watch, not a medical test. If you feel anxious, low or overwhelmed for a long time, ask a doctor. The existing stress bar in the heart panel stays as it was."
     ]
   }
 };

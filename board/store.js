@@ -1,5 +1,6 @@
 // AMS Garmin Board — the few things the board keeps on this Mac:
-// settings (targets, access code), the Captain's log, and the travel marker.
+// settings (targets, weekly plan, notification switch, access code), the Captain's log,
+// the travel marker, and which red alerts the Mac was already told about today.
 // Small JSON files in ~/Library/Application Support/AMS Garmin MCP/board/, written atomically.
 
 import { mkdir, readFile, writeFile, rename } from 'node:fs/promises';
@@ -8,11 +9,34 @@ import { homedir } from 'node:os';
 
 export const DEFAULT_STORE_DIR = join(homedir(), 'Library', 'Application Support', 'AMS Garmin MCP', 'board');
 export const DEFAULT_TARGETS = Object.freeze({ steps: 300000, workouts: 12, swims: 0, runs: 0, trainingMinutes: 900, distanceKm: 0 });
+/** The weekly workout plan (1.4): how many of each kind a week. 0 = not planned. */
+export const DEFAULT_PLAN = Object.freeze({ runs: 0, strength: 0, swims: 0, rides: 0, hikes: 0, walks: 0, yoga: 0 });
 export const LOG_MAX_CHARS = 200;
 export const HOME_ZONE = 'Europe/Stockholm';
 
 const TARGET_KEYS = Object.keys(DEFAULT_TARGETS);
+const PLAN_KEYS = Object.keys(DEFAULT_PLAN);
 const isDay = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+
+/** Reads a map of non-negative whole numbers, keeping the defaults for anything odd. */
+function readCounts(raw, defaults, keys) {
+  const out = { ...defaults };
+  for (const k of keys) {
+    const v = Number(raw?.[k]);
+    if (Number.isFinite(v) && v >= 0) out[k] = Math.round(v);
+  }
+  return out;
+}
+/** Merges a patch of counts; a negative or non-number is refused with a plain message. */
+function mergeCounts(target, patch, keys, word) {
+  if (!patch || typeof patch !== 'object') return;
+  for (const k of keys) {
+    if (patch[k] === undefined || patch[k] === null || patch[k] === '') continue;
+    const v = Number(patch[k]);
+    if (!Number.isFinite(v) || v < 0) throw new RangeError(`The ${word} "${k}" must be a number of 0 or more.`);
+    target[k] = Math.round(v);
+  }
+}
 
 export class BoardStore {
   constructor(dir = DEFAULT_STORE_DIR) {
@@ -36,29 +60,25 @@ export class BoardStore {
 
   // ---------- settings ----------
 
-  /** Targets and the access code (the code itself is only used server-side). */
+  /** Targets, the weekly plan, the notification switch and the access code (the code is only shown on the Mac itself). */
   async settings() {
     const raw = await this.#read('settings.json', {});
-    const targets = { ...DEFAULT_TARGETS };
-    for (const k of TARGET_KEYS) {
-      const v = Number(raw?.targets?.[k]);
-      if (Number.isFinite(v) && v >= 0) targets[k] = Math.round(v);
-    }
+    const targets = readCounts(raw?.targets, DEFAULT_TARGETS, TARGET_KEYS);
+    const plan = readCounts(raw?.plan, DEFAULT_PLAN, PLAN_KEYS);
+    const notify = raw?.notify !== false;
     const accessCode = typeof raw?.accessCode === 'string' && raw.accessCode.trim() ? raw.accessCode.trim() : '';
-    return { targets, accessCode };
+    return { targets, plan, notify, accessCode };
   }
 
-  /** Merges targets and/or accessCode into the saved settings. Returns the new settings. */
+  /** Merges targets, plan, notify and/or accessCode into the saved settings. Returns the new settings. */
   async saveSettings(patch = {}) {
     const current = await this.settings();
-    const next = { targets: { ...current.targets }, accessCode: current.accessCode };
-    if (patch.targets && typeof patch.targets === 'object') {
-      for (const k of TARGET_KEYS) {
-        if (patch.targets[k] === undefined || patch.targets[k] === null || patch.targets[k] === '') continue;
-        const v = Number(patch.targets[k]);
-        if (!Number.isFinite(v) || v < 0) throw new RangeError(`The target "${k}" must be a number of 0 or more.`);
-        next.targets[k] = Math.round(v);
-      }
+    const next = { targets: { ...current.targets }, plan: { ...current.plan }, notify: current.notify, accessCode: current.accessCode };
+    mergeCounts(next.targets, patch.targets, TARGET_KEYS, 'target');
+    mergeCounts(next.plan, patch.plan, PLAN_KEYS, 'plan');
+    if (patch.notify !== undefined) {
+      if (typeof patch.notify !== 'boolean') throw new RangeError('The notification switch must be on or off.');
+      next.notify = patch.notify;
     }
     if (patch.accessCode !== undefined) {
       if (typeof patch.accessCode !== 'string') throw new RangeError('The access code must be text.');
@@ -114,5 +134,18 @@ export class BoardStore {
   async travel() {
     const t = await this.#read('travel.json', null);
     return t && isDay(t.since) && typeof t.zone === 'string' ? { since: t.since, zone: t.zone } : null;
+  }
+
+  // ---------- red-alert notifications (1.4) ----------
+
+  /** Which alert keys the Mac was already told about, and on which day. */
+  async notified() {
+    const n = await this.#read('alerts-notified.json', null);
+    return n && isDay(n.date) && Array.isArray(n.keys) ? { date: n.date, keys: n.keys.filter((k) => typeof k === 'string') } : { date: null, keys: [] };
+  }
+
+  async saveNotified(date, keys) {
+    if (!isDay(date)) throw new RangeError('The day must look like YYYY-MM-DD.');
+    await this.#write('alerts-notified.json', { date, keys: [...new Set(keys)] });
   }
 }

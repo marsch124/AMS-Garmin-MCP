@@ -371,6 +371,10 @@ svg text { font-family: var(--font); text-transform: uppercase; }
   #month-steps-panel, #activities-panel { grid-column: span 8; }
   #month-hr-panel { grid-column: span 12; }
   #month-totals-panel { grid-column: span 4; }
+  #plan-panel, #rhythm-panel { grid-column: span 6; }
+  #resting-trend-panel { grid-column: span 7; }
+  #hydration-panel { grid-column: span 5; }
+  #stress-panel { grid-column: span 12; }
   .act { grid-template-columns: 58px 100px minmax(0, 1fr) 82px 72px 72px; }
   .act .te { display: none; }
   .tiles { grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -384,8 +388,8 @@ svg text { font-family: var(--font); text-transform: uppercase; }
   .elbow, .elbow-bottom { width: 150px; }
   .elbow::after, .elbow-bottom::after { left: 84px; width: 66px; }
   .block { font-size: 12px; }
-  #red-alert, #chrono-panel, #steps-panel, #body-battery-panel, #heart-panel, #intensity-panel, #energy-panel, #bb-curve-panel, #fitness-panel, #sleep-panel, #hrv-panel, #sleep-debt-panel, #weight-panel, #training-panel, #zones-panel, #streaks-panel, #weather-panel, #targets-panel, #log-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #month-totals-panel, #activity-detail-panel, #year-panel { grid-column: span 6; }
-  #red-alert, #bb-curve-panel, #weight-panel, #weather-panel, #log-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #activity-detail-panel, #year-panel { grid-column: span 12; }
+  #red-alert, #chrono-panel, #steps-panel, #body-battery-panel, #heart-panel, #intensity-panel, #energy-panel, #bb-curve-panel, #fitness-panel, #sleep-panel, #hrv-panel, #sleep-debt-panel, #weight-panel, #training-panel, #zones-panel, #streaks-panel, #weather-panel, #targets-panel, #log-panel, #plan-panel, #rhythm-panel, #resting-trend-panel, #stress-panel, #hydration-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #month-totals-panel, #activity-detail-panel, #year-panel { grid-column: span 6; }
+  #red-alert, #bb-curve-panel, #weight-panel, #weather-panel, #log-panel, #resting-trend-panel, #stress-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #activity-detail-panel, #year-panel { grid-column: span 12; }
   .seg.title { font-size: 16px; }
   .seg.info { display: none; }
   .seg.btn { padding: 0 10px; font-size: 13px; }
@@ -405,7 +409,13 @@ svg text { font-family: var(--font); text-transform: uppercase; }
   .frame-bottom { height: auto; }
   .seg.w1, .seg.w2, .seg.w3, .seg.w4, .seg.w6 { display: none; }
   .panels { grid-column: 1; padding-left: 0; }
-  #red-alert, #chrono-panel, #steps-panel, #body-battery-panel, #heart-panel, #intensity-panel, #energy-panel, #bb-curve-panel, #fitness-panel, #sleep-panel, #hrv-panel, #sleep-debt-panel, #weight-panel, #training-panel, #zones-panel, #streaks-panel, #weather-panel, #targets-panel, #log-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #month-totals-panel, #activity-detail-panel, #year-panel { grid-column: span 12; }
+  #red-alert, #chrono-panel, #steps-panel, #body-battery-panel, #heart-panel, #intensity-panel, #energy-panel, #bb-curve-panel, #fitness-panel, #sleep-panel, #hrv-panel, #sleep-debt-panel, #weight-panel, #training-panel, #zones-panel, #streaks-panel, #weather-panel, #targets-panel, #log-panel, #plan-panel, #rhythm-panel, #resting-trend-panel, #stress-panel, #hydration-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #month-totals-panel, #activity-detail-panel, #year-panel { grid-column: span 12; }
+  .stress-body { flex-direction: column; }
+  .stress-body .stress-today { width: auto; }
+  .hydration-body { flex-direction: column; align-items: stretch; }
+  .hydration-body .gauge { margin: 0 auto; }
+  .hydration-body .chart { max-width: 240px; margin: 0 auto; }
+  .share-body canvas { max-height: 60vh; }
   .heart, .weight-body { flex-direction: column; }
   .act { grid-template-columns: 44px minmax(0, 1fr) 60px 60px; gap: 6px; font-size: 13px; }
   .act .n-dist { display: none; }
@@ -422,3 +432,68 @@ svg text { font-family: var(--font); text-transform: uppercase; }
 .chip.cmp.up { color: var(--c5); } .chip.cmp.down { color: var(--c7); }
 .chip.cmp small { color: var(--dim); font-weight: 500; font-size: 10px; margin-left: 4px; }
 .nudge { margin: 0 12px 10px; padding: 4px 10px; border-radius: 6px; background: var(--track); color: var(--pc); font-size: 11px; letter-spacing: .04em; }
+
+/* ---------- 1.4.0 ---------- */
+
+/* the LAST NIGHT strip on the sleep panel */
+.strip { margin: 4px 2px 0 6px; padding: 3px 10px; border-radius: 999px; background: var(--pc); color: var(--ink); font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.strip.first { background: var(--ok); }
+
+/* this week's plan */
+.plan-list { display: flex; flex-direction: column; gap: 3px; }
+.plan-row { display: grid; grid-template-columns: 90px minmax(0, 1fr) 54px; gap: 8px; align-items: center; font-size: 14px; line-height: 22px; border-bottom: 1px solid var(--grid); }
+.plan-row .pk { color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.plan-row .ticks { font-size: 18px; letter-spacing: .12em; color: var(--pc); line-height: 1; white-space: nowrap; overflow: hidden; }
+.plan-row .ticks .open { color: var(--grid); }
+.plan-row .pv { text-align: right; color: var(--pc); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.plan-row.done .pk, .plan-row.done .pv, .plan-row.done .ticks { color: var(--ok); }
+
+/* stress */
+.panel-head .head-chip { flex: none; margin-left: 4px; font-size: 12px; line-height: 20px; height: 20px; }
+.stress-body { display: flex; gap: 14px; align-items: flex-start; }
+.stress-body .stress-today { width: 240px; flex: none; }
+.stress-body .stress-today .stack { margin-top: 4px; height: 18px; border-radius: 9px; }
+.stress-body .chart { flex: 1; min-width: 0; }
+.stress-body .sub-label { flex-basis: 100%; }
+.stress-body { flex-wrap: wrap; }
+
+/* water */
+.hydration-body { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+.hydration-body .gauge { width: 150px; flex: none; margin: 0; }
+.hydration-body .chart { flex: 1; min-width: 120px; }
+.hydration-body .sub-label { flex-basis: 100%; }
+
+/* year: last year as a faint second bar and a small line */
+.tile .tbar.ghost { background: transparent; margin-top: 1px; }
+.tile .tbar.ghost i { background: var(--grid); opacity: .9; }
+.tile .ly { color: var(--dim); font-size: 10px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* settings: plan group and the switch */
+.form .form-title { grid-column: 1 / -1; font-size: 12px; color: var(--c1); margin-top: 6px; border-top: 1px solid var(--grid); padding-top: 8px; }
+.form .check { flex-direction: row; align-items: center; gap: 8px; font-size: 12px; color: var(--text); }
+.form .check input { width: 18px; height: 18px; padding: 0; border-radius: 4px; accent-color: var(--c1); }
+
+/* share sheet */
+.share-box { width: min(560px, 100%); }
+.share-body { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.share-body canvas { width: 100%; height: auto; max-height: calc(100vh - 200px); object-fit: contain; border-radius: 10px; background: var(--bg); box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+.share-body .hint { font-size: 13px; color: var(--dim); margin: 0; text-align: center; }
+
+/* ---------- print (⌘P) ---------- */
+@media print {
+  @page { size: A4 portrait; margin: 10mm; }
+  html, body { background: #fff !important; color: #111 !important; }
+  body.night #board { filter: none !important; }
+  .frame-left, .frame-bottom, .sheet, .head-btn, .nav, .log-row, #weather-locate-button, #detail-close, button.label::after { display: none !important; }
+  .frame-top { height: 40px; }
+  .lcars { display: block; padding: 0; min-height: 0; }
+  .panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; padding: 0; }
+  .panel { break-inside: avoid; page-break-inside: avoid; grid-column: span 1 !important; border: 1px solid #ddd; border-radius: 8px; padding: 4px; }
+  #red-alert, #bb-curve-panel, #month-steps-panel, #month-hr-panel, #activities-panel, #year-panel, #stress-panel, #resting-trend-panel, #log-panel { grid-column: span 2 !important; }
+  .panel-head .label { background: #eee !important; color: #111 !important; }
+  .kv .v, .big .v, .tile .tv, .tot-list .v, .clock-small .v, .chrono .clock-time { color: #111 !important; }
+  .kv .k, .big .k, .sub-label, .tile .tk, .tot-list .k { color: #555 !important; }
+  svg text { fill: #333 !important; }
+  .gridline { stroke: #ddd !important; }
+  .track { stroke: #eee !important; }
+}

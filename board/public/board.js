@@ -367,6 +367,94 @@
     host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="sleep need against actual">${grid.join('')}${bars}</svg>`;
   }
 
+  /** 1.4: average steps per weekday over 12 weeks; the weakest day in the alert colour, the strongest in green. */
+  function drawRhythm(host, r) {
+    const W = 300, H = 120, padL = 28, padB = 16, padT = 14;
+    const plotW = W - padL - 6, plotH = H - padB - padT;
+    const days = r.days || [];
+    const vals = days.map((d) => d.avg).filter(isNum);
+    if (!vals.length) { host.innerHTML = emptySvg(W, H, 'NO DAYS WITH DATA YET'); return; }
+    const top = Math.ceil(Math.max(...vals, r.overallAvg || 0) / 2500) * 2500 || 2500;
+    const bw = plotW / 7;
+    const yOf = (v) => padT + plotH - (v / top) * plotH;
+    const grid = [];
+    for (let v = 0; v <= top; v += top / 4) grid.push(`<line x1="${padL}" y1="${f1(yOf(v))}" x2="${W - 6}" y2="${f1(yOf(v))}" class="gridline"/><text x="${padL - 4}" y="${f1(yOf(v) + 3)}" text-anchor="end" font-size="9" fill="${css('--dim')}">${fmt1(v / 1000)}K</text>`);
+    const bars = days.map((d, i) => {
+      const x = padL + i * bw + bw * 0.18, w = bw * 0.64;
+      const color = d.name === r.weakest ? css('--c7') : d.name === r.strongest ? css('--ok') : css('--c2');
+      const bar = isNum(d.avg)
+        ? `<rect x="${f1(x)}" y="${f1(yOf(d.avg))}" width="${f1(w)}" height="${f1(padT + plotH - yOf(d.avg))}" rx="2" fill="${color}"><title>${d.name}: ${fmtInt(d.avg)} a day over ${d.count} days, goal met ${d.goalDays} times</title></rect>
+           <text x="${f1(x + w / 2)}" y="${f1(yOf(d.avg) - 3)}" text-anchor="middle" font-size="9" fill="${css('--c8')}">${fmt1(d.avg / 1000)}K</text>`
+        : '';
+      return `${bar}<text x="${f1(x + w / 2)}" y="${H - 4}" text-anchor="middle" font-size="9" fill="${css('--dim')}">${d.name}</text>`;
+    }).join('');
+    // The average is a dashed line only; its number is in the note below (a label here collides with the bar labels).
+    const avg = isNum(r.overallAvg) ? `<line x1="${padL}" y1="${f1(yOf(r.overallAvg))}" x2="${W - 6}" y2="${f1(yOf(r.overallAvg))}" stroke="${css('--c3')}" stroke-width="1.5" stroke-dasharray="5 4"><title>All days: ${fmtInt(r.overallAvg)} a day</title></line>` : '';
+    host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="average steps per weekday">${grid.join('')}${avg}${bars}</svg>`;
+  }
+
+  /** 1.4: 90 days of resting pulse as dots, the 7-day average as a line, the 90-day average dashed. */
+  function drawRestingTrend(host, t, today) {
+    const W = 420, H = 150, padL = 30, padR = 8, padT = 10, padB = 18;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const points = t.points || [];
+    if (!points.length) { host.innerHTML = emptySvg(W, H, 'NO PULSE DATA YET'); return; }
+    const end = new Date(today + 'T00:00:00');
+    const start = new Date(end.getTime() - (t.days || 90) * 86400000);
+    const xOf = (iso) => padL + Math.min(1, Math.max(0, (new Date(iso + 'T00:00:00') - start) / (end - start))) * plotW;
+    const vals = points.map((p) => p.bpm);
+    const lo = Math.floor((Math.min(...vals) - 3) / 5) * 5, hi = Math.ceil((Math.max(...vals) + 3) / 5) * 5;
+    const yOf = (v) => padT + plotH - ((v - lo) / (hi - lo || 1)) * plotH;
+    const grid = [];
+    for (let v = lo; v <= hi; v += 5) grid.push(`<line x1="${padL}" y1="${f1(yOf(v))}" x2="${W - padR}" y2="${f1(yOf(v))}" class="gridline"/><text x="${padL - 4}" y="${f1(yOf(v) + 3)}" text-anchor="end" font-size="9" fill="${css('--dim')}">${v}</text>`);
+    const months = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      if (d.getDate() === 1) months.push(`<text x="${f1(xOf(d.toLocaleDateString('sv-SE')))}" y="${H - 5}" font-size="9" fill="${css('--dim')}">${MONTHS[d.getMonth()]}</text>`);
+    }
+    const dots = points.map((p) => `<circle cx="${f1(xOf(p.date))}" cy="${f1(yOf(p.bpm))}" r="2.3" fill="${css('--c7')}" opacity=".75"><title>${p.date}: ${p.bpm} bpm</title></circle>`).join('');
+    const avgPath = (t.avg7 || []).map((p, i) => `${i ? 'L' : 'M'} ${f1(xOf(p.date))} ${f1(yOf(p.bpm))}`).join(' ');
+    const avgLine = isNum(t.avg) ? `<line x1="${padL}" y1="${f1(yOf(t.avg))}" x2="${W - padR}" y2="${f1(yOf(t.avg))}" stroke="${css('--c3')}" stroke-width="1.5" stroke-dasharray="5 4"/><text x="${W - padR - 2}" y="${f1(yOf(t.avg) - 4)}" text-anchor="end" font-size="9" fill="${css('--c3')}">90-DAY AVG ${t.avg}</text>` : '';
+    host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="resting pulse over 90 days">${grid.join('')}${months.join('')}${avgLine}<path d="${avgPath}" fill="none" stroke="${css('--c8')}" stroke-width="2" stroke-linejoin="round"/>${dots}</svg>`;
+  }
+
+  /** 1.4: seven days of water against the goal. */
+  function drawHydrationDays(host, days, goalMl) {
+    const W = 200, H = 80, padL = 4, padB = 14, padT = 10;
+    const plotW = W - padL - 4, plotH = H - padB - padT;
+    const list = days || [];
+    const top = Math.max(500, goalMl || 0, ...list.map((d) => d.ml || 0));
+    const bw = plotW / Math.max(1, list.length);
+    const yOf = (v) => padT + plotH - (v / top) * plotH;
+    const bars = list.map((d, i) => {
+      const x = padL + i * bw + bw * 0.2, w = bw * 0.6;
+      const g = d.goalMl ?? goalMl;
+      const bar = d.ml > 0 ? `<rect x="${f1(x)}" y="${f1(yOf(d.ml))}" width="${f1(w)}" height="${f1(padT + plotH - yOf(d.ml))}" rx="2" fill="${d.ml >= (g || Infinity) ? css('--ok') : css('--c5')}"><title>${d.date}: ${fmt1(d.ml / 1000)} l</title></rect>` : '';
+      const goal = isNum(g) ? `<line x1="${f1(x - 2)}" y1="${f1(yOf(g))}" x2="${f1(x + w + 2)}" y2="${f1(yOf(g))}" stroke="${css('--c8')}" stroke-width="1.5"/>` : '';
+      return `${bar}${goal}<text x="${f1(x + w / 2)}" y="${H - 3}" text-anchor="middle" font-size="9" fill="${css('--dim')}">${weekdayOf(d.date)[0]}</text>`;
+    }).join('');
+    host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="water over seven days"><line x1="${padL}" y1="${f1(padT + plotH)}" x2="${W - 4}" y2="${f1(padT + plotH)}" class="gridline"/>${bars}</svg>`;
+  }
+
+  /** 1.4: 28 days of average stress, coloured by Garmin's bands, with the 4-week average dashed. */
+  function drawStressDays(host, days, avg28, today) {
+    const W = 420, H = 110, padL = 26, padB = 16, padT = 8;
+    const plotW = W - padL - 6, plotH = H - padB - padT;
+    const list = days || [];
+    if (!list.some((d) => isNum(d.avg))) { host.innerHTML = emptySvg(W, H, 'NO STRESS READINGS YET'); return; }
+    const bw = plotW / Math.max(1, list.length);
+    const yOf = (v) => padT + plotH - (Math.min(100, v) / 100) * plotH;
+    const bandColor = (v) => (v < 25 ? css('--c5') : v < 50 ? css('--c6') : v < 75 ? css('--c1') : css('--c7'));
+    const grid = [0, 25, 50, 75, 100].map((v) => `<line x1="${padL}" y1="${f1(yOf(v))}" x2="${W - 6}" y2="${f1(yOf(v))}" class="gridline"/><text x="${padL - 4}" y="${f1(yOf(v) + 3)}" text-anchor="end" font-size="9" fill="${css('--dim')}">${v}</text>`).join('');
+    const bars = list.map((d, i) => {
+      const x = padL + i * bw + bw * 0.2, w = bw * 0.6;
+      const bar = isNum(d.avg) ? `<rect x="${f1(x)}" y="${f1(yOf(d.avg))}" width="${f1(w)}" height="${f1(padT + plotH - yOf(d.avg))}" rx="1.5" fill="${bandColor(d.avg)}" opacity="${d.date === today ? 1 : 0.8}"><title>${d.date}: average ${d.avg}${isNum(d.max) ? `, peak ${d.max}` : ''}</title></rect>` : '';
+      const label = i % 7 === 0 || d.date === today ? `<text x="${f1(x + w / 2)}" y="${H - 4}" text-anchor="middle" font-size="9" fill="${d.date === today ? css('--c6') : css('--dim')}">${Number(d.date.slice(8))}</text>` : '';
+      return bar + label;
+    }).join('');
+    const avg = isNum(avg28) ? `<line x1="${padL}" y1="${f1(yOf(avg28))}" x2="${W - 6}" y2="${f1(yOf(avg28))}" stroke="${css('--c3')}" stroke-width="1.5" stroke-dasharray="5 4"/><text x="${W - 8}" y="${f1(yOf(avg28) - 4)}" text-anchor="end" font-size="9" fill="${css('--c3')}">4-WEEK AVG ${avg28}</text>` : '';
+    host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="average stress per day">${grid}${avg}${bars}</svg>`;
+  }
+
   /** Heart rate over a workout with the altitude as a soft area behind it. */
   function drawHrCurve(host, hr, altitude) {
     const W = 520, H = 200, padL = 30, padR = 30, padT = 10, padB = 18;
@@ -447,6 +535,7 @@
   };
   const SWIMS = new Set(['lap_swimming', 'open_water_swimming', 'swimming']);
   const RUNS = new Set(['running', 'treadmill_running', 'trail_running', 'indoor_running', 'track_running', 'virtual_run']);
+  const PLAN_KEYS = ['runs', 'strength', 'swims', 'rides', 'hikes', 'walks', 'yoga'];
   function typeTag(type) {
     const t = TYPE_TAGS[type];
     if (t) return { text: t[0], color: css(t[1]) };
@@ -523,10 +612,18 @@
   function renderSleep(b) {
     const s = b.sleep || {};
     const host = $('sleep-body');
+    const strip = $('sleep-strip');
+    strip.hidden = !s.recorded;
     if (!s.recorded) {
       host.innerHTML = `<div class="nodata">NO SLEEP DATA<small>WEAR THE WATCH AT NIGHT — THE NIGHT APPEARS HERE IN THE MORNING</small></div>`;
       return;
     }
+    const bed = s.start ? fmtClock(new Date(s.start), undefined, false) : '—';
+    const up = s.end ? fmtClock(new Date(s.end), undefined, false) : '—';
+    strip.classList.toggle('first', !!s.firstNight);
+    strip.textContent = s.firstNight
+      ? `FIRST NIGHT WITH THE WATCH · WELL DONE · BED ${bed} · UP ${up}`
+      : `LAST NIGHT · BED ${bed} · UP ${up}${s.qualifier ? ` · ${s.qualifier}` : ''}`;
     const total = (s.deepSeconds || 0) + (s.lightSeconds || 0) + (s.remSeconds || 0) + (s.awakeSeconds || 0) || s.seconds || 1;
     const pct = (v) => `${((v || 0) / total) * 100}%`;
     const parts = [['DEEP', s.deepSeconds, css('--c4')], ['LIGHT', s.lightSeconds, css('--c5')], ['REM', s.remSeconds, css('--c3')], ['AWAKE', s.awakeSeconds, css('--c7')]];
@@ -665,16 +762,23 @@
 
   function renderYear(b) {
     const y = b.year || { months: [] };
+    const ly = b.lastYear || null;
+    const lyMonths = new Map((ly?.months || []).map((m) => [m.ym.slice(5, 7), m]));
     const current = b.date.slice(0, 7);
-    const maxSteps = Math.max(1, ...y.months.map((m) => m.steps));
+    const maxSteps = Math.max(1, ...y.months.map((m) => m.steps), ...(ly?.months || []).map((m) => m.steps));
     for (const m of y.months) {
-      const tile = $(`year-tile-${m.ym.slice(5, 7)}`);
+      const mm = m.ym.slice(5, 7);
+      const tile = $(`year-tile-${mm}`);
       if (!tile) continue;
       const future = m.ym > current;
+      const lm = lyMonths.get(mm);
+      const hasLy = !!(lm && lm.daysWithData > 0);
       tile.className = `tile${future ? ' future' : ''}${m.ym === current ? ' current' : ''}`;
-      tile.innerHTML = `<span class="tm">${MONTHS[Number(m.ym.slice(5, 7)) - 1]}</span>
+      tile.innerHTML = `<span class="tm">${MONTHS[Number(mm) - 1]}</span>
         <span class="tv">${future ? '—' : fmtInt(m.steps)}</span><span class="tk">STEPS</span>
         <span class="tbar"><i style="width:${Math.round((m.steps / maxSteps) * 100)}%"></i></span>
+        <span class="tbar ghost" title="${ly ? `${ly.year}: ${hasLy ? fmtInt(lm.steps) + ' steps' : 'no data'}` : ''}"><i style="width:${hasLy ? Math.round((lm.steps / maxSteps) * 100) : 0}%"></i></span>
+        <span class="tk ly" id="year-last-${mm}">${hasLy ? `${ly.year} · ${fmtInt(lm.steps)} · ${lm.workouts} WORKOUTS` : (ly ? `${ly.year} · —` : '—')}</span>
         <span class="tv">${future ? '—' : m.workouts}</span><span class="tk">WORKOUTS · ${fmtDur(m.trainingSeconds)}</span>
         <span class="tv">${isNum(m.restingHrAvg) ? m.restingHrAvg : '—'}</span><span class="tk">RESTING · ${m.stepGoalDays} GOAL DAYS</span>`;
       tile.style.cursor = future ? 'default' : 'pointer';
@@ -683,8 +787,94 @@
     const totalSteps = y.months.reduce((a, m) => a + m.steps, 0);
     const totalWorkouts = y.months.reduce((a, m) => a + m.workouts, 0);
     setText('year-note', `${y.year} · ${fmtInt(totalSteps)} STEPS · ${totalWorkouts} WORKOUTS · ${fmtDur(y.months.reduce((a, m) => a + m.trainingSeconds, 0))}`);
+    setText('last-year-line', lastYearLine(ly, b));
     const label = $('explain-year');
     if (label) label.textContent = `THE YEAR ${y.year}`;
+  }
+
+  /** "SAME TIME LAST YEAR": last year's number, then this year's, with the change. */
+  function lastYearLine(ly, b) {
+    if (!ly) return '—';
+    const m = ly.month || {}, t = ly.toDate || {};
+    const change = (v, unit) => (!isNum(v) ? '' : v === 0 ? ' (=)' : ` (${v > 0 ? '▲ +' : '▼ −'}${Math.abs(v)}${unit})`);
+    const pair = (blk, fmt, unit) => `${fmt(blk.before)} → ${fmt(blk.now)}${change(isNum(blk.pct) ? blk.pct : blk.diff, isNum(blk.pct) ? ' %' : unit)}`;
+    const name = m.ym ? monthWord(m.ym) : '';
+    const parts = [];
+    if (m.available) {
+      parts.push(`SAME TIME LAST YEAR · ${name} ${ly.year} TO DAY ${m.throughDay} · STEPS ${pair(m.steps, fmtInt, '')} · WORKOUTS ${pair(m.workouts, (n) => n, '')}${isNum(m.restingHrAvg?.before) && isNum(m.restingHrAvg?.now) ? ` · RESTING ${m.restingHrAvg.before} → ${m.restingHrAvg.now}${change(m.restingHrAvg.diff, '')}` : ''}`);
+    } else {
+      parts.push(`NO DATA FOR ${name} ${ly.year} · NOTHING TO COMPARE WITH YET`);
+    }
+    if (t.available) parts.push(`${ly.year} TO THIS DAY · STEPS ${pair(t.steps, fmtInt, '')} · WORKOUTS ${pair(t.workouts, (n) => n, '')} · TRAINING ${pair(t.trainingSeconds, fmtDur, '')}`);
+    return parts.join('   ·   ');
+  }
+
+  // ----- the 1.4 panels: plan, rhythm, resting trend, stress, water -----
+
+  function renderPlan(b) {
+    const p = b.plan || { items: [], target: 0, done: 0 };
+    const items = p.items || [];
+    $('plan-list').innerHTML = items.length
+      ? items.map((it) => {
+        const ticks = [];
+        for (let i = 0; i < it.target; i++) ticks.push(i < it.done ? '<span class="tick">●</span>' : '<span class="open">○</span>');
+        if (it.done > it.target) ticks.push(`<small>+${it.done - it.target}</small>`);
+        return `<div class="plan-row${it.done >= it.target ? ' done' : ''}" id="plan-row-${escapeHtml(it.key)}" title="${escapeHtml((it.dates || []).map(fmtDay).join(', '))}">
+          <span class="pk">${escapeHtml(it.label)}</span><span class="ticks">${ticks.join('')}</span><span class="pv">${it.done} / ${it.target}</span></div>`;
+      }).join('')
+      : '<div class="act-empty">NO PLAN YET. HOW MANY RUNS, STRENGTH SESSIONS OR SWIMS A WEEK?</div>';
+    const left = p.daysLeft === 0 ? 'LAST DAY OF THE WEEK' : `${p.daysLeft} ${p.daysLeft === 1 ? 'DAY' : 'DAYS'} LEFT`;
+    setText('plan-note', !p.target ? 'NO PLAN SET · EDIT TO ADD ONE' : p.complete ? `ALL DONE · ${left}` : `${p.done} OF ${p.target} DONE · ${left}`);
+  }
+
+  function renderRhythm(b) {
+    const r = b.rhythm || { days: [] };
+    drawRhythm($('rhythm-chart'), r);
+    const by = new Map((r.days || []).map((d) => [d.name, d]));
+    const dayWord = (n) => ({ MON: 'MONDAY', TUE: 'TUESDAY', WED: 'WEDNESDAY', THU: 'THURSDAY', FRI: 'FRIDAY', SAT: 'SATURDAY', SUN: 'SUNDAY' }[n] || n);
+    setText('rhythm-note', r.weakest
+      ? `WEAKEST ${dayWord(r.weakest)} · ${fmtInt(by.get(r.weakest)?.avg)} A DAY · STRONGEST ${dayWord(r.strongest)} · ${fmtInt(by.get(r.strongest)?.avg)}${isNum(r.overallAvg) ? ` · ALL DAYS ${fmtInt(r.overallAvg)}` : ''}`
+      : 'NO DAYS WITH DATA YET');
+  }
+
+  function renderRestingTrend(b) {
+    const t = b.restingTrend || { points: [], avg7: [] };
+    drawRestingTrend($('resting-trend-chart'), t, b.date);
+    setText('resting-trend-note', t.points?.length
+      ? `AVG ${t.avg} · ${t.min}–${t.max}${t.latest ? ` · LATEST ${t.latest.bpm} ON ${fmtDay(t.latest.date).toUpperCase()}` : ''}${t.avg7?.length ? ` · 7-DAY AVG ${fmt1(t.avg7[t.avg7.length - 1].bpm)}` : ''}`
+      : 'NO PULSE DATA YET');
+  }
+
+  function renderStress(b) {
+    const s = b.stress || { today: {}, days: [] };
+    const t = s.today || {};
+    const chip = $('stress-word');
+    chip.textContent = t.qualifier || '—';
+    chip.classList.toggle('warn', /STRESSFUL/.test(t.qualifier || ''));
+    const parts = [['REST', t.restSec, css('--c5')], ['LOW', t.lowSec, css('--c6')], ['MEDIUM', t.mediumSec, css('--c1')], ['HIGH', t.highSec, css('--c7')]];
+    const total = t.measuredSec || 0;
+    $('stress-stack').innerHTML = total
+      ? parts.map(([k, v, c]) => `<span style="width:${((v || 0) / total) * 100}%;background:${c}" title="${k} ${fmtDur(v || 0)}"></span>`).join('')
+      : '';
+    $('stress-legend').innerHTML = total
+      ? parts.map(([k, v, c]) => `<span><i style="background:${c}"></i>${k} ${fmtDur(v || 0)}</span>`).join('')
+      : '<span>NO STRESS LEVELS MEASURED YET TODAY</span>';
+    drawStressDays($('stress-days-chart'), s.days || [], s.avg28, b.date);
+    setText('stress-note', `${isNum(t.avg) ? `TODAY ${t.avg}` : 'TODAY —'}${isNum(t.max) ? ` · PEAK ${t.max}` : ''}${isNum(s.avg28) ? ` · 4-WEEK AVG ${s.avg28}` : ''} · UNDER 25 IS REST, OVER 75 IS HIGH`);
+  }
+
+  function renderHydration(b) {
+    const h = b.hydration || { logged: false, days: [] };
+    const litres = (ml) => (isNum(ml) ? fmt1(ml / 1000) : '—');
+    drawArcGauge($('hydration-gauge'), {
+      value: h.todayMl, max: h.goalMl, color: css('--c5'),
+      big: litres(h.todayMl), unit: 'LITRES',
+      small: isNum(h.pct) ? `${h.pct} % OF GOAL` : (isNum(h.goalMl) ? `GOAL ${litres(h.goalMl)} L` : 'NO GOAL SET'),
+    });
+    drawHydrationDays($('hydration-days'), h.days || [], h.goalMl);
+    setText('hydration-note', h.logged
+      ? `${isNum(h.goalMl) ? `GOAL ${litres(h.goalMl)} L · ` : ''}7-DAY AVG ${litres(h.avgMl)} L${h.lastEntryAt ? ` · LAST ENTRY ${fmtStamp(h.lastEntryAt)}` : ''}`
+      : 'NO WATER LOGGED · LOG IT IN GARMIN CONNECT OR ON THE WATCH');
   }
 
   function renderTravel(travel) {
@@ -1000,6 +1190,11 @@
     renderZones(b);
     renderStreaks(b);
     renderYear(b);
+    renderPlan(b);
+    renderRhythm(b);
+    renderRestingTrend(b);
+    renderStress(b);
+    renderHydration(b);
     renderTravel(b.travel);
     if (!viewYm) {
       monthData = { ym: b.date.slice(0, 7), month: b.month, activities: b.activities, compare: b.compare, log: b.log };
@@ -1107,8 +1302,14 @@
       $('target-runs').value = t.runs ?? '';
       $('target-training-minutes').value = t.trainingMinutes ?? '';
       $('target-distance-km').value = t.distanceKm ?? '';
+      const p = j.settings?.plan || {};
+      for (const k of PLAN_KEYS) $(`plan-${k}`).value = p[k] ?? '';
+      $('notify-toggle').checked = j.settings?.notify !== false;
       $('access-code').value = '';
       $('access-code').placeholder = j.settings?.hasAccessCode ? 'A code is set · type a new one, or a space to remove it' : 'Set a code to open the board on your iPhone or iPad';
+      const cur = $('access-code-current');
+      cur.hidden = !j.settings?.accessCode;
+      cur.textContent = j.settings?.accessCode ? `CURRENT CODE · ${j.settings.accessCode}` : '';
       setText('lan-address', j.settings?.lanAddress || '—');
     } catch (err) {
       $('settings-error').hidden = false;
@@ -1119,6 +1320,8 @@
     const num = (id) => { const v = $(id).value.trim(); return v === '' ? undefined : Number(v); };
     const body = {
       targets: { steps: num('target-steps'), workouts: num('target-workouts'), swims: num('target-swims'), runs: num('target-runs'), trainingMinutes: num('target-training-minutes'), distanceKm: num('target-distance-km') },
+      plan: Object.fromEntries(PLAN_KEYS.map((k) => [k, num(`plan-${k}`)])),
+      notify: $('notify-toggle').checked,
     };
     const code = $('access-code').value;
     if (code !== '') body.accessCode = code.trim(); // a single space clears it
@@ -1129,6 +1332,7 @@
       if (!res.ok || !j.ok) throw new Error(j.error || 'Could not save.');
       if (board) { board.targets = j.settings.targets; if (monthData) renderMonthGroup(monthData); }
       closeSheets();
+      load(false); // the server has re-ticked the week's plan; the cached board comes back at once
     } catch (err) {
       $('settings-error').hidden = false;
       $('settings-error').textContent = err.message || String(err);
@@ -1152,6 +1356,128 @@
     } catch (err) {
       setText('report-text', `Could not build the report: ${err.message || err}`);
     }
+  }
+
+  // ---------- share today as a picture (1.4) ----------
+
+  /** Draws the day's card on the canvas with the Canvas 2D API, in the current colours. */
+  function drawShareCard(canvas, b) {
+    const W = canvas.width, H = canvas.height;
+    const ctx = canvas.getContext('2d');
+    const C = { bg: css('--bg'), ink: css('--ink'), text: css('--text'), dim: css('--dim'), track: css('--track'), grid: css('--grid'), c1: css('--c1'), c2: css('--c2'), c3: css('--c3'), c5: css('--c5'), c6: css('--c6'), c7: css('--c7'), c8: css('--c8'), ok: css('--ok') };
+    const font = (px, bold = true) => `${bold ? 700 : 400} ${px}px Antonio, "Arial Narrow", "Helvetica Neue", Arial, sans-serif`;
+    const text = (s, x, y, px, color, align = 'left', bold = true) => { ctx.font = font(px, bold); ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'alphabetic'; ctx.fillText(String(s ?? '—').toUpperCase(), x, y); };
+    const rr = (x, y, w, h, r, color) => { ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill(); };
+    const now = new Date();
+    const t = b.today || {}, s = b.sleep || {}, wk = b.week || {}, a = b.activities || {}, w = b.weight || null, p = b.plan || {};
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+
+    // top frame
+    rr(40, 40, 1000, 70, 35, C.c1);
+    rr(40, 40, 380, 70, 35, C.c1);
+    text('AMS GARMIN · BRIDGE', 70, 90, 40, C.ink);
+    rr(440, 40, 220, 70, 0, C.c3); rr(670, 40, 120, 70, 0, C.c2); rr(800, 40, 240, 70, 35, C.c2);
+    text(now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }), 1010, 90, 30, C.ink, 'right');
+
+    // a panel helper
+    const panel = (x, y, w, h, title, color) => {
+      rr(x, y, w, 26, 13, color); ctx.fillStyle = color; ctx.fillRect(x + 20, y, w - 20, 26);
+      text(title, x + 22, y + 20, 22, C.ink);
+      ctx.fillStyle = C.track; ctx.globalAlpha = 0.5; ctx.fillRect(x, y + 34, w, h - 34); ctx.globalAlpha = 1;
+    };
+    const big = (x, y, value, label, color) => { text(value, x, y, 64, color); text(label, x, y + 28, 20, C.dim); };
+
+    // steps ring
+    panel(40, 140, 480, 330, 'STEPS TODAY', C.c2);
+    const cx = 170, cy = 330, r = 110;
+    const ratio = isNum(t.steps) && isNum(t.stepGoal) && t.stepGoal > 0 ? Math.min(1, t.steps / t.stepGoal) : 0;
+    ctx.lineCap = 'round'; ctx.lineWidth = 26;
+    ctx.strokeStyle = C.track; ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI * 0.75, Math.PI * 2.25); ctx.stroke();
+    if (ratio > 0.002) { ctx.strokeStyle = C.c2; ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI * 0.75, Math.PI * (0.75 + 1.5 * ratio)); ctx.stroke(); }
+    text(fmtInt(t.steps), cx, cy + 18, 54, C.c2, 'center');
+    text(isNum(t.stepGoal) ? `${Math.round(ratio * 100)} % OF ${fmtInt(t.stepGoal)}` : 'NO GOAL', cx, cy + 95, 20, C.dim, 'center');
+    big(330, 260, fmtKm(t.distanceM), 'DISTANCE', C.c2);
+    big(330, 360, fmtInt(t.floorsUp), 'FLOORS UP', C.c2);
+    const chip = t.stepsCompare;
+    if (chip && isNum(chip.steps)) text(`${chip.delta > 0 ? '▲ +' : chip.delta < 0 ? '▼ −' : '= '}${fmtInt(Math.abs(chip.delta))} VS 4 WEEKS AGO`, 330, 440, 20, chip.delta >= 0 ? C.ok : C.c7);
+
+    // cardio and battery
+    panel(560, 140, 480, 330, 'CARDIO · TODAY', C.c7);
+    big(590, 260, isNum(t.restingHr) ? `${t.restingHr}` : '—', 'RESTING PULSE · BPM', C.c7);
+    big(820, 260, isNum(t.bodyBattery?.latest) ? `${t.bodyBattery.latest}` : '—', 'BODY BATTERY', C.c5);
+    big(590, 360, isNum(t.stressAvg) ? `${t.stressAvg}` : '—', 'STRESS · AVERAGE', C.c1);
+    big(820, 360, isNum(b.month?.restingHrAvg) ? `${b.month.restingHrAvg}` : '—', 'MONTH AVERAGE PULSE', C.c7);
+    text(b.stress?.today?.qualifier ? `GARMIN SAYS ${b.stress.today.qualifier}` : '', 590, 440, 20, C.dim);
+
+    // sleep, intensity, workouts, weight
+    panel(40, 500, 480, 230, 'SLEEP · LAST NIGHT', C.c3);
+    if (s.recorded) {
+      big(70, 610, fmtHours(s.seconds), `ASLEEP${s.qualifier ? ' · ' + s.qualifier : ''}`, C.c3);
+      text(`BED ${s.start ? fmtClock(new Date(s.start), undefined, false) : '—'} · UP ${s.end ? fmtClock(new Date(s.end), undefined, false) : '—'}${isNum(s.score) ? ` · SCORE ${s.score}` : ''}`, 70, 690, 22, C.text);
+    } else {
+      text('NO SLEEP RECORDED', 70, 610, 40, C.c7);
+      text('WEAR THE WATCH AT NIGHT', 70, 660, 22, C.dim);
+    }
+    panel(560, 500, 480, 230, 'INTENSITY · THIS WEEK', C.c1);
+    big(590, 610, fmtInt(wk.intensityMinutes), isNum(wk.goal) ? `MINUTES OF ${fmtInt(wk.goal)}` : 'MINUTES', C.c1);
+    const wr = isNum(wk.goal) && wk.goal > 0 ? Math.min(1, (wk.intensityMinutes || 0) / wk.goal) : 0;
+    rr(590, 660, 420, 22, 11, C.track); if (wr > 0) rr(590, 660, 420 * wr, 22, 11, C.c1);
+    text(isNum(wk.goal) ? `${Math.round(wr * 100)} % OF THE WEEKLY GOAL` : '', 590, 712, 20, C.dim);
+
+    panel(40, 760, 480, 230, `WORKOUTS · ${monthWord(b.date.slice(0, 7))}`, C.c6);
+    big(70, 870, `${a.count ?? 0}`, `WORKOUTS · ${fmtDur(a.seconds)}`, C.c6);
+    text(`${fmtKm(a.distanceM)} · ${fmtInt(a.elevationGain)} M CLIMBED${p.target ? ` · WEEK PLAN ${p.done}/${p.target}` : ''}`, 70, 950, 22, C.text);
+    panel(560, 760, 480, 230, 'MASS', C.c5);
+    big(590, 870, w ? fmtKg(w.kg) : '—', w?.date ? `WEIGHED ${fmtDay(w.date)}` : 'NO WEIGH-IN IN 90 DAYS', C.c5);
+    if (w && isNum(w.deltaKg)) text(`${w.deltaKg > 0 ? '▲ +' : w.deltaKg < 0 ? '▼ −' : '= '}${Math.abs(w.deltaKg).toLocaleString(LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} KG SINCE THE WEIGH-IN BEFORE`, 590, 950, 22, C.text);
+
+    // the month as bars
+    panel(40, 1020, 1000, 220, `STEPS · ${monthWord(b.date.slice(0, 7))} SO FAR`, C.c2);
+    const days = b.month?.days || [];
+    const top = Math.max(1, ...days.map((d) => Math.max(d.steps || 0, d.stepGoal || 0)));
+    const bx = 70, by = 1215, bw = 960 / Math.max(1, days.length), bh = 130;
+    days.forEach((d, i) => {
+      const h = ((d.steps || 0) / top) * bh;
+      ctx.fillStyle = d.date === b.date ? C.c6 : C.c2; ctx.globalAlpha = d.stepGoal && d.steps >= d.stepGoal ? 1 : 0.55;
+      if (h > 0) ctx.fillRect(bx + i * bw + bw * 0.15, by - h, bw * 0.7, h);
+      ctx.globalAlpha = 1;
+      if (d.stepGoal) { ctx.fillStyle = C.c8; ctx.fillRect(bx + i * bw + bw * 0.1, by - (d.stepGoal / top) * bh - 1, bw * 0.8, 2); }
+    });
+    const logLine = b.log?.[b.date];
+    text(logLine ? `LOG · ${logLine}` : `${fmtInt(b.month?.steps)} STEPS · GOAL MET ${b.month?.stepGoalDays ?? 0} DAYS`, 70, 1236, 20, C.dim);
+
+    // footer bar
+    rr(40, 1270, 1000, 40, 20, C.c2);
+    text(`BOARD ${b.version || ''} · STARDATE ${stardate(now)} · AMS GARMIN BRIDGE BOARD`, 540, 1298, 20, C.ink, 'center');
+  }
+
+  const shareFileName = () => `ams-garmin-board-${board?.date || todayIso()}.png`;
+  const canShareFiles = () => { try { return !!navigator.canShare?.({ files: [new File([''], 'x.png', { type: 'image/png' })] }); } catch { return false; } };
+  async function showShare() {
+    if (!board) return;
+    openSheet('share-sheet');
+    $('share-send').hidden = !canShareFiles();
+    try { await document.fonts?.load?.(`700 40px Antonio`); } catch { /* the fallback font will do */ }
+    drawShareCard($('share-canvas'), board);
+  }
+  function canvasBlob() { return new Promise((resolve) => $('share-canvas').toBlob(resolve, 'image/png')); }
+  async function saveShare() {
+    const blob = await canvasBlob();
+    if (!blob) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = shareFileName();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    $('share-save').textContent = 'SAVED';
+    setTimeout(() => { $('share-save').textContent = 'SAVE PNG'; }, 1500);
+  }
+  async function sendShare() {
+    const blob = await canvasBlob();
+    if (!blob) return;
+    const file = new File([blob], shareFileName(), { type: 'image/png' });
+    try { await navigator.share({ files: [file], title: 'AMS Garmin Board' }); } catch { /* the user closed the share sheet */ }
   }
 
   // ---------- looks, kiosk, keys ----------
@@ -1194,6 +1520,7 @@
     switch (e.key) {
       case 'r': case 'R': load(true); break;
       case 'f': case 'F': toggleKiosk(); break;
+      case 's': case 'S': showShare(); break;
       case 'ArrowLeft': if (board) stepMonth(-1); break;
       case 'ArrowRight': if (board) stepMonth(1); break;
       case '?': if (anySheetOpen()) closeSheets(); else showHelp('how'); break;
@@ -1221,6 +1548,11 @@
   $('report-kind-week').addEventListener('click', () => showReport('week'));
   $('report-kind-month').addEventListener('click', () => showReport('month'));
   $('report-close').addEventListener('click', closeSheets);
+  $('share-button').addEventListener('click', showShare);
+  $('share-save').addEventListener('click', saveShare);
+  $('share-send').addEventListener('click', sendShare);
+  $('share-close').addEventListener('click', closeSheets);
+  $('plan-edit-button').addEventListener('click', showSettings);
   $('month-prev').addEventListener('click', () => stepMonth(-1));
   $('month-next').addEventListener('click', () => stepMonth(1));
   $('month-today').addEventListener('click', () => showMonth(null));

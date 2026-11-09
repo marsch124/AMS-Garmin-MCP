@@ -1,5 +1,40 @@
 # What's new
 
+## 1.4.0 — 9 November 2026
+Nine new things on the board: a look at last night, last year, your weekly rhythm and plan, resting pulse, water and stress, a Mac alert, a card to share, and printing.
+
+**New**
+- Last night strip: at the top of the sleep panel, one line such as "LAST NIGHT · BED 23:10 · UP 06:45 · GOOD". The word is Garmin's own: EXCELLENT (90 to 100), GOOD (80 to 89), FAIR (60 to 79) or POOR (under 60). When the watch has recorded only this one night out of the last seven, it says "FIRST NIGHT WITH THE WATCH · WELL DONE" instead, with the same bed and up times. With no sleep recorded the strip stays hidden and the usual NO SLEEP DATA note stays.
+- Same time last year: in the year panel, a line compares this month up to today's date with the same days last year (steps, workouts, training time, each with an arrow and a percent), and the year so far with the same days of last year. For example "SAME TIME LAST YEAR · NOVEMBER 2025 TO DAY 9 · STEPS 61 200 → 68 500 (▲ +12 %) · WORKOUTS 4 → 4 (=)". Every month tile also gets a faint bar and a small line for the same month last year, such as "2025 · 48 200". Without data from last year the line says "NO DATA FOR NOVEMBER 2025" and the tiles show "—".
+- Weekly rhythm: a new panel with seven bars, Monday to Sunday, showing your average steps per weekday over the last 12 weeks. Only finished days with data count. The weakest day is red, the strongest green, and your overall average is a dashed line. A note says it in words, for example "WEAKEST SUNDAY · 6 100 A DAY · STRONGEST SATURDAY · 12 400".
+- This week's plan: a new panel with your own weekly workout plan and a tick for each workout done since Monday, for example ●●○ for 2 of 3 runs. You set the numbers in Settings for runs, strength, swims, rides, hikes, walks and yoga (0 means not in the plan). The note reads "3 OF 5 DONE · 4 DAYS LEFT", "ALL DONE · 2 DAYS LEFT", or "NO PLAN SET · EDIT TO ADD ONE". An EDIT button opens Settings. Running includes treadmill and trail runs, rides include indoor and mountain biking, swims include open water, and yoga includes Pilates.
+- Resting pulse over 90 days: a new panel with a dot for each finished day, a 7-day average line and your 90-day average dashed, with month marks like the weight chart. The note reads "AVG 51 · 46–58 · LATEST 48 ON 8 NOV", or "NO PULSE DATA YET".
+- Stress: a new panel with today's word from Garmin (CALM, BALANCED, STRESSFUL or VERY STRESSFUL), a bar that splits the day into rest, low, medium and high stress with the hours, and 28 small bars of the daily average with the 4-week average dashed. The note reads "TODAY 23 · 4-WEEK AVG 27". The stress bar in the heart panel stays as it was.
+- Water: a new panel with a round gauge for the litres logged today against your goal (for example 1,2 LITRES), seven small bars for the last week, and a note such as "GOAL 2,5 L · 7-DAY AVG 1,8 L".
+- Mac notification on red alert: when an alert fires for the first time, the Mac shows a notification, even with no board page open, with the title "AMS Garmin Board · Red alert" and the alert texts. You get one notification per alert per day. A switch in Settings turns it off.
+- Share and print: a new SHARE button at the bottom (key S) draws a card for the day as a picture: steps with goal, resting pulse, Body Battery, sleep, intensity minutes, workouts and training time this month, weight, small bars of the month's steps, your Captain's log line of the day, and the board version and stardate. SAVE PNG saves it on the Mac, and on the iPhone a SHARE… button hands it to Messages, Mail and the like. Press ⌘P to print the board on white paper, without the buttons.
+- Access code shown: on the Mac, Settings now shows the current code ("CURRENT CODE · 482913") so you can read it when you type it on the phone.
+
+**Changed**
+- The version is now 1.4.0.
+- Settings on the Mac now show the current access code. From the home network the code is never shown.
+- The board now checks for red alerts every 30 minutes by itself, also when no page is open. That is what makes the Mac notification work.
+- The daily summaries now reach 90 days back, so the resting pulse trend has its 90 days even in January and February.
+- The sleep, year, targets and red alert explanations have a new paragraph, and there are five new explanations: weekly rhythm, this week's plan, resting pulse over 90 days, water and stress. There are now 30 headings you can press.
+- If the board gets a new version while the page is open, the page reloads by itself.
+
+**Good to know**
+- Water shows "NO WATER LOGGED" until you log water in Garmin Connect or on the watch. The board cannot see what you drink by itself.
+- The last-year line needs data from 2025. Where the watch recorded nothing, it says so, and the faint bars stay empty.
+- The first time a Mac notification is due, the Mac may ask to allow notifications for Script Editor. Say yes, or you get none.
+- The picture card uses the colour look you have chosen.
+- To print, press ⌘P. The buttons and sheets are left out and the colours are made for white paper.
+- The plan, the notification switch and the code live only on this Mac, like the targets.
+- The explanations are general information. For health questions, ask a doctor.
+
+**Quality**
+- New automatic tests check the new parts by their names, and each was seen failing before the code was written: the sleep strip words, the last-year numbers with and without data, the weekly rhythm, the plan and its sums, the 90-day resting pulse, water with and without logged drinks, stress and its words, the notification once per alert per day, the code shown on the Mac only, and every new element on the page. They run on every push to GitHub.
+
 ## 1.3.0 — 9 November 2026
 Small helpers that make the board more useful on a quiet week, and reports that can travel to your iPhone.
 

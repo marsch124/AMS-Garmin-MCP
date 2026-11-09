@@ -17,17 +17,22 @@ The board is a live instrument panel for your Garmin data, in the style of a Sta
 - Intensity minutes this week against your goal. Hard minutes count double.
 - Body Battery today as a line, with sleep and workouts shaded.
 - Fitness: VO2 max and fitness age next to your real age, with trend arrows.
-- Sleep and HRV from last night, and sleep debt over the last 7 nights. If the watch has no sleep data, the board says so: wear the watch at night. After three empty nights in a row, the sleep-debt panel says "WEAR THE WATCH TONIGHT · 3 EMPTY NIGHTS" and the sleep panel shows a small note.
+- Sleep and HRV from last night, with a LAST NIGHT strip (bed time, up time and Garmin's word: EXCELLENT, GOOD, FAIR or POOR), and sleep debt over the last 7 nights. If the watch has no sleep data, the board says so: wear the watch at night. After three empty nights in a row, the sleep-debt panel says "WEAR THE WATCH TONIGHT · 3 EMPTY NIGHTS" and the sleep panel shows a small note.
 - Weight: your last weigh-in, plus 90 days of dots, a 7-day average and your goal line.
 - Training load: the last 7 days against your usual week, with one word: RECOVERY, MAINTAINING, PRODUCTIVE or OVERREACHING.
 - Heart-rate zones this week, from Monday. When the week has no workout yet, the panel shows the last 7 days instead and says so ("LAST 7 DAYS · NO WORKOUT YET THIS WEEK").
 - Streaks: days in a row at your step goal and with a workout, and the longest this year.
 - Weather for the next 12 hours.
 - Targets: your own monthly goals with progress bars.
+- This week's plan: your own weekly workout plan (runs, strength, swims, rides, hikes, walks, yoga) with a tick for each workout done since Monday and the days left.
 - Captain's log: one line a day.
+- Weekly rhythm: your average steps for each weekday over 12 weeks, with the weakest and strongest day marked.
+- Resting pulse over 90 days: a dot per day, a 7-day average line and the 90-day average.
+- Stress: today's word from Garmin, how the day divides into rest and stress, and 4 weeks of daily averages.
+- Water: litres logged today against your goal, and the last 7 days. It says "no water logged" until you log water in Garmin Connect or on the watch.
 - This month: a bar for every day's steps, a line for resting pulse, and the totals with an arrow against last month up to the same day.
 - Workouts: the list, newest first. Press one to see splits, heart-rate curve and a map of the route.
-- Year: twelve tiles, one per month.
+- Year: twelve tiles, one per month, with a faint bar for the same month last year and a SAME TIME LAST YEAR line that compares this month and the year so far with a year ago.
 - Link status: green when Garmin answers, red with the reason when not, plus when your key runs out.
 
 **Press any heading**
@@ -39,16 +44,22 @@ At the bottom there is a colour switcher with seven looks: Calm Dusk (standard),
 **Looking back**
 The arrows beside the month name show earlier months. The right arrow stops at the current month, and a button jumps back to it. The workouts, totals and Captain's log follow the month you picked.
 
+**Share and print**
+- Press **SHARE** at the bottom, or the **S** key. The board draws a card for the day as a picture, in your current colour look: steps, resting pulse, Body Battery, sleep, intensity minutes, workouts, weight, the month's steps and your Captain's log line.
+- On the Mac, **SAVE PNG** saves the picture. On the iPhone, **SHARE…** hands it to Messages, Mail and so on.
+- Press **⌘P** to print the board on white paper, without the buttons.
+
 **Captain's log, targets and settings**
 - Type one line in the Captain's log and press save. This month's lines are listed below.
-- Open **Settings** to change your monthly targets (steps, workouts, swims, runs, training minutes, distance) and to set a code. Cancel leaves everything as it was.
+- Open **Settings** to change your monthly targets (steps, workouts, swims, runs, training minutes, distance), your weekly plan (runs, strength, swims, rides, hikes, walks, yoga; 0 leaves one out), the Mac notification switch and the access code. The current code is shown there on the Mac. Cancel leaves everything as it was.
+- The Mac shows a notification when a red alert fires for the first time, once per alert per day, even with no page open. The board checks every 30 minutes. Switch it off with MAC NOTIFICATION ON RED ALERT in Settings. The first time, allow notifications for Script Editor if the Mac asks.
 
 **Full screen**
 Press **F** or the FULL SCREEN button for a calm wall display. The cursor hides when it is still, and between 21:00 and 07:00 the board dims.
 
 **iPhone and iPad on your home Wi-Fi**
-1. On the Mac, open Settings and type a code of your choice. Save.
-2. Settings now shows an address. Type that address into Safari on the phone.
+1. On the Mac, open Settings and type a code of your choice. Save. Settings shows the current code from then on.
+2. Settings also shows an address. Type that address into Safari on the phone.
 3. Enter the code once. The phone remembers it for a year.
 Without a code, the board works on this Mac only. Only the Mac can change settings.
 
@@ -59,7 +70,7 @@ Every Monday morning, a summary of last week lands in Apple Notes (folder "AMS G
 Run `scripts/install-agents.sh` once. It makes the board start at login and sets up the Monday and month reports. Run it with `--remove` to undo.
 
 **Keyboard**
-R refresh · F full screen · left and right arrows previous and next month · ? help · Escape close.
+R refresh · F full screen · S share · left and right arrows previous and next month · ? help · Escape close.
 
 **Help**
 The **?** button opens How it works and What's new.
@@ -124,5 +135,6 @@ Make a new key on the same Garmin page (see above) and run the save-key dialog a
 Your data goes from Garmin straight to Claude on this Mac. The code repository is public so that GitHub runs the tests for free; it contains no data and no keys, and never will.
 
 ## Version
+1.4.0 — 9 Nov 2026
 1.3.0 — 9 Nov 2026
 1.2.0 — 9 Nov 2026

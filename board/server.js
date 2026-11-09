@@ -7,12 +7,13 @@
 
 import http from 'node:http';
 import os from 'node:os';
+import { execFile } from 'node:child_process';
 import { readFile, stat } from 'node:fs/promises';
 import { dirname, join, normalize, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GarminClient, FileTokenStore, readApiKey, GarminError } from '../src/garmin-client.js';
 import { VERSION } from '../src/tools.js';
-import { buildBoard, buildMonth, reportText, travelView, nextMonth } from './board-data.js';
+import { buildBoard, buildMonth, reportText, travelView, nextMonth, planView } from './board-data.js';
 import { BoardStore, DEFAULT_STORE_DIR, HOME_ZONE } from './store.js';
 import { createWeather, HOME_PLACE } from './weather.js';
 import { workoutFromFile } from './fit.js';
@@ -164,7 +165,7 @@ const docsSection = (md, heading) => {
  */
 export function createBoardServer({
   client, now = () => Date.now(), cacheMs = 5 * 60 * 1000, today, storeDir, store,
-  fetchFn, remoteAddressOf, homeZone = HOME_ZONE, port = DEFAULT_PORT, onAccessCodeChange,
+  fetchFn, remoteAddressOf, homeZone = HOME_ZONE, port = DEFAULT_PORT, onAccessCodeChange, notify,
 } = {}) {
   const st = store ?? new BoardStore(storeDir ?? DEFAULT_STORE_DIR);
   const weather = createWeather({ fetchFn, now });
@@ -175,11 +176,29 @@ export function createBoardServer({
   const monthCache = new Map();    // ym -> { at, body }
   const activityCache = new Map(); // id -> body
 
+  /** Tells the Mac about red alerts it has not heard of today (once per alert, per day). */
+  async function notifyAlerts(body) {
+    if (!notify || !Array.isArray(body?.alerts) || !body.alerts.length) return;
+    try {
+      const settings = await st.settings();
+      if (!settings.notify) return;
+      const date = body.date ?? todayOf();
+      const seen = await st.notified();
+      const known = new Set(seen.date === date ? seen.keys : []);
+      const fresh = body.alerts.filter((a) => a?.key && !known.has(a.key));
+      if (!fresh.length) return;
+      await st.saveNotified(date, [...known, ...fresh.map((a) => a.key)]);
+      await notify({ title: 'AMS Garmin Board · Red alert', text: fresh.map((a) => a.text).join(' · '), alerts: fresh });
+    } catch (err) {
+      process.stderr.write(`[ams-garmin-board] notification failed: ${err?.message || err}\n`);
+    }
+  }
+
   async function boardJson(force) {
     if (!force && cache && now() - cache.at < cacheMs) return cache.body;
     if (!pending) {
       pending = buildBoard(client, { now, today: todayOf(), store: st, homeZone })
-        .then((body) => { cache = { at: now(), body }; return body; })
+        .then(async (body) => { cache = { at: now(), body }; await notifyAlerts(body); return body; })
         .finally(() => { pending = null; });
     }
     return pending;
@@ -235,9 +254,12 @@ export function createBoardServer({
     return body;
   }
 
-  async function settingsJson() {
+  /** The settings; the code itself only on this Mac (loopback), never over the home network. */
+  async function settingsJson(local = false) {
     const s = await st.settings();
-    return { ok: true, settings: { targets: s.targets, hasAccessCode: !!s.accessCode, lanAddress: lanAddress(port) } };
+    const settings = { targets: s.targets, plan: s.plan, notify: s.notify, hasAccessCode: !!s.accessCode, lanAddress: lanAddress(port) };
+    if (local && s.accessCode) settings.accessCode = s.accessCode;
+    return { ok: true, settings };
   }
 
   async function defaultPlace() {
@@ -307,11 +329,18 @@ export function createBoardServer({
           const forecast = await weather.forecast(place);
           return sendJson(res, 200, { ok: true, place: { ...place, lat: Math.round(place.lat * 100) / 100, lon: Math.round(place.lon * 100) / 100 }, ...forecast });
         }
-        if (path === '/api/settings' && method === 'GET') return sendJson(res, 200, await settingsJson());
+        if (path === '/api/settings' && method === 'GET') return sendJson(res, 200, await settingsJson(local));
         if (path === '/api/settings' && method === 'PUT') {
           const before = (await st.settings()).accessCode;
           const after = await st.saveSettings(await readJson(req));
-          const out = await settingsJson();
+          if (cache?.body) {
+            // Re-tick the week's plan against the cached workouts so the page sees it at once.
+            const b = cache.body;
+            b.targets = { ...after.targets };
+            const acts = (b.context?.acts ?? []).filter((a) => a.date && a.date >= b.weekStart && a.date <= b.date);
+            b.plan = planView(after.plan, acts, b.date, b.weekStart);
+          }
+          const out = await settingsJson(local);
           if (!!before !== !!after.accessCode) onAccessCodeChange?.(!!after.accessCode);
           return sendJson(res, 200, out);
         }
@@ -366,10 +395,24 @@ export function createBoardServer({
     await sendFile(res, path, req.method === 'HEAD');
   }
 
-  return http.createServer((req, res) => {
+  const server = http.createServer((req, res) => {
     handle(req, res).catch((err) => {
       if (!res.headersSent) sendJson(res, 500, { ok: false, error: err?.message || String(err) });
       else res.end();
+    });
+  });
+  /** Rebuilds the board (and checks the red alerts) even when no page is open. */
+  server.refresh = () => boardJson(true);
+  return server;
+}
+
+/** Shows a Mac notification (Notification Centre) through osascript. */
+export function macNotify({ title, text }) {
+  const esc = (s) => String(s ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  return new Promise((resolve) => {
+    execFile('osascript', ['-e', `display notification "${esc(text)}" with title "${esc(title)}" sound name "Basso"`], { timeout: 10_000 }, (err) => {
+      if (err) process.stderr.write(`[ams-garmin-board] osascript: ${err.message}\n`);
+      resolve();
     });
   });
 }
@@ -380,7 +423,7 @@ export async function realClient() {
   return new GarminClient({ apiKey, tokenStore: new FileTokenStore() });
 }
 
-export async function startBoard({ port = DEFAULT_PORT } = {}) {
+export async function startBoard({ port = DEFAULT_PORT, watchMs = 30 * 60 * 1000 } = {}) {
   let client;
   try {
     client = await realClient();
@@ -401,6 +444,7 @@ export async function startBoard({ port = DEFAULT_PORT } = {}) {
   });
   server = createBoardServer({
     client, store, port,
+    notify: process.platform === 'darwin' ? macNotify : null,
     onAccessCodeChange(hasCode) {
       // Re-bind so the home network is (or is no longer) reachable, after the answer went out.
       const next = hasCode ? '0.0.0.0' : '127.0.0.1';
@@ -414,6 +458,12 @@ export async function startBoard({ port = DEFAULT_PORT } = {}) {
     },
   });
   await listen();
+  // Check the red alerts now and then even when no page is open, so the Mac notification can fire.
+  if (watchMs > 0) {
+    const check = () => server.refresh().catch((err) => process.stderr.write(`[ams-garmin-board] alert check: ${err?.message || err}\n`));
+    setTimeout(check, 15_000);
+    setInterval(check, watchMs).unref();
+  }
   const stop = () => server.close(() => process.exit(0));
   process.on('SIGINT', stop);
   process.on('SIGTERM', stop);

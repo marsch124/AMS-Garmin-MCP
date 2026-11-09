@@ -1,11 +1,12 @@
 // AMS Garmin Board — gathers everything the board shows into one answer.
-// buildBoard() asks Garmin for the year so far (daily summaries and workouts),
-// last night, the last seven nights, the weigh-ins of 90 days, fitness age,
-// heart-rate zones and today's Body Battery curve, and turns it all into plain
-// numbers the page can draw. buildMonth() does the same for one past month.
+// buildBoard() asks Garmin for the year so far (daily summaries and workouts, at least
+// 90 days back), the same stretch of last year, last night, the last seven nights, the
+// weigh-ins of 90 days, a week of water, fitness age, heart-rate zones and today's Body
+// Battery curve, and turns it all into plain numbers the page can draw.
+// buildMonth() does the same for one past month.
 
 import { todayLocal, trimActivity, VERSION } from '../src/tools.js';
-import { BoardStore, DEFAULT_TARGETS, HOME_ZONE } from './store.js';
+import { BoardStore, DEFAULT_TARGETS, DEFAULT_PLAN, HOME_ZONE } from './store.js';
 
 const DAY_MS = 86_400_000;
 const pad2 = (n) => String(n).padStart(2, '0');
@@ -241,14 +242,26 @@ export const isRun = (type) => RUN_TYPES.has(type);
 
 // ---------- sleep, HRV, weight ----------
 
+const SLEEP_WORDS = new Set(['EXCELLENT', 'GOOD', 'FAIR', 'POOR']);
+/** Garmin's word for the sleep score; derived from the score when Garmin sends none. */
+export function sleepWord(score, qualifierKey) {
+  const k = typeof qualifierKey === 'string' ? qualifierKey.toUpperCase() : null;
+  if (k && SLEEP_WORDS.has(k)) return k;
+  if (num(score) === null) return null;
+  return score >= 90 ? 'EXCELLENT' : score >= 80 ? 'GOOD' : score >= 60 ? 'FAIR' : 'POOR';
+}
+
 function sleepView(raw) {
   const dto = raw?.dailySleepDTO;
   const seconds = pos(dto?.sleepTimeSeconds);
-  if (!dto || !seconds) return { recorded: false };
+  if (!dto || !seconds) return { recorded: false, qualifier: null, firstNight: false };
+  const score = pos(dto.sleepScores?.overall?.value);
   return {
     recorded: true,
     seconds,
-    score: pos(dto.sleepScores?.overall?.value),
+    score,
+    qualifier: sleepWord(score, dto.sleepScores?.overall?.qualifierKey),
+    firstNight: false,
     deepSeconds: pos(dto.deepSleepSeconds) ?? 0,
     lightSeconds: pos(dto.lightSleepSeconds) ?? 0,
     remSeconds: pos(dto.remSleepSeconds) ?? 0,
@@ -552,6 +565,171 @@ export function travelView(stored, allDays, today) {
   };
 }
 
+// ---------- the 1.4 blocks ----------
+
+const DOW_NAMES = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+const dowIndex = (iso) => (new Date(toUtc(iso)).getUTCDay() + 6) % 7; // Monday = 0
+
+/** The same calendar day one year earlier (29 February becomes 28 February). */
+export function sameDayLastYear(iso) {
+  const y = Number(iso.slice(0, 4)) - 1;
+  const rest = iso.slice(4);
+  return rest === '-02-29' ? `${y}-02-28` : `${y}${rest}`;
+}
+
+/** Average steps per weekday over the last 12 weeks (today left out). */
+export function rhythmView(allDays, today, weeks = 12) {
+  const since = addDays(today, -weeks * 7);
+  const until = addDays(today, -1);
+  const buckets = DOW_NAMES.map((name, i) => ({ dow: i + 1, name, total: 0, count: 0, goalDays: 0 }));
+  for (const d of allDays) {
+    if (!d.hasData || d.date < since || d.date > until) continue;
+    const b = buckets[dowIndex(d.date)];
+    b.total += d.steps;
+    b.count += 1;
+    if (goalMet(d)) b.goalDays += 1;
+  }
+  const days = buckets.map(({ total, ...b }) => ({ ...b, avg: b.count ? Math.round(total / b.count) : null }));
+  const withData = days.filter((d) => d.avg !== null);
+  const strongest = withData.length ? withData.reduce((a, b) => (b.avg > a.avg ? b : a)).name : null;
+  const weakest = withData.length ? withData.reduce((a, b) => (b.avg < a.avg ? b : a)).name : null;
+  const count = sum(buckets, (b) => b.count);
+  return { weeks, since, until, days, strongest, weakest, overallAvg: count ? Math.round(sum(buckets, (b) => b.total) / count) : null };
+}
+
+const RIDE_TYPES = new Set(['cycling', 'road_biking', 'indoor_cycling', 'virtual_ride', 'mountain_biking', 'gravel_cycling']);
+export const PLAN_GROUPS = [
+  ['runs', 'RUNS', RUN_TYPES],
+  ['strength', 'STRENGTH', new Set(['strength_training'])],
+  ['swims', 'SWIMS', SWIM_TYPES],
+  ['rides', 'RIDES', RIDE_TYPES],
+  ['hikes', 'HIKES', new Set(['hiking'])],
+  ['walks', 'WALKS', new Set(['walking'])],
+  ['yoga', 'YOGA', new Set(['yoga', 'pilates'])],
+];
+
+/** The week's workout plan from Settings against the workouts done since Monday. */
+export function planView(plan, weekActs, today, wStart) {
+  const items = [];
+  for (const [key, label, types] of PLAN_GROUPS) {
+    const target = pos(plan?.[key]) ?? 0;
+    if (!target) continue;
+    const dates = weekActs.filter((a) => types.has(a.type) && a.date).map((a) => a.date).sort();
+    items.push({ key, label, target, done: dates.length, dates });
+  }
+  const target = sum(items, (i) => i.target);
+  const done = items.reduce((a, i) => a + Math.min(i.done, i.target), 0);
+  return { weekStart: wStart, daysLeft: 6 - dowIndex(today), items, target, done, complete: target > 0 && done >= target };
+}
+
+/** 90 days of resting pulse (finished days only) with a 7-day trailing average. */
+export function restingTrendView(allDays, today, days = 90) {
+  const since = addDays(today, -(days - 1));
+  const points = allDays
+    .filter((d) => d.hasData && d.date >= since && d.date < today && num(d.restingHr) !== null)
+    .map((d) => ({ date: d.date, bpm: d.restingHr }));
+  const avg7 = points.map((p) => {
+    const from = addDays(p.date, -6);
+    const win = points.filter((q) => q.date >= from && q.date <= p.date);
+    return { date: p.date, bpm: round1(win.reduce((a, q) => a + q.bpm, 0) / win.length) };
+  });
+  const s = stats(points.map((p) => p.bpm));
+  return { days, since, points, avg7, avg: s.avg, min: s.min, max: s.max, latest: points.at(-1) ?? null };
+}
+
+/** A week of water: today's intake against the goal, and seven small days. */
+export function hydrationView(raw, dailyRaw, today) {
+  const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.data) ? raw.data : []);
+  const byDate = new Map(list.filter((e) => typeof e?.calendarDate === 'string').map((e) => [e.calendarDate, e]));
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const date = addDays(today, -i);
+    const e = byDate.get(date);
+    days.push({ date, ml: round(pos(e?.valueInML)) ?? 0, goalMl: round(pos(e?.goalInML)) });
+  }
+  const t = byDate.get(today);
+  const todayMl = pos(t?.valueInML) === null ? null : round(t.valueInML);
+  const goalMl = round(pos(t?.goalInML)) ?? round(pos(dailyRaw?.hydrationGoalInML)) ?? days.map((d) => d.goalMl).filter((g) => g !== null).at(-1) ?? null;
+  const logged = days.filter((d) => d.ml > 0);
+  const lastEntryAt = list.map((e) => e?.lastEntryTimestampLocal).filter((s) => typeof s === 'string').sort().at(-1) ?? null;
+  return {
+    logged: logged.length > 0,
+    todayMl,
+    goalMl,
+    pct: todayMl !== null && goalMl ? Math.round((todayMl / goalMl) * 100) : null,
+    days,
+    avgMl: logged.length ? Math.round(sum(logged, (d) => d.ml) / logged.length) : null,
+    lastEntryAt,
+  };
+}
+
+const STRESS_WORDS = {
+  CALM: 'CALM', CALM_AWAKE: 'CALM', BALANCED: 'BALANCED', BALANCED_AWAKE: 'BALANCED',
+  STRESSFUL: 'STRESSFUL', STRESSFUL_AWAKE: 'STRESSFUL', VERY_STRESSFUL: 'VERY STRESSFUL', VERY_STRESSFUL_AWAKE: 'VERY STRESSFUL',
+};
+/** Today's stress by level (from Garmin's day summary) and four weeks of daily averages. */
+export function stressView(dailyRaw, allDays, today, todayDay = null) {
+  const d = dailyRaw || {};
+  const sec = (v) => round(pos(v)) ?? 0;
+  const t = {
+    avg: d.averageStressLevel === undefined ? pos(todayDay?.stressAvg) : pos(d.averageStressLevel),
+    max: d.maxStressLevel === undefined ? pos(todayDay?.stressMax) : pos(d.maxStressLevel),
+    qualifier: STRESS_WORDS[d.stressQualifier] ?? null,
+    restSec: sec(d.restStressDuration), lowSec: sec(d.lowStressDuration), mediumSec: sec(d.mediumStressDuration), highSec: sec(d.highStressDuration),
+  };
+  t.measuredSec = t.restSec + t.lowSec + t.mediumSec + t.highSec;
+  const byDate = new Map(allDays.map((x) => [x.date, x]));
+  const days = [];
+  for (let i = 27; i >= 0; i--) {
+    const date = addDays(today, -i);
+    const x = byDate.get(date);
+    days.push({ date, avg: x?.hasData ? x.stressAvg : null, max: x?.hasData ? x.stressMax : null });
+  }
+  return { today: t, days, avg28: stats(days.filter((x) => x.date !== today).map((x) => x.avg)).avg };
+}
+
+/** This year against the same stretch of last year: the month to the same day, the year to date, and last year's months. */
+export function lastYearView(lyDays, lyActs, allDays, acts, today) {
+  const year = Number(today.slice(0, 4));
+  const ly = year - 1;
+  const ym = today.slice(0, 7);
+  const lyYm = `${ly}-${today.slice(5, 7)}`;
+  const throughDay = dayOfMonth(today);
+  const lyToday = sameDayLastYear(today);
+  const block = (nowList, beforeList, pick) => { const now = sum(nowList, pick), before = sum(beforeList, pick); return { now, before, pct: pct(now, before) }; };
+  const count = (nowList, beforeList) => ({ now: nowList.length, before: beforeList.length, diff: nowList.length - beforeList.length });
+  const upTo = (list, month, limit) => list.filter((x) => inMonth(month)(x) && dayOfMonth(x.date) <= limit);
+  const curDays = upTo(allDays, ym, throughDay), befDays = upTo(lyDays, lyYm, throughDay);
+  const curActs = upTo(acts, ym, throughDay), befActs = upTo(lyActs, lyYm, throughDay);
+  const hrNow = stats(curDays.filter((d) => d.date !== today).map((d) => d.restingHr)).avg;
+  const hrBefore = stats(befDays.map((d) => d.restingHr)).avg;
+  const month = {
+    ym: lyYm,
+    throughDay,
+    available: befDays.some((d) => d.hasData),
+    steps: block(curDays, befDays, (d) => d.steps),
+    workouts: count(curActs, befActs),
+    trainingSeconds: block(curActs, befActs, (a) => a.seconds),
+    restingHrAvg: { now: hrNow, before: hrBefore, diff: hrNow !== null && hrBefore !== null ? hrNow - hrBefore : null },
+  };
+  const inRange = (list, from, to) => list.filter((x) => x.date && x.date >= from && x.date <= to);
+  const yearDays = inRange(allDays, `${year}-01-01`, today), lyYearDays = inRange(lyDays, `${ly}-01-01`, lyToday);
+  const yearActs = inRange(acts, `${year}-01-01`, today), lyYearActs = inRange(lyActs, `${ly}-01-01`, lyToday);
+  const toDate = {
+    available: lyYearDays.some((d) => d.hasData),
+    steps: block(yearDays, lyYearDays, (d) => d.steps),
+    workouts: count(yearActs, lyYearActs),
+    trainingSeconds: block(yearActs, lyYearActs, (a) => a.seconds),
+  };
+  const months = [];
+  for (let m = 1; m <= 12; m++) {
+    const mym = `${ly}-${pad2(m)}`;
+    const ds = lyDays.filter(inMonth(mym));
+    months.push({ ym: mym, steps: sum(ds, (d) => d.steps), workouts: lyActs.filter(inMonth(mym)).length, daysWithData: ds.filter((d) => d.hasData).length });
+  }
+  return { year: ly, month, toDate, months };
+}
+
 // ---------- the board ----------
 
 /**
@@ -575,11 +753,14 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
   const yearStart = `${year}-01-01`;
   const mStart = monthStart(today);
   const wStart = weekStart(today);
-  const rangeStart = earlier(earlier(yearStart, `${prevMonth(ym)}-01`), wStart);
+  // At least 90 days back, for the resting-pulse trend and the weekly rhythm.
+  const rangeStart = earlier(earlier(earlier(yearStart, `${prevMonth(ym)}-01`), wStart), addDays(today, -89));
+  const lyStart = `${Number(year) - 1}-01-01`;
+  const lyToday = sameDayLastYear(today);
 
   const { all: allDays, byDate } = await fetchDays(client, rangeStart, today);
 
-  const [activitiesRaw, sleepRaw, nightsRaw, hrvRaw, weightRaw, weightGoalRaw, fitnessRaw, zonesRaw, bbRaw, dailyRaw, token, settings, travelStored, log] = await Promise.all([
+  const [activitiesRaw, sleepRaw, nightsRaw, hrvRaw, weightRaw, weightGoalRaw, fitnessRaw, zonesRaw, bbRaw, dailyRaw, token, settings, travelStored, log, hydrationRaw, lyDaysRaw, lyActsRaw] = await Promise.all([
     side('workouts', () => fetchActivities(client, rangeStart, today), []),
     side('sleep', () => client.get('/sleep-service/sleep/dailySleep', { date: today }), null),
     side('sleep nights', () => client.get('/sleep-service/sleep/dailySleepSummariesByDate', { startDate: addDays(today, -6), endDate: today }), null),
@@ -591,13 +772,18 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
     side('Body Battery', () => client.get('/wellness-service/wellness/bodyBattery/reports/daily', { startDate: today, endDate: today }), null),
     side('last sync', () => client.get('/usersummary-service/usersummary/daily', { calendarDate: today }), null),
     side('link', () => client.tokenInfo?.(), null),
-    st.settings().catch(() => ({ targets: { ...DEFAULT_TARGETS }, accessCode: '' })),
+    st.settings().catch(() => ({ targets: { ...DEFAULT_TARGETS }, plan: { ...DEFAULT_PLAN }, notify: true, accessCode: '' })),
     st.travel().catch(() => null),
     st.log(ym).catch(() => ({})),
+    side('water', () => client.get(`/usersummary-service/stats/hydration/daily/${addDays(today, -6)}/${today}`), []),
+    side('last year', () => fetchDays(client, lyStart, lyToday), { all: [] }),
+    side('last year workouts', () => fetchActivities(client, lyStart, lyToday), []),
   ]);
 
   const acts = (Array.isArray(activitiesRaw) ? activitiesRaw : []).map(activityView)
     .sort((a, b) => String(b.start ?? '').localeCompare(String(a.start ?? '')));
+  const lyDays = Array.isArray(lyDaysRaw?.all) ? lyDaysRaw.all : [];
+  const lyActs = (Array.isArray(lyActsRaw) ? lyActsRaw : []).map(activityView);
   const monthActs = acts.filter(inMonth(ym));
   const weekActs = acts.filter((a) => a.date && a.date >= wStart && a.date <= today);
   const weekDays = allDays.filter((d) => toUtc(d.date) >= toUtc(wStart));
@@ -609,6 +795,10 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
   const lastSyncMs = parseGmt(dailyRaw?.lastSyncTimestampGMT);
   const lastSyncAt = lastSyncMs === null ? null : new Date(lastSyncMs).toISOString();
   const weightTrend = weightTrendView(weightRaw, weightGoalRaw);
+  const sleepDebt = sleepDebtView(nightsRaw, today);
+  const sleep = sleepView(sleepRaw);
+  // The first night with the watch: this night is the only one recorded in the last seven.
+  sleep.firstNight = sleep.recorded && sleepDebt.nights.filter((n) => n.recorded).length <= 1;
 
   const board = {
     ok: true,
@@ -630,7 +820,7 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
       goal: weeklyGoal,
     },
     activities: activitiesView(monthActs),
-    sleep: sleepView(sleepRaw),
+    sleep,
     hrv: hrvView(hrvRaw),
     weight: weightView(weightRaw),
     compare: compareView(allDays, acts, ym, today),
@@ -643,9 +833,15 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
     zones: zonesView(weekActs, zonesRaw, { acts, today, weekStart: wStart }),
     fitness: fitnessView(acts, fitnessRaw),
     bodyBatteryCurve: bodyBatteryCurveView(bbRaw, today),
-    sleepDebt: sleepDebtView(nightsRaw, today),
+    sleepDebt,
     weightTrend,
     year: yearView(allDays, acts, year, today),
+    lastYear: lastYearView(lyDays, lyActs, allDays, acts, today),
+    rhythm: rhythmView(allDays, today),
+    plan: planView(settings.plan ?? DEFAULT_PLAN, weekActs, today, wStart),
+    restingTrend: restingTrendView(allDays, today),
+    hydration: hydrationView(hydrationRaw, dailyRaw, today),
+    stress: stressView(dailyRaw, allDays, today, todayDay),
     travel: travelView(travelStored, allDays, today),
     targets: { ...settings.targets },
     log,

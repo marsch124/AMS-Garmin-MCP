@@ -115,12 +115,16 @@ const post = (url, body) => fetch(url, { method: 'POST', headers: { 'content-typ
 import { reportText } from '../board/board-data.js';
 
 // ---------- A. version and docs ----------
-test('1.3 A: package.json version is 1.3.0', async () => {
-  assert.equal(JSON.parse(await read('package.json')).version, '1.3.0');
+test('1.3 A: package.json version is 1.3.0 or later', async () => {
+  const v = JSON.parse(await read('package.json')).version;
+  assert.match(v, /^\d+\.\d+\.\d+$/);
+  const [a, b, c] = v.split('.').map(Number);
+  assert.ok(a > 1 || (a === 1 && (b > 3 || (b === 3 && c >= 0))), v);
 });
-test('1.3 A: CHANGELOG starts with a 1.3.0 entry', async () => {
-  const first = (await read('CHANGELOG.md')).split('\n').find((l) => l.startsWith('## '));
-  assert.match(first, /^## 1\.3\.0/);
+test('1.3 A: CHANGELOG has a 1.3.0 entry and starts with a version heading', async () => {
+  const lines = (await read('CHANGELOG.md')).split('\n');
+  assert.match(lines.find((l) => l.startsWith('## ')), /^## \d+\.\d+\.\d+/);
+  assert.ok(lines.some((l) => l.startsWith('## 1.3.0')));
 });
 
 // ---------- B. zones fallback ----------
