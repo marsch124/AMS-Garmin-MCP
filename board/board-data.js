@@ -737,6 +737,34 @@ export function lastYearView(lyDays, lyActs, allDays, acts, today) {
  * The daily summaries are the heart of it: if Garmin refuses those, the call fails.
  * Every other part falls back to "nothing" and leaves a warning.
  */
+/** 1.6.0 Peek: up to 90 days of each number, oldest first; days without a value are left out. */
+export function historyView(allDays, today, { nights = [], weightPoints = [], hydrationDays = [] } = {}, days = 90) {
+  const from = addDays(today, -(days - 1));
+  const recent = allDays.filter((d) => d.hasData && d.date >= from && d.date <= today);
+  const series = (pick) => recent
+    .map((d) => ({ date: d.date, value: pick(d) }))
+    .filter((p) => typeof p.value === 'number' && Number.isFinite(p.value));
+  return {
+    // A day with no steps at all is a day without the watch, not a low: left out.
+    steps: series((d) => (d.steps > 0 ? d.steps : null)),
+    distance: series((d) => (d.steps > 0 ? d.distanceM : null)),
+    'resting-hr': series((d) => d.restingHr),
+    'hr-min': series((d) => d.minHr),
+    'hr-max': series((d) => d.maxHr),
+    stress: series((d) => d.stressAvg),
+    'stress-max': series((d) => d.stressMax),
+    respiration: series((d) => d.respirationAvg),
+    'body-battery': series((d) => d.bodyBattery?.max),
+    calories: series((d) => d.caloriesTotal),
+    'calories-active': series((d) => d.caloriesActive),
+    floors: series((d) => d.floorsUp),
+    intensity: series((d) => intensityOf(d)),
+    sleep: nights.filter((n) => n.recorded && n.date >= from).map((n) => ({ date: n.date, value: n.sleptMin })),
+    weight: weightPoints.filter((p) => p.date >= from).map((p) => ({ date: p.date, value: p.kg })),
+    hydration: hydrationDays.filter((d) => d.ml > 0 && d.date >= from).map((d) => ({ date: d.date, value: d.ml })),
+  };
+}
+
 export async function buildBoard(client, { today = todayLocal(), now = () => Date.now(), storeDir, store, homeZone = HOME_ZONE } = {}) {
   const warnings = [];
   const side = async (label, fn, fallback) => {
@@ -800,10 +828,12 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
   // The first night with the watch: this night is the only one recorded in the last seven.
   sleep.firstNight = sleep.recorded && sleepDebt.nights.filter((n) => n.recorded).length <= 1;
 
+  const hydration = hydrationView(hydrationRaw, dailyRaw, today);
+  const generatedAt = new Date(now()).toISOString();
   const board = {
     ok: true,
     version: VERSION,
-    generatedAt: new Date(now()).toISOString(),
+    generatedAt,
     date: today,
     monthStart: mStart,
     weekStart: wStart,
@@ -840,8 +870,10 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
     rhythm: rhythmView(allDays, today),
     plan: planView(settings.plan ?? DEFAULT_PLAN, weekActs, today, wStart),
     restingTrend: restingTrendView(allDays, today),
-    hydration: hydrationView(hydrationRaw, dailyRaw, today),
+    hydration,
     stress: stressView(dailyRaw, allDays, today, todayDay),
+    history: historyView(allDays, today, { nights: sleepDebt.nights, weightPoints: weightTrend.points, hydrationDays: hydration.days }),
+    updated: { watchSyncedAt: lastSyncAt, fetchedAt: generatedAt },
     travel: travelView(travelStored, allDays, today),
     targets: { ...settings.targets },
     log,

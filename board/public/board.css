@@ -647,6 +647,23 @@ svg text.t-hero { font-family: var(--font); text-transform: uppercase; letter-sp
 /* The In short paragraph of an explanation stays at a readable line length, so lines break earlier. Learn more is unchanged. */
 #explain-summary { max-width: 60ch; }
 
+/* ---------- 1.6.0 · Peek (hover or press and hold a number) ---------- */
+[data-peek] { cursor: help; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+#peek-card { position: fixed; z-index: 60; width: min(340px, calc(100vw - 16px)); padding: 10px 12px 9px; background: var(--card, var(--bg)); color: var(--text); border: 1px solid var(--edge, rgba(255,255,255,.1)); border-radius: 14px; box-shadow: var(--shadow, 0 8px 24px rgba(0,0,0,.4)); font-family: var(--prose); text-transform: none; letter-spacing: 0; font-size: 13px; line-height: 18px; pointer-events: none; }
+#peek-card[hidden] { display: none; }
+.peek-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.peek-title { font-family: var(--font); text-transform: uppercase; letter-spacing: .04em; font-size: 14px; color: var(--pc, var(--c1)); }
+.peek-value { font-family: var(--font); font-size: 22px; line-height: 24px; color: var(--pc, var(--c1)); white-space: nowrap; }
+.peek-row { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 18px; }
+.peek-row .d { color: var(--dim); white-space: nowrap; }
+.peek-row .b { height: 6px; background: var(--track); border-radius: 3px; overflow: hidden; }
+.peek-row .b i { display: block; height: 100%; background: var(--pc, var(--c1)); border-radius: 3px; }
+.peek-row .v { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.peek-row.today .d, .peek-row.today .v { color: var(--text); font-weight: 600; }
+.peek-avg, .peek-empty { margin-top: 6px; color: var(--dim); white-space: pre-line; }
+.peek-updated { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--edge, rgba(255,255,255,.1)); color: var(--dim); }
+@media print { #peek-card { display: none !important; } }
+
 /* ---------- print (⌘P) ---------- */
 @media print {
   @page { size: A4 portrait; margin: 10mm; }

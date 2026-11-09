@@ -1,4 +1,4 @@
-# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026; board 1.5.1)
+# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026; board 1.6.0)
 
 ## 1. Purpose
 Read-only MCP server giving Claude access to the owner's Garmin Connect data via Garmin's official Personal API (spec: `docs/garmin-personal-openapi.json`, title "Garmin Connect Personal API" 1.0.0, 26 paths, all GET). Base URL `https://personal.connectapi.garmin.com` (the spec also lists `.garmin.cn`; unused). Nothing is ever written to Garmin.
@@ -84,7 +84,7 @@ Note: `/weight-service/weight/all/{startDate}/{endDate}` has no dedicated tool; 
 - GitHub Actions runs `npm test` on every push.
 
 ## 9. Board
-"AMS Garmin Board" 1.5.1: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
+"AMS Garmin Board" 1.6.0: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
 
 ### Files
 - `board/board-data.js` — `buildBoard(client, { today, now, settings, log, travel })` returns one JSON object. Uses `GarminClient`.
@@ -151,7 +151,7 @@ Panels in order inside `<main class="panels">` (12-column grid, sN = span N):
 25. `activity-detail-panel` (s12, hidden until a workout row is pressed): `detail-title`, `detail-summary`, `detail-splits`, `detail-hr-chart`, `detail-map`, `detail-close`. Workout rows: `class="act"`, `id="act-<activityId>"`, `data-id`.
 26. `year-panel` (s12): `year-tiles` with `year-tile-01` … `year-tile-12` (steps, workouts, resting pulse, goal days; future months dimmed). New in 1.4.0: under the tiles `last-year-line` (`<div class="sub-label">`; `SAME TIME LAST YEAR · NOVEMBER 2025 TO DAY 9 · STEPS 61 200 → 68 500 (▲ +12 %) · WORKOUTS 4 → 4 (=) · 2025 TO 9 NOV · 1 230 000 STEPS ▲ +3 %`; without data `NO DATA FOR NOVEMBER 2025`), and in each tile a faint ghost bar and `<span class="tk ly" id="year-last-01">2025 · 48 200</span>` (ids `year-last-01` … `year-last-12`; `—` when that month had no data).
 
-Footer bar: `palette-select`, `kiosk-button`, `help-button`, `report-button`, `share-button` (SHARE, key S; new in 1.4.0), `settings-button`, `footer-version` ("1.5.1"), plus the link status and refresh controls.
+Footer bar: `palette-select`, `kiosk-button`, `help-button`, `report-button`, `share-button` (SHARE, key S; new in 1.4.0), `settings-button`, `footer-version` ("1.6.0"), plus the link status and refresh controls.
 
 Sheets (overlays, `hidden` by default; Escape closes = Cancel; the main button is full colour):
 - `explain-sheet`: `explain-title`, `explain-summary` (IN SHORT), `explain-more` (LEARN MORE), `explain-close`.
@@ -189,8 +189,15 @@ Loopback listener on 127.0.0.1 always; see "LAN gate" for the second listener.
 - `GET /api/docs` — `{ ok, version, howItWorks, whatsNew }` (markdown): the README section "## The board" up to the next "## ", and CHANGELOG.md.
 - `GET /code`, `POST /code` — see the LAN gate.
 
+### Peek card (1.6.0)
+Hover (Mac) or press and hold (iPhone) on a number shows a small card with its history and update times.
+- Data: `history { <key>: [ { date: 'YYYY-MM-DD', value: number } ] }`, oldest first, at most 90 days, days without a value left out. Keys: `steps`, `distance` (metres), `resting-hr`, `hr-min`, `hr-max`, `stress`, `stress-max`, `respiration`, `body-battery` (the day's highest), `calories`, `calories-active`, `floors`, `intensity` (minutes, moderate + 2 × vigorous), `sleep` (minutes, recorded nights only), `weight` (kg, weigh-ins only), `hydration` (ml). `updated { watchSyncedAt: ISO string or null (daily summary lastSyncTimestampGMT), fetchedAt: ISO string (same as generatedAt) }`. No extra Garmin calls.
+- Card ids: `peek-card` (`hidden`, `role="tooltip"`), `peek-title`, `peek-value`, `peek-rows` (last 7 days, newest first; rows `.peek-row` with `.d` day, `.b` bar, `.v` value), `peek-avg` (30-day average, 90-day high and low in words), `peek-updated` ("Watch synced 14:12 · board fetched 14:35").
+- `data-peek="<key>"` marks 18 elements: `steps-gauge`, `steps-value`, `distance-value`, `resting-hr`, `hr-min`, `hr-max`, `stress-avg`, `stress-max`, `respiration-value`, `body-battery-bar`, `intensity-gauge`, `intensity-week`, `calories-value`, `calories-active`, `floors-value`, `sleep-body`, `weight-thermo`, `hydration-gauge`. Every key is one of the history keys.
+- Behaviour (`board.js`): mouse `mouseover` / `mouseout` with a short delay; touch `pointerdown` press-and-hold of about 450 ms, cancelled by `pointerup` / `pointercancel`; Escape or a tap elsewhere closes; the card sits next to the number and stays inside the window. CSS: `#peek-card { position: fixed; }` above the panels on the card background.
+
 ### Board JSON (`/api/board`)
-Unchanged from 1.1.0: `ok, version, generatedAt, date, monthStart, weekStart, link { ok, tokenExpiresAt }, today { … }, month { days, steps, avgSteps, stepGoalDays, daysWithData, distanceM, floorsUp, intensityMinutes, restingHrAvg, restingHrMin, restingHrMax }, week { start, intensityMinutes, goal }, activities { count, seconds, distanceM, calories, elevationGain, byType, list [ { id, name, type, start, seconds, distanceM, calories, avgHr, maxHr, elevationGain, trainingEffect, aerobic, anaerobic, load } ] }, sleep, hrv, weight, warnings`. Resting pulse figures use finished days only. Intensity minutes = moderate + 2 × vigorous. Stress −1 becomes null. Weight comes in grams and is shown in kg with one decimal.
+Unchanged from 1.1.0: `ok, version, generatedAt, date, monthStart, weekStart, link { ok, tokenExpiresAt }, today { … }, month { days, steps, avgSteps, stepGoalDays, daysWithData, distanceM, floorsUp, intensityMinutes, restingHrAvg, restingHrMin, restingHrMax }, week { start, intensityMinutes, goal }, activities { count, seconds, distanceM, calories, elevationGain, byType, list [ { id, name, type, start, seconds, distanceM, calories, avgHr, maxHr, elevationGain, trainingEffect, aerobic, anaerobic, load } ] }, sleep, hrv, weight, warnings`. Since 1.6.0 also `history` and `updated` (see Peek card). Resting pulse figures use finished days only. Intensity minutes = moderate + 2 × vigorous. Stress −1 becomes null. Weight comes in grams and is shown in kg with one decimal.
 
 Added in 1.2.0:
 ```

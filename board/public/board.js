@@ -1580,6 +1580,121 @@
     const sheet = e.target.closest('.sheet');
     if (sheet && e.target === sheet) closeSheets(); // click on the dark backdrop
   });
+  // ---------- 1.6.0 Peek: hover (Mac) or press and hold (iPhone) a number → its last days and when it was updated ----------
+  const fmtHm = (min) => (isNum(min) ? `${Math.floor(min / 60)} h ${pad2(Math.round(min % 60))}` : '—');
+  const isoShift = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toLocaleDateString('sv-SE'); };
+  const bpm = (v) => `${fmtInt(v)} bpm`;
+  const kcal = (v) => `${fmtInt(v)} kcal`;
+  const PEEK = {
+    steps: { title: 'Steps', fmt: fmtInt },
+    distance: { title: 'Distance', fmt: fmtKm },
+    'resting-hr': { title: 'Resting pulse', fmt: bpm },
+    'hr-min': { title: 'Lowest pulse', fmt: bpm },
+    'hr-max': { title: 'Highest pulse', fmt: bpm },
+    stress: { title: 'Stress · average', fmt: fmtInt },
+    'stress-max': { title: 'Stress · highest', fmt: fmtInt },
+    respiration: { title: 'Breaths a minute', fmt: fmt1 },
+    'body-battery': { title: "Body Battery · day's high", fmt: fmtInt },
+    calories: { title: 'Calories · total', fmt: kcal },
+    'calories-active': { title: 'Calories · active', fmt: kcal },
+    floors: { title: 'Floors up', fmt: fmtInt },
+    intensity: { title: 'Intensity minutes · a day', fmt: (v) => `${fmtInt(v)} min` },
+    sleep: { title: 'Sleep', fmt: fmtHm },
+    weight: { title: 'Weight', fmt: fmtKg },
+    hydration: { title: 'Water', fmt: (v) => `${fmtInt(v)} ml` },
+  };
+  const peekCard = $('peek-card');
+  let peekTimer = null;
+  let peekAnchor = null;
+  let peekTouch = false;
+  const peekTarget = (e) => (e.target && e.target.closest ? e.target.closest('[data-peek]') : null);
+
+  function placePeek(el) {
+    const r = el.getBoundingClientRect();
+    peekCard.style.left = '0px';
+    peekCard.style.top = '0px';
+    const w = peekCard.offsetWidth;
+    const h = peekCard.offsetHeight;
+    const left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+    let top = r.bottom + 8;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 8);
+    top = Math.min(top, Math.max(8, window.innerHeight - h - 8)); // never off the bottom of the window
+    peekCard.style.left = `${Math.round(left)}px`;
+    peekCard.style.top = `${Math.round(top)}px`;
+  }
+
+  function showPeek(el) {
+    const key = el.dataset.peek;
+    const def = PEEK[key];
+    const list = board && board.history ? board.history[key] : null;
+    if (!def || !Array.isArray(list)) return;
+    peekAnchor = el;
+    const panel = el.closest('.panel');
+    const pc = panel ? getComputedStyle(panel).getPropertyValue('--pc').trim() : '';
+    if (pc) peekCard.style.setProperty('--pc', pc); else peekCard.style.removeProperty('--pc');
+    const today = todayIso();
+    const latest = list.length ? list[list.length - 1] : null;
+    setText('peek-title', def.title);
+    setText('peek-value', latest ? `${def.fmt(latest.value)}${latest.date === today ? '' : ' · ' + fmtDay(latest.date)}` : '—');
+    const last = list.slice(-7).reverse();
+    const max = Math.max(1, ...last.map((p) => p.value));
+    $('peek-rows').innerHTML = last.length ? last.map((p) => {
+      const d = new Date(p.date + 'T12:00:00');
+      const word = p.date === today ? 'Today' : `${DAY_NAMES[d.getDay()]} ${fmtDay(p.date)}`;
+      return `<div class="peek-row${p.date === today ? ' today' : ''}"><span class="d">${escapeHtml(word)}</span><span class="b"><i style="width:${Math.max(0, Math.round(100 * p.value / max))}%"></i></span><span class="v">${escapeHtml(def.fmt(p.value))}</span></div>`;
+    }).join('') : '<div class="peek-empty">No values yet</div>';
+    const win = list.filter((p) => p.date >= isoShift(today, -29));
+    const avg = win.length ? win.reduce((a, p) => a + p.value, 0) / win.length : null;
+    const hi = list.length ? list.reduce((a, p) => (p.value > a.value ? p : a)) : null;
+    const lo = list.length ? list.reduce((a, p) => (p.value < a.value ? p : a)) : null;
+    setText('peek-avg', list.length
+      ? `30-day average ${def.fmt(avg)}\n90-day high ${def.fmt(hi.value)} · ${fmtDay(hi.date)} · low ${def.fmt(lo.value)} · ${fmtDay(lo.date)}`
+      : 'Nothing recorded in the last 90 days');
+    const u = board.updated || {};
+    setText('peek-updated', `Watch synced ${u.watchSyncedAt ? fmtStamp(u.watchSyncedAt) : '—'} · board fetched ${fmtStamp(u.fetchedAt || board.generatedAt)}`);
+    peekCard.hidden = false;
+    peekCard.setAttribute('aria-hidden', 'false');
+    placePeek(el);
+  }
+
+  function hidePeek() {
+    clearTimeout(peekTimer);
+    peekTimer = null;
+    peekAnchor = null;
+    if (peekCard.hidden) return;
+    peekCard.hidden = true;
+    peekCard.setAttribute('aria-hidden', 'true');
+  }
+
+  document.addEventListener('mouseover', (e) => {
+    if (peekTouch) return;
+    const el = peekTarget(e);
+    if (!el || (el === peekAnchor && !peekCard.hidden)) return;
+    clearTimeout(peekTimer);
+    peekTimer = setTimeout(() => showPeek(el), 250);
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (peekTouch) return;
+    const el = peekTarget(e);
+    if (!el) return;
+    if (e.relatedTarget && el.contains(e.relatedTarget)) return;
+    hidePeek();
+  });
+  document.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'touch') return;
+    const el = peekTarget(e);
+    hidePeek();
+    if (!el) return;
+    peekTouch = true;
+    peekTimer = setTimeout(() => showPeek(el), 450); // press and hold
+  });
+  document.addEventListener('pointerup', () => { clearTimeout(peekTimer); peekTimer = null; });
+  document.addEventListener('pointercancel', hidePeek);
+  document.addEventListener('contextmenu', (e) => { if (peekTouch && peekTarget(e)) e.preventDefault(); });
+  document.addEventListener('scroll', hidePeek, { passive: true, capture: true });
+  document.addEventListener('click', (e) => { if (!peekCard.hidden && !peekTarget(e)) hidePeek(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePeek(); });
+
   document.addEventListener('keydown', onKey);
   document.addEventListener('fullscreenchange', onFullscreenChange);
   document.addEventListener('webkitfullscreenchange', onFullscreenChange);

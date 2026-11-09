@@ -1,5 +1,29 @@
 # What's new
 
+## 1.6.0 — 9 November 2026
+Peek: hover over a number on the Mac, or press and hold it on the iPhone, and a small card shows that number's history and when it was updated.
+
+**New**
+- Before: a number on the board showed only today's value, and nothing told you when the data was last updated.
+- New: on the Mac, hold the pointer over a number for a moment. On the iPhone, press and hold it for about half a second. A small card appears next to the number.
+- The card shows the last 7 days, newest first, each with a small bar and its value, then the 30-day average and the highest and lowest value of the last 90 days, in words.
+- The last line of the card says when the data is fresh: "Watch synced 14:12 · board fetched 14:35". Watch synced is when the watch last sent data to Garmin. Board fetched is when this page last got its data from Garmin.
+- 18 numbers have a card: steps (the gauge and the number), distance, resting, lowest and highest heart rate, average stress and highest stress, breathing, the Body Battery bar, intensity minutes (the gauge and the week), calories, active calories, floors, the sleep figures, the weight thermometer and the water gauge.
+- Escape, or a tap anywhere else, closes the card. The card is placed next to the number and always stays inside the window.
+- The board's data now carries the history of 16 series (up to 90 days each, days without a value left out) and the two update times.
+- The version is now 1.6.0.
+
+**Changed**
+- Nothing on the panels moved or changed. The card only appears when you ask for it.
+
+**Good to know**
+- No new data is fetched from Garmin. The card uses the 90 days the board already loads, so the board is just as fast as before.
+- The "board fetched" time is at most 5 minutes old, because the board keeps its data for 5 minutes.
+- Sleep shows recorded nights only, and weight shows weigh-ins only.
+
+**Quality**
+- New tests find the card, its parts and the marked numbers by their identifiers, and check the history and update times in the board data. They were written and seen failing before the feature.
+
 ## 1.5.1 — 9 November 2026
 A small reading fix: the "In short" text in the explanation window is now narrower and easier to read.
 

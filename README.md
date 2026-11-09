@@ -69,6 +69,12 @@ Every Monday morning, a summary of last week lands in Apple Notes (folder "AMS G
 **Install step (auto-start and reports)**
 Run `scripts/install-agents.sh` once. It makes the board start at login and sets up the Monday and month reports. Run it with `--remove` to undo.
 
+**Peek at a number's history**
+- On the Mac, hold the pointer over a number for a moment. On the iPhone, press and hold the number for about half a second. A small card appears next to it. Escape, or a tap elsewhere, closes it.
+- The card shows the last 7 days with small bars, the 30-day average, and the highest and lowest value of the last 90 days.
+- The last line says "Watch synced 14:12 · board fetched 14:35". Watch synced is when the watch last sent its data to Garmin. Board fetched is when this page last got data, at most 5 minutes old.
+- 18 numbers have a card: steps, distance, floors, calories, active calories, heart rate, stress, breathing, Body Battery, intensity minutes, sleep, weight and water.
+
 **Keyboard**
 R refresh · F full screen · S share · left and right arrows previous and next month · ? help · Escape close.
 
@@ -135,6 +141,7 @@ Make a new key on the same Garmin page (see above) and run the save-key dialog a
 Your data goes from Garmin straight to Claude on this Mac. The code repository is public so that GitHub runs the tests for free; it contains no data and no keys, and never will.
 
 ## Version
+1.6.0 — 9 Nov 2026
 1.5.1 — 9 Nov 2026
 1.5.0 — 9 Nov 2026
 1.4.0 — 9 Nov 2026

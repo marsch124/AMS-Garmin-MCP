@@ -84,12 +84,12 @@
     <section class="panel p-c2 s3" id="steps-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-steps">STEPS · TODAY</button><span class="line"></span></div>
       <div class="panel-body">
-        <div class="gauge" id="steps-gauge"></div>
+        <div class="gauge" id="steps-gauge" data-peek="steps"></div>
         <div class="chip-row"><span class="chip cmp" id="steps-chip" title="Today against the same weekday four weeks ago">—</span></div>
         <div class="kv-row">
-          <div class="kv"><span class="k">Steps</span><span class="v" id="steps-value">—</span></div>
+          <div class="kv"><span class="k">Steps</span><span class="v" id="steps-value" data-peek="steps">—</span></div>
           <div class="kv"><span class="k">Goal</span><span class="v" id="steps-goal">—</span></div>
-          <div class="kv"><span class="k">Distance</span><span class="v" id="distance-value">—</span></div>
+          <div class="kv"><span class="k">Distance</span><span class="v" id="distance-value" data-peek="distance">—</span></div>
         </div>
       </div>
     </section>
@@ -97,7 +97,7 @@
     <section class="panel p-c5 s2" id="body-battery-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-body-battery">BODY BATTERY</button><span class="line"></span></div>
       <div class="panel-body">
-        <div class="thermo" id="body-battery-bar"></div>
+        <div class="thermo" id="body-battery-bar" data-peek="body-battery"></div>
         <div class="kv-row">
           <div class="kv"><span class="k">Charged</span><span class="v" id="bb-charged">—</span></div>
           <div class="kv"><span class="k">Drained</span><span class="v" id="bb-drained">—</span></div>
@@ -108,19 +108,19 @@
     <section class="panel p-c7 s4" id="heart-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-heart">CARDIO · TODAY</button><span class="line"></span></div>
       <div class="panel-body heart">
-        <div class="dial" id="resting-hr"></div>
+        <div class="dial" id="resting-hr" data-peek="resting-hr"></div>
         <div class="heart-side">
           <div class="kv-row">
-            <div class="kv"><span class="k">Min</span><span class="v" id="hr-min">—</span></div>
-            <div class="kv"><span class="k">Max</span><span class="v" id="hr-max">—</span></div>
+            <div class="kv"><span class="k">Min</span><span class="v" id="hr-min" data-peek="hr-min">—</span></div>
+            <div class="kv"><span class="k">Max</span><span class="v" id="hr-max" data-peek="hr-max">—</span></div>
             <div class="kv"><span class="k">Month avg</span><span class="v" id="hr-month-avg">—</span></div>
           </div>
           <div class="sub-label">Stress</div>
           <div class="hbar" id="stress-bar"></div>
           <div class="kv-row">
-            <div class="kv"><span class="k">Avg</span><span class="v" id="stress-avg">—</span></div>
-            <div class="kv"><span class="k">Max</span><span class="v" id="stress-max">—</span></div>
-            <div class="kv"><span class="k">Breaths</span><span class="v" id="respiration-value">—</span></div>
+            <div class="kv"><span class="k">Avg</span><span class="v" id="stress-avg" data-peek="stress">—</span></div>
+            <div class="kv"><span class="k">Max</span><span class="v" id="stress-max" data-peek="stress-max">—</span></div>
+            <div class="kv"><span class="k">Breaths</span><span class="v" id="respiration-value" data-peek="respiration">—</span></div>
           </div>
         </div>
       </div>
@@ -129,9 +129,9 @@
     <section class="panel p-c1 s3" id="intensity-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-intensity">INTENSITY · WEEK</button><span class="line"></span></div>
       <div class="panel-body">
-        <div class="gauge" id="intensity-gauge"></div>
+        <div class="gauge" id="intensity-gauge" data-peek="intensity"></div>
         <div class="kv-row">
-          <div class="kv"><span class="k">This week</span><span class="v" id="intensity-week">—</span></div>
+          <div class="kv"><span class="k">This week</span><span class="v" id="intensity-week" data-peek="intensity">—</span></div>
           <div class="kv"><span class="k">Weekly goal</span><span class="v" id="intensity-goal">—</span></div>
           <div class="kv"><span class="k">This month</span><span class="v" id="intensity-month">—</span></div>
         </div>
@@ -142,11 +142,11 @@
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-energy">ENERGY · TODAY</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="big-row">
-          <div class="big"><span class="v" id="calories-value">—</span><span class="k">kcal total</span></div>
-          <div class="big"><span class="v" id="calories-active">—</span><span class="k">kcal active</span></div>
+          <div class="big"><span class="v" id="calories-value" data-peek="calories">—</span><span class="k">kcal total</span></div>
+          <div class="big"><span class="v" id="calories-active" data-peek="calories-active">—</span><span class="k">kcal active</span></div>
         </div>
         <div class="big-row">
-          <div class="big"><span class="v" id="floors-value">—</span><span class="k">Floors up</span></div>
+          <div class="big"><span class="v" id="floors-value" data-peek="floors">—</span><span class="k">Floors up</span></div>
           <div class="big"><span class="v" id="floors-goal">—</span><span class="k">Floor goal</span></div>
         </div>
       </div>
@@ -172,7 +172,7 @@
     <section class="panel p-c4 s3" id="sleep-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-sleep">SLEEP · LAST NIGHT</button><span class="line"></span></div>
       <div class="strip" id="sleep-strip" hidden></div>
-      <div class="panel-body" id="sleep-body"><div class="nodata">—</div></div>
+      <div class="panel-body" id="sleep-body" data-peek="sleep"><div class="nodata">—</div></div>
       <div class="nudge" id="sleep-nudge" hidden></div>
     </section>
 
@@ -192,7 +192,7 @@
     <section class="panel p-c6 s4" id="weight-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-weight">MASS · 90 DAYS</button><span class="line"></span></div>
       <div class="panel-body weight-body">
-        <div class="thermo" id="weight-thermo"></div>
+        <div class="thermo" id="weight-thermo" data-peek="weight"></div>
         <div class="weight-side">
           <div class="chart" id="weight-trend-chart"></div>
           <div class="kv-row">
@@ -313,7 +313,7 @@
     <section class="panel p-c5 s4" id="hydration-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-hydration">WATER · TODAY</button><span class="line"></span></div>
       <div class="panel-body hydration-body">
-        <div class="gauge" id="hydration-gauge"></div>
+        <div class="gauge" id="hydration-gauge" data-peek="hydration"></div>
         <div class="chart" id="hydration-days"></div>
         <div class="sub-label" id="hydration-note"></div>
       </div>
@@ -420,10 +420,18 @@
       <button type="button" class="seg btn c2" id="kiosk-button" title="Full screen (F)">FULL SCREEN</button>
       <button type="button" class="seg btn c1" id="refresh-button" title="Refresh (R)">REFRESH</button>
       <button type="button" class="seg btn c3 round" id="help-button" title="How it works and what's new (?)">?</button>
-      <span class="seg end version c2" id="footer-version">1.5.1</span>
+      <span class="seg end version c2" id="footer-version">1.6.0</span>
     </div>
   </footer>
 
+</div>
+
+<!-- 1.6.0 Peek: hover (Mac) or press and hold (iPhone) a number for its last days and when it was updated -->
+<div id="peek-card" class="peek" hidden role="tooltip" aria-hidden="true">
+  <div class="peek-head"><span class="peek-title" id="peek-title">—</span><span class="peek-value" id="peek-value">—</span></div>
+  <div class="peek-rows" id="peek-rows"></div>
+  <div class="peek-avg" id="peek-avg"></div>
+  <div class="peek-updated" id="peek-updated"></div>
 </div>
 
 <!-- The explanation of a panel: in short, then the full story -->
