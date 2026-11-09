@@ -7,6 +7,7 @@ KEY_FILE="$DIR/api-key"
 TOKEN_FILE="$DIR/token.json"
 
 KEY=$(osascript <<'APPLESCRIPT'
+with timeout of 43200 seconds
 tell application "System Events"
   activate
   set answer to display dialog "Paste your Garmin Personal API key.
@@ -14,6 +15,7 @@ tell application "System Events"
 Create one at connect.garmin.com → Settings → Personal API Key. It is shown only once." default answer "" with hidden answer with title "AMS Garmin" buttons {"Cancel", "Save"} default button "Save" with icon note
   return text returned of answer
 end tell
+end timeout
 APPLESCRIPT
 ) || { echo "Cancelled. Nothing saved."; exit 1; }
 
