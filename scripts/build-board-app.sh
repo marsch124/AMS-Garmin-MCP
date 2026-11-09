@@ -2,7 +2,8 @@
 # Builds ~/Applications/AMS Garmin Board.app (a tiny launcher) and a Desktop alias.
 set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-NAME="AMS Garmin Board"
+NAME="AMS Garmin Bridge Board"
+OLD_NAME="AMS Garmin Board"   # the launcher's name before 1.2; its app and alias are replaced
 DEST="$HOME/Applications"
 APP="$DEST/$NAME.app"
 ICON_SRC="$HOME/Documents/01 Leisure/30 App Development/AMS Icon Library/png/app-icon/heart-1024.png"
@@ -34,6 +35,8 @@ echo "Icon and settings done, signed."
 
 mkdir -p "$DEST"
 rm -rf "$APP"   # only the older copy of this one app
+if [ -d "$DEST/$OLD_NAME.app" ]; then rm -rf "$DEST/$OLD_NAME.app"; echo "Removed the old launcher $OLD_NAME.app"; fi
+if [ -e "$HOME/Desktop/$OLD_NAME" ]; then rm -f "$HOME/Desktop/$OLD_NAME"; echo "Removed the old Desktop alias."; fi
 mv "$TMP/$NAME.app" "$APP"
 echo "Installed: $APP"
 

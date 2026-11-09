@@ -4,25 +4,73 @@
 AMS Garmin lets Claude read your own Garmin Connect workouts and health data, using Garmin's official Personal API. You ask in plain words ("how did I sleep last night?") and Claude fetches the answer from Garmin. It only reads. Nothing is ever written to Garmin.
 
 ## The board
-The board is a live instrument panel for your Garmin data, in the style of a Star Trek control screen: black background, rounded orange, lavender and blue bars, tall capital letters. It opens in your normal browser.
+The board is a live instrument panel for your Garmin data, in the style of a Star Trek control screen: soft orange, peach, lavender and red bars on a warm grey background, with tall capital letters. It opens in your normal browser.
 
 **How to open it**
-- Double-click **AMS Garmin Board** on your Desktop, or type its name in Raycast.
-- The first time after a restart it can take a few seconds to appear, because it has to wake up first.
+- Double-click **AMS Garmin Bridge Board** on your Desktop, or type "AMS Garmin Bridge Board" in Raycast.
+- After you run the install step once, the board starts by itself when you log in, so the page opens instantly. Without that, the first open after a restart can take a few seconds.
 
 **What it shows**
-- Clocks: local time with seconds, world time (UTC), the date, the week number, and a playful "stardate".
-- Today: steps against your goal, distance, floors, calories, resting, lowest and highest heart rate, stress, Body Battery, and this week's intensity minutes against your weekly goal.
-- This month: a bar for every day's steps with your goal marked, a line for resting heart rate, and the month's totals.
-- Workouts this month: how many, total time, distance, calories and climbing, plus the list, newest first.
-- Sleep and HRV from last night. If your watch has no sleep data, the board says so clearly: wear the watch at night.
-- Weight: your last weigh-in and the change since before.
-- Link status: green when Garmin answers, red with the reason when it does not, plus when your key runs out and when the board last refreshed.
+- Red alert: a red bar at the top, only when needed: resting pulse 10 percent above the month average, Body Battery under 20, or no watch sync for 24 hours.
+- Clocks: local time, world time (UTC), the date, the week number, a playful stardate, and sunrise and sunset. Away from home, a travel line shows days away, distance and time zone.
+- Steps today against your goal, distance, floors, calories, resting, lowest and highest heart rate, stress, and Body Battery.
+- Intensity minutes this week against your goal. Hard minutes count double.
+- Body Battery today as a line, with sleep and workouts shaded.
+- Fitness: VO2 max and fitness age next to your real age, with trend arrows.
+- Sleep and HRV from last night, and sleep debt over the last 7 nights. If the watch has no sleep data, the board says so: wear the watch at night.
+- Weight: your last weigh-in, plus 90 days of dots, a 7-day average and your goal line.
+- Training load: the last 7 days against your usual week, with one word: RECOVERY, MAINTAINING, PRODUCTIVE or OVERREACHING.
+- Heart-rate zones this week, from Monday.
+- Streaks: days in a row at your step goal and with a workout, and the longest this year.
+- Weather for the next 12 hours.
+- Targets: your own monthly goals with progress bars.
+- Captain's log: one line a day.
+- This month: a bar for every day's steps, a line for resting pulse, and the totals with an arrow against last month up to the same day.
+- Workouts: the list, newest first. Press one to see splits, heart-rate curve and a map of the route.
+- Year: twelve tiles, one per month.
+- Link status: green when Garmin answers, red with the reason when not, plus when your key runs out.
+
+**Press any heading**
+Every heading is a button. A window opens with the meaning in short, and below it the full story. Escape closes it.
+
+**Colours**
+At the bottom there is a colour switcher with seven looks: Calm Dusk (standard), Calm Dark, Calm Day, Ice, Ember, Forest and Graphite. It remembers your choice on this Mac.
+
+**Looking back**
+The arrows beside the month name show earlier months. The right arrow stops at the current month, and a button jumps back to it. The workouts, totals and Captain's log follow the month you picked.
+
+**Captain's log, targets and settings**
+- Type one line in the Captain's log and press save. This month's lines are listed below.
+- Open **Settings** to change your monthly targets (steps, workouts, swims, runs, training minutes, distance) and to set a code. Cancel leaves everything as it was.
+
+**Full screen**
+Press **F** or the FULL SCREEN button for a calm wall display. The cursor hides when it is still, and between 21:00 and 07:00 the board dims.
+
+**iPhone and iPad on your home Wi-Fi**
+1. On the Mac, open Settings and type a code of your choice. Save.
+2. Settings now shows an address. Type that address into Safari on the phone.
+3. Enter the code once. The phone remembers it for a year.
+Without a code, the board works on this Mac only. Only the Mac can change settings.
+
+**Reports in Apple Notes**
+Every Monday morning, a summary of last week lands in Apple Notes (folder "AMS Garmin"). On the 1st of the month, the summary of last month does too. The REPORT button shows them any time. Both need the install step below.
+
+**Install step (auto-start and reports)**
+Run `scripts/install-agents.sh` once. It makes the board start at login and sets up the Monday and month reports. Run it with `--remove` to undo.
+
+**Keyboard**
+R refresh · F full screen · left and right arrows previous and next month · ? help · Escape close.
+
+**Help**
+The **?** button opens How it works and What's new.
 
 **Good to know**
 - It refreshes itself every 10 minutes, and there is a REFRESH button for right now.
-- It only works on this Mac. Nobody else can open it, and it stores nothing.
-- It is dark on purpose, day and night.
+- The footer shows the version number.
+- Your Captain's log, targets, code and travel note are stored only on this Mac, in the folder `~/Library/Application Support/AMS Garmin MCP/board/`. Nothing goes to Garmin or GitHub.
+- Weather needs the internet.
+- Sleep, HRV and sleep debt fill once the watch is worn at night.
+- The training-load words are the board's own reading, a rule of thumb.
 
 ## How to get your Garmin key
 1. On the Garmin Connect website, log in and go to https://connect.garmin.com/app/settings/personalApiToken
@@ -76,4 +124,4 @@ Make a new key on the same Garmin page (see above) and run the save-key dialog a
 Your data goes from Garmin straight to Claude on this Mac. The code repository is public so that GitHub runs the tests for free; it contains no data and no keys, and never will.
 
 ## Version
-1.1.0 — 9 Nov 2026
+1.2.0 — 9 Nov 2026

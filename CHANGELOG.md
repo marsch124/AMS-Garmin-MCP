@@ -1,5 +1,49 @@
 # What's new
 
+## 1.2.0 — 9 November 2026
+The board grows up: calmer colours, an explanation behind every heading, and much more to look at.
+
+**New**
+- A calmer look. The board is now soft orange, peach, lavender and red on a warm mid-grey background, not black. There is a colour switcher at the bottom with seven looks: Calm Dusk (the new standard), Calm Dark, Calm Day, Ice, Ember, Forest and Graphite. It remembers your choice on this Mac.
+- Press any heading to learn what it means. A small window opens with the answer in short, and below it the full story: what the measure is, how it is worked out, what good values look like for a man of 60, and what to watch out for. Escape closes it.
+- Compared with last month: every total in the month panel now has an arrow and a percent or difference against last month up to the same day. Steps, distance, floors, intensity minutes, resting pulse, workouts and training time.
+- Streaks: how many days in a row you reached your step goal and did a workout, and your longest run this year.
+- Red alert: a red bar at the top when your resting pulse is 10 percent above the month average, your Body Battery is under 20, or the watch has not synced for 24 hours. It stays hidden when all is well.
+- Training load: the last 7 days against your usual week, with a word for it: RECOVERY, MAINTAINING, PRODUCTIVE or OVERREACHING.
+- Heart-rate zones this week: a bar showing how long your workouts since Monday kept you in each of the five zones.
+- VO2 max and fitness age, side by side with your real age, each with an arrow for the trend.
+- Body Battery for today as a line from midnight, with sleep and workouts shaded.
+- Press a workout in the list to open it: kilometre splits, a heart-rate curve and, when the watch had GPS, the route on a map.
+- Weather and sunrise and sunset, from the internet, for the place of your latest workout, or home, or where your browser says you are. The next 12 hours at a glance.
+- Travel mode: away from home, the clock panel shows how many days you have been away, how far, and the time zone.
+- Your own monthly targets for steps, workouts, swims, runs, training minutes and distance, each with a progress bar. Set them in Settings.
+- Captain's log: one line a day to remember how it felt. This month's lines are listed below.
+- Weight trend over 90 days: dots for each weigh-in, a 7-day average line, and your goal line from Garmin.
+- Sleep debt: how many hours of sleep you owe over the last 7 nights, with a small chart of each night.
+- Month arrows to look back at earlier months, with a button to jump back to this month. A year view with twelve tiles shows steps, workouts, resting pulse and goal days for every month.
+- Full screen (kiosk) mode for a spare screen: the cursor hides when still, and the board dims between 21:00 and 07:00.
+- iPhone and iPad on your home Wi-Fi, behind a code. Set the code in Settings, then type the address shown there on the phone and enter the code once.
+- Monday report and month report: a plain-words summary of the last week, or the last month, written into Apple Notes by itself. You can also read it any time with the REPORT button.
+- Polish: a ? help button with How it works and What's new, the keys R (refresh), F (full screen), the left and right arrows (month), ? (help) and Escape (close), the version number in the footer, and auto-start at login so the page opens instantly.
+
+**Changed**
+- The Desktop launcher is now called **AMS Garmin Bridge Board** (type that in Raycast); the old "AMS Garmin Board" app and alias were replaced.
+- The red alert for a high resting pulse waits for a real reading: early on a day without a recorded night it judges yesterday's finished value instead of the provisional morning number.
+- The version is now 1.2.0.
+- The board is no longer black by default. Black is still there as Calm Dark.
+- The board answers on the home network only when you set a code. Without a code, it works on this Mac only, as before.
+- If the board gets a new version while the page is open, the page reloads by itself.
+
+**Good to know**
+- Sleep debt, sleep and HRV fill once the watch is worn at night.
+- The training-load words are the board's own reading of Garmin's workout loads, not Garmin's own verdict. They are a rule of thumb, not medical advice.
+- Weather needs the internet. Without it, that panel stays empty and the rest works.
+- The Captain's log, your targets, the code and the travel note live only on this Mac. They are never sent to Garmin or to GitHub.
+- The explanations are general information. For health questions, ask a doctor.
+
+**Quality**
+- New automatic tests check every new part by its name: the colour switcher, the explanations, the streaks, the red alert, the training load, the zones, the weather, the log, the targets, the month arrows, the workout detail, the reports and the home-network code. They run on every push to GitHub.
+
 ## 1.1.0 — 9 November 2026
 The AMS Garmin Board: your Garmin data on a Star Trek style instrument screen.
 
