@@ -1,5 +1,23 @@
 # What's new
 
+## 1.9.0 — 10 November 2026
+Your workouts now show up on the Body Battery curve, and the WORKOUTS panel compares this week with the week before.
+
+**New**
+- Before: the Body Battery curve showed sleep and shaded workout stretches, but you could not tell which workout was which.
+- New: every workout of today gets a marker on the curve: a dashed line at its start and a small label above it with the type and what it cost, for example "Run −17". Press the marker and the workout's details open, just like from the workout list.
+- The cost comes from Garmin's own activity figure for that workout. When Garmin gives none, the board works it out from the Body Battery reading just before the start and the one just after the end. When neither is possible, the label shows only the name.
+- New: on the 7 DAYS tab of the WORKOUTS panel, a line under the totals: "vs the 7 days before: +2 workouts · +1 h 10 · +5,1 km". A drop is written with a minus sign (−). The line is hidden when both weeks have no workouts, and it is not shown on TODAY and YESTERDAY.
+- The board's data now carries, for each workout, `startMs` (start time in epoch milliseconds, or null), `recentWorkouts.prev7` (the 7 days before the last 7, same shape as `last7`), `recentWorkouts.vsLastWeek` (count, seconds, distance and calories, last 7 minus the 7 before) and `bodyBatteryCurve.workouts` (today's workouts with start, end and drain).
+
+**Changed**
+- The workout figures from Garmin now keep the start time in UTC (`startTimeGMT`), which the markers need.
+- The version is now 1.9.0. How it works, the explanations of BODY BATTERY TODAY and WORKOUTS, and this list are updated.
+
+**Good to know**
+- No extra calls to Garmin.
+- No colours, layout or stored data changed.
+
 ## 1.8.0 — 10 November 2026
 A new WORKOUTS panel at the top right of the board, next to Body Battery. Switch between today, yesterday and the last 7 days, and press a workout to open its details.
 

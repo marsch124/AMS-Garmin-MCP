@@ -70,10 +70,10 @@ globalThis.AMS_EXPLAIN = {
   },
   "bb-curve": {
     title: "BODY BATTERY TODAY",
-    summary: "Today's Body Battery as a line from midnight until now. Shaded stretches mark sleep and workouts so you can see what charged and what drained you.",
+    summary: "Today's Body Battery as a line from midnight until now. Shaded stretches mark sleep and workouts so you can see what charged and what drained you. Each of today's workouts also has a dashed marker with its cost, like \"Run −17\"; press it to open the workout.",
     more: [
       "The line is made from the minute-by-minute values Garmin saves during the day. A rising line is charging, usually in sleep and quiet rest. A falling line is draining, from stress and exercise.",
-      "The shaded blocks show sleep and your workouts, with the change in Body Battery that came with each. A hard run or a heavy gym session can take 15 to 30 points. This tells you what each activity costs you.",
+      "The shaded blocks show sleep and your workouts, with the change in Body Battery that came with each. A hard run or a heavy gym session can take 15 to 30 points. This tells you what each activity costs you. The dashed marker at the start of each workout carries a label with that cost, taken from Garmin's own figure or, when there is none, worked out from the readings before and after. Press the marker to open the workout's details.",
       "A good day has a high start, a gentle fall, and small recoveries after meals or rest. A line that never climbs may mean poor sleep, ongoing stress, illness or a watch that was not worn.",
       "If the early part of the line is flat or empty, the watch probably was not worn at night. Wear it in bed to get a real charge curve.",
       "Like all Body Battery numbers, this is Garmin's estimate. It helps you plan hard days and rest days. It does not diagnose anything. If you feel unwell, ask a doctor."
@@ -226,7 +226,7 @@ globalThis.AMS_EXPLAIN = {
   },
   "activities": {
     title: "WORKOUTS",
-    summary: "Every workout of the month, newest first, with type, time, distance and heart rate. Press a row to open its splits, heart-rate curve and map.",
+    summary: "Every workout of the month, newest first, with type, time, distance and heart rate. Press a row to open its splits, heart-rate curve and map. On 7 DAYS a line compares the week with the 7 days before.",
     more: [
       "The list comes from Garmin Connect and includes everything the watch recorded: runs, walks, hikes, swims, strength training and more. The header shows the count and the totals for time, distance, calories and climbing.",
       "Each row shows the date, type, name, duration, distance, average heart rate and the training effect. Training effect from 0 to 5 shows how much the workout improved your fitness. 2 maintains it, 3 improves it, 4 is a big gain, and 5 is overreaching.",
@@ -240,7 +240,7 @@ globalThis.AMS_EXPLAIN = {
     summary: "Your workouts of today, yesterday or the last 7 days, newest first, with one line of totals. Press a row to open its splits, heart-rate curve and map.",
     more: [
       "Use the three buttons at the top of the panel to choose the time: TODAY, YESTERDAY or 7 DAYS. 7 DAYS means the last seven days, today included. The board remembers your choice on this device.",
-      "The line under the buttons adds up the workouts you see: how many there are, the total time, the distance and the calories. Each row shows a type tag, the day and time, the name, the duration and the distance.",
+      "The line under the buttons adds up the workouts you see: how many there are, the total time, the distance and the calories. Each row shows a type tag, the day and time, the name, the duration and the distance. On the 7 DAYS tab a further line compares the week with the 7 days before, for example +2 workouts, +1 h 10 and +5,1 km; a minus sign means less than the week before, and it is hidden when both weeks were empty.",
       "Press a row to open the detail panel with kilometre splits, the heart-rate curve and, where there is GPS, the track on a map.",
       "If you did nothing in that time, the panel says so: no workouts today, no workouts yesterday, or no workouts in the last 7 days. A rest day is part of good training.",
       "The panel always looks at the real today, whichever month you have picked with the arrows. The list further down shows the whole month. Both come from the workouts the board already loads from Garmin Connect, so there are no extra calls.",

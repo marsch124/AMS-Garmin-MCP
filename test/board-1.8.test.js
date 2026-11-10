@@ -88,5 +88,5 @@ test('1.8 E: page, explanation and version', async () => {
   }
   assert.ok(pos('heart-panel') > pos('sleep-debt-panel'), 'heart panel after sleep debt');
   assert.match(await read('board', 'public', 'explain.js'), /["']?workouts["']?\s*:\s*\{/);
-  assert.equal(JSON.parse(await read('package.json')).version, '1.8.0');
+  assert.match(JSON.parse(await read('package.json')).version, /^1\.(8|9|[1-9]\d)\./);
 });

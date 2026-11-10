@@ -277,7 +277,7 @@
   }
 
   /** Today's Body Battery readings over the 24 hours, with Garmin's sleep / activity / recovery spans shaded. */
-  function drawCurve(host, points, events) {
+  function drawCurve(host, points, events, workouts = []) {
     const W = 620, H = 150, padL = 26, padR = 8, padT = 10, padB = 18;
     const plotW = W - padL - padR, plotH = H - padT - padB;
     if (!points.length) { host.innerHTML = emptySvg(W, H, 'No Body Battery readings yet today'); return; }
@@ -296,8 +296,21 @@
     const hours = [0, 3, 6, 9, 12, 15, 18, 21, 24].map((h) => `<text class="t-tick" x="${f1(padL + (h / 24) * plotW)}" y="${H - 5}" text-anchor="middle" font-size="9" fill="${css('--dim')}">${pad2(h % 24)}</text>`).join('');
     const path = points.map((p, i) => `${i ? 'L' : 'M'} ${f1(xOf(p[0]))} ${f1(yOf(p[1]))}`).join(' ');
     const last = points[points.length - 1];
+    // 1.9.0: a dashed line and a label at the start of each of today's workouts, with what it drained.
+    const wks = workouts.filter((w) => isNum(w.startMs) && w.startMs >= dayStart.getTime()).map((w, i) => {
+      const x = xOf(w.startMs);
+      const tag = typeTag(w.type);
+      const drain = isNum(w.drain) && w.drain !== 0 ? ` ${w.drain > 0 ? '−' : '+'}${Math.abs(w.drain)}` : '';
+      const label = `${sentence(tag.text)}${drain}`;
+      const ly = padT + 20 + (i % 2) * 12;
+      const anchor = x > W - 70 ? 'end' : 'start';
+      return `<g class="bb-wk" id="bb-wk-${escapeHtml(w.id)}" data-id="${escapeHtml(w.id)}" role="button" tabindex="0" style="cursor:pointer"><title>${escapeHtml(w.name)}${drain ? ` · Body Battery${drain}` : ''}</title>
+        <line x1="${f1(x)}" y1="${padT}" x2="${f1(x)}" y2="${padT + plotH}" stroke="${tag.color}" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <rect x="${f1(anchor === 'end' ? x - 64 : x)}" y="${ly - 10}" width="64" height="14" fill="transparent"/>
+        <text class="t-legend" x="${f1(anchor === 'end' ? x - 4 : x + 4)}" y="${ly}" text-anchor="${anchor}" font-size="10" font-weight="700" fill="${tag.color}">${escapeHtml(label)}</text></g>`;
+    }).join('');
     const legend = Object.entries(colors).map(([k, c], i) => `<rect x="${padL + 60 + i * 80}" y="${padT}" width="8" height="8" fill="${c}" opacity=".6"/><text class="t-legend" x="${padL + 72 + i * 80}" y="${padT + 8}" font-size="9" fill="${css('--dim')}">${sentence(k)}</text>`).join('');
-    host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="body battery today">${spans}${grid}${hours}${legend}
+    host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="body battery today">${spans}${grid}${hours}${legend}${wks}
       <path d="${path}" fill="none" stroke="${css('--c5')}" stroke-width="2.5" stroke-linejoin="round"/>
       <circle cx="${f1(xOf(last[0]))}" cy="${f1(yOf(last[1]))}" r="4" fill="${css('--c5')}"/>
       <text class="t-hero" x="${f1(Math.min(W - padR - 2, xOf(last[0]) + 6))}" y="${f1(yOf(last[1]) - 6)}" font-size="12" font-weight="700" fill="${css('--c5')}" text-anchor="${xOf(last[0]) > W - 60 ? 'end' : 'start'}">${last[1]}</text></svg>`;
@@ -695,7 +708,7 @@
 
   function renderBbCurve(b) {
     const c = b.bodyBatteryCurve || { points: [], events: [] };
-    drawCurve($('bb-curve-chart'), c.points, c.events);
+    drawCurve($('bb-curve-chart'), c.points, c.events, c.workouts || []);
     setText('bb-curve-note', c.points.length ? `${c.points.length} readings` : '');
   }
 
@@ -990,6 +1003,16 @@
     setText('workouts-summary', list.length
       ? [`${p.count} ${p.count === 1 ? 'workout' : 'workouts'}`, fmtDur(p.seconds), p.distanceM > 0 ? fmtKm(p.distanceM) : null, isNum(p.calories) && p.calories > 0 ? `${fmtInt(p.calories)} kcal` : null].filter(Boolean).join(' · ')
       : WORKOUT_EMPTY[workoutsRange]);
+    // 1.9.0: on the 7-day tab, a line comparing with the 7 days before.
+    const cmp = $('workouts-compare');
+    const v = b?.recentWorkouts?.vsLastWeek, prev = b?.recentWorkouts?.prev7;
+    if (workoutsRange === 'last7' && v && prev && (p?.count || prev.count)) {
+      const sg = (n) => (n > 0 ? '+' : n < 0 ? '−' : '±');
+      const parts = [`${sg(v.count)}${Math.abs(v.count)} ${Math.abs(v.count) === 1 ? 'workout' : 'workouts'}`, `${sg(v.seconds)}${fmtDur(Math.abs(v.seconds))}`];
+      if (v.distanceM !== 0) parts.push(`${sg(v.distanceM)}${fmtKm(Math.abs(v.distanceM))}`);
+      cmp.textContent = `vs the 7 days before: ${parts.join(' · ')}`;
+      cmp.hidden = false;
+    } else { cmp.textContent = ''; cmp.hidden = true; }
     const when = (x) => {
       const d = parseLocal(x.start);
       if (!d) return '—';
@@ -1607,6 +1630,14 @@
   $('workouts-list').addEventListener('click', (e) => {
     const row = e.target.closest('.act[data-id]');
     if (row) openWorkout(row.dataset.id);
+  });
+  $('bb-curve-chart').addEventListener('click', (e) => {
+    const g = e.target.closest('.bb-wk[data-id]');
+    if (g) openWorkout(g.dataset.id);
+  });
+  $('bb-curve-chart').addEventListener('keydown', (e) => {
+    const g = e.target.closest('.bb-wk[data-id]');
+    if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openWorkout(g.dataset.id); }
   });
   $('workouts-list').addEventListener('keydown', (e) => {
     const row = e.target.closest('.act[data-id]');

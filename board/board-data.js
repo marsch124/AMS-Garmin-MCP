@@ -196,6 +196,7 @@ function activityView(raw) {
     name: a.activityName ?? '',
     type: typeof a.activityType === 'string' ? a.activityType : (a.activityType?.typeKey ?? 'other'),
     start,
+    startMs: parseGmt(a.startTimeGMT),
     date: typeof start === 'string' ? start.slice(0, 10) : null,
     seconds: round(a.duration) ?? 0,
     distanceM: round(a.distance) ?? 0,
@@ -229,7 +230,18 @@ export function recentWorkoutsView(acts, today) {
     };
   };
   const y = addDays(today, -1);
-  return { today: period(today, today), yesterday: period(y, y), last7: period(addDays(today, -6), today) };
+  const last7 = period(addDays(today, -6), today);
+  const prev7 = period(addDays(today, -13), addDays(today, -7));
+  return {
+    today: period(today, today), yesterday: period(y, y), last7, prev7,
+    // 1.9.0: the rolling 7 days against the 7 days before them.
+    vsLastWeek: {
+      count: last7.count - prev7.count,
+      seconds: last7.seconds - prev7.seconds,
+      distanceM: last7.distanceM - prev7.distanceM,
+      calories: (last7.calories ?? 0) - (prev7.calories ?? 0),
+    },
+  };
 }
 
 function activitiesView(list) {
@@ -369,7 +381,7 @@ function sleepDebtView(raw, today) {
 }
 
 /** Today's Body Battery readings and the sleep / activity / recovery spans Garmin marked. */
-function bodyBatteryCurveView(raw, today) {
+function bodyBatteryCurveView(raw, today, acts = []) {
   const list = Array.isArray(raw) ? raw : (raw && typeof raw === 'object' ? [raw] : []);
   const entry = list.find((e) => e?.date === today) ?? list[0] ?? null;
   const points = (Array.isArray(entry?.bodyBatteryValuesArray) ? entry.bodyBatteryValuesArray : [])
@@ -382,7 +394,23 @@ function bodyBatteryCurveView(raw, today) {
       return { type: typeof e?.eventType === 'string' ? e.eventType : 'EVENT', startMs, endMs: startMs === null ? null : startMs + dur, impact: num(e?.bodyBatteryImpact) };
     })
     .filter((e) => e.startMs !== null);
-  return { points, events };
+  // 1.9.0: today's workouts as markers, with what each one drained.
+  const workouts = acts
+    .filter((a) => a.date === today && num(a.startMs) !== null)
+    .sort((a, b) => a.startMs - b.startMs)
+    .map((a) => {
+      const endMs = a.startMs + (a.seconds || 0) * 1000;
+      const ev = events.find((e) => e.type === 'ACTIVITY' && num(e.impact) !== null && Math.abs(e.startMs - a.startMs) <= 10 * 60_000);
+      let drain = null;
+      if (ev) drain = -ev.impact;
+      else {
+        const before = [...points].reverse().find((p) => p[0] <= a.startMs);
+        const after = points.find((p) => p[0] >= endMs);
+        if (before && after) drain = before[1] - after[1];
+      }
+      return { id: a.id, name: a.name, type: a.type, startMs: a.startMs, endMs, drain };
+    });
+  return { points, events, workouts };
 }
 
 // ---------- the new 1.2 blocks ----------
@@ -880,7 +908,7 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
     training: trainingView(acts, today),
     zones: zonesView(weekActs, zonesRaw, { acts, today, weekStart: wStart }),
     fitness: fitnessView(acts, fitnessRaw),
-    bodyBatteryCurve: bodyBatteryCurveView(bbRaw, today),
+    bodyBatteryCurve: bodyBatteryCurveView(bbRaw, today, acts),
     sleepDebt,
     weightTrend,
     year: yearView(allDays, acts, year, today),

@@ -100,7 +100,7 @@ function stripKeys(value, keys) {
 }
 
 const ACTIVITY_FIELDS = [
-  'activityId', 'activityName', 'startTimeLocal', 'duration', 'movingDuration', 'distance', 'calories',
+  'activityId', 'activityName', 'startTimeLocal', 'startTimeGMT', 'duration', 'movingDuration', 'distance', 'calories',
   'averageHR', 'maxHR', 'elevationGain', 'averageSpeed', 'maxSpeed', 'steps',
   'aerobicTrainingEffect', 'anaerobicTrainingEffect', 'trainingEffectLabel', 'activityTrainingLoad',
   'vO2MaxValue', 'avgPower', 'normPower', 'totalSets', 'totalReps', 'summarizedExerciseSets',
