@@ -976,6 +976,38 @@
       : '<div class="act-empty">The log is empty. Go move.</div>';
   }
 
+  // ---------- 1.8.0 Workouts: today / yesterday / last 7 days, beside Body Battery ----------
+  const WORKOUTS_KEY = 'ams-garmin-board.workoutsRange';
+  const WORKOUT_RANGES = ['today', 'yesterday', 'last7'];
+  const WORKOUT_EMPTY = { today: 'No workouts today', yesterday: 'No workouts yesterday', last7: 'No workouts in the last 7 days' };
+  let workoutsRange = (() => {
+    try { const v = localStorage.getItem(WORKOUTS_KEY); return WORKOUT_RANGES.includes(v) ? v : 'today'; } catch { return 'today'; }
+  })();
+  function renderWorkouts(b) {
+    for (const r of WORKOUT_RANGES) $(`workouts-tab-${r}`).setAttribute('aria-pressed', String(r === workoutsRange));
+    const p = b?.recentWorkouts?.[workoutsRange];
+    const list = p?.list || [];
+    setText('workouts-summary', list.length
+      ? [`${p.count} ${p.count === 1 ? 'workout' : 'workouts'}`, fmtDur(p.seconds), p.distanceM > 0 ? fmtKm(p.distanceM) : null, isNum(p.calories) && p.calories > 0 ? `${fmtInt(p.calories)} kcal` : null].filter(Boolean).join(' · ')
+      : WORKOUT_EMPTY[workoutsRange]);
+    const when = (x) => {
+      const d = parseLocal(x.start);
+      if (!d) return '—';
+      const hm = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+      return workoutsRange === 'last7' ? `${DAY_NAMES[d.getDay()]} ${hm}` : hm;
+    };
+    $('workouts-list').innerHTML = list.map((x) => {
+      const tag = typeTag(x.type);
+      return `<div class="act" id="wk-act-${escapeHtml(x.id)}" data-id="${escapeHtml(x.id)}" role="button" tabindex="0">
+        <span class="tag" style="background:${tag.color}">${escapeHtml(tag.text)}</span>
+        <span class="when">${when(x)}</span>
+        <span class="name" title="${escapeHtml(x.name)}">${escapeHtml(x.name)}</span>
+        <span class="num n-dur">${fmtDur(x.seconds)}</span>
+        <span class="num n-dist">${x.distanceM > 0 ? fmtKm(x.distanceM) : '—'}</span>
+      </div>`;
+    }).join('');
+  }
+
   function renderTargets(targets, m, a, ym, isCurrent) {
     const list = a.list || [];
     const values = {
@@ -1198,6 +1230,7 @@
     renderRestingTrend(b);
     renderStress(b);
     renderHydration(b);
+    renderWorkouts(b);
     renderTravel(b.travel);
     if (!viewYm) {
       monthData = { ym: b.date.slice(0, 7), month: b.month, activities: b.activities, compare: b.compare, log: b.log };
@@ -1566,6 +1599,26 @@
   $('log-save-button').addEventListener('click', saveLogLine);
   $('log-today-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveLogLine(); } });
   $('weather-locate-button').addEventListener('click', toggleLocate);
+  const openWorkout = (id) => {
+    showActivity(id);
+    $(`wk-act-${id}`)?.classList.add('selected');
+    $('activity-detail-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  $('workouts-list').addEventListener('click', (e) => {
+    const row = e.target.closest('.act[data-id]');
+    if (row) openWorkout(row.dataset.id);
+  });
+  $('workouts-list').addEventListener('keydown', (e) => {
+    const row = e.target.closest('.act[data-id]');
+    if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openWorkout(row.dataset.id); }
+  });
+  for (const r of WORKOUT_RANGES) {
+    $(`workouts-tab-${r}`).addEventListener('click', () => {
+      workoutsRange = r;
+      try { localStorage.setItem(WORKOUTS_KEY, r); } catch { /* ignore */ }
+      renderWorkouts(board);
+    });
+  }
   $('activities-list').addEventListener('click', (e) => {
     const row = e.target.closest('.act[data-id]');
     if (row) showActivity(row.dataset.id);

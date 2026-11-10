@@ -1,4 +1,4 @@
-# AMS Garmin MCP — Specification (1.1.0, 9 Nov 2026; board 1.7.0)
+# AMS Garmin MCP — Specification (1.1.0, 10 Nov 2026; board 1.8.0)
 
 ## 1. Purpose
 Read-only MCP server giving Claude access to the owner's Garmin Connect data via Garmin's official Personal API (spec: `docs/garmin-personal-openapi.json`, title "Garmin Connect Personal API" 1.0.0, 26 paths, all GET). Base URL `https://personal.connectapi.garmin.com` (the spec also lists `.garmin.cn`; unused). Nothing is ever written to Garmin.
@@ -84,7 +84,7 @@ Note: `/weight-service/weight/all/{startDate}/{endDate}` has no dedicated tool; 
 - GitHub Actions runs `npm test` on every push.
 
 ## 9. Board
-"AMS Garmin Board" 1.7.0: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
+"AMS Garmin Board" 1.8.0: an LCARS-inspired instrument board (calm colours on a mid-grey background, rounded bars, condensed uppercase lettering) showing the owner's Garmin data live in the browser. Read-only towards Garmin. Own data (settings, Captain's log, travel note) is stored only on the owner's Mac, outside the repository. Plain JavaScript, Node 20 or newer, no dependencies, no build step.
 
 ### Files
 - `board/board-data.js` — `buildBoard(client, { today, now, settings, log, travel })` returns one JSON object. Uses `GarminClient`.
@@ -130,7 +130,7 @@ The footer `<select id="palette-select">` has exactly eight option values (the s
 ### Page: panels and element ids
 Existing ids (unchanged): `board`, `clock-local`, `clock-utc`, `clock-date`, `stardate`, `steps-gauge`, `steps-value`, `body-battery-bar`, `resting-hr`, `stress-bar`, `intensity-gauge`, `floors-value`, `calories-value`, `month-steps-chart`, `month-hr-chart`, `activities-list`, `activities-total`, `sleep-panel`, `hrv-panel`, `weight-thermo`, `link-status`, `last-refresh`, `refresh-button`, `version-label`.
 
-Every panel heading is a `<button type="button" class="label" id="explain-<key>">`. The 31 keys: chrono, steps, body-battery, heart, intensity, energy, bb-curve, fitness, sleep, hrv, sleep-debt, weight, training, zones, streaks, weather, targets, log, month-steps, month-hr, activities, month-totals, activity-detail, year, red-alert, link, rhythm, plan, resting-trend, hydration, stress. The key `link` has no button on the page (the footer status gets none); it is used by the help texts only, so the page carries 30 `explain-*` buttons.
+Every panel heading is a `<button type="button" class="label" id="explain-<key>">`. The 32 keys (since 1.8.0 including `workouts`, after `activities`): chrono, steps, body-battery, heart, intensity, energy, bb-curve, fitness, sleep, hrv, sleep-debt, weight, training, zones, streaks, weather, targets, log, month-steps, month-hr, activities, month-totals, activity-detail, year, red-alert, link, rhythm, plan, resting-trend, hydration, stress. The key `link` has no button on the page (the footer status gets none); it is used by the help texts only, so the page carries 30 `explain-*` buttons.
 
 Panels in order inside `<main class="panels">` (12-column grid, sN = span N):
 1. `red-alert` (s12, `hidden` unless alerts): `red-alert-text`.
@@ -155,10 +155,10 @@ Panels in order inside `<main class="panels">` (12-column grid, sN = span N):
 19e. `hydration-panel` (s4, `WATER · TODAY`): `explain-hydration`, `hydration-gauge` (`<div class="gauge">`, arc of ml against goal; big number in litres with one decimal and a decimal comma, e.g. `1,2`, unit `LITRES`), `hydration-days` (7 small bars), `hydration-note` (`NO WATER LOGGED · LOG IT IN GARMIN CONNECT OR ON THE WATCH` when `logged` is false, else `GOAL 2,5 L · 7-DAY AVG 1,8 L`).
 20. `month-nav` (s12): `month-prev`, `month-label` (e.g. "NOVEMBER 2026 · SO FAR"), `month-next` (disabled on the current month), `month-today` (hidden on the current month).
 21. `month-steps-panel` (s7). 22. `month-hr-panel` (s5). 23. `activities-panel` (s8). 24. `month-totals-panel` (s4): delta cells `delta-steps`, `delta-distance`, `delta-floors`, `delta-intensity`, `delta-resting-hr`, `delta-workouts`, `delta-training-time` (arrow ▲ or ▼ with percent or difference against the previous month to the same day).
-25. `activity-detail-panel` (s12, hidden until a workout row is pressed): `detail-title`, `detail-summary`, `detail-splits`, `detail-hr-chart`, `detail-map`, `detail-close`. Workout rows: `class="act"`, `id="act-<activityId>"`, `data-id`.
+25. `activity-detail-panel` (s12, hidden until a workout row is pressed): `detail-title`, `detail-summary`, `detail-splits`, `detail-hr-chart`, `detail-map`, `detail-close`. Workout rows: `class="act"`, `id="wk-act-<activityId>"`, `data-id`.
 26. `year-panel` (s12): `year-tiles` with `year-tile-01` … `year-tile-12` (steps, workouts, resting pulse, goal days; future months dimmed). New in 1.4.0: under the tiles `last-year-line` (`<div class="sub-label">`; `SAME TIME LAST YEAR · NOVEMBER 2025 TO DAY 9 · STEPS 61 200 → 68 500 (▲ +12 %) · WORKOUTS 4 → 4 (=) · 2025 TO 9 NOV · 1 230 000 STEPS ▲ +3 %`; without data `NO DATA FOR NOVEMBER 2025`), and in each tile a faint ghost bar and `<span class="tk ly" id="year-last-01">2025 · 48 200</span>` (ids `year-last-01` … `year-last-12`; `—` when that month had no data).
 
-Footer bar: `palette-select`, `kiosk-button`, `help-button`, `report-button`, `share-button` (SHARE, key S; new in 1.4.0), `settings-button`, `footer-version` ("1.6.0"), plus the link status and refresh controls.
+Footer bar: `palette-select`, `kiosk-button`, `help-button`, `report-button`, `share-button` (SHARE, key S; new in 1.4.0), `settings-button`, `footer-version` ("1.8.0"), plus the link status and refresh controls.
 
 Sheets (overlays, `hidden` by default; Escape closes = Cancel; the main button is full colour):
 - `explain-sheet`: `explain-title`, `explain-summary` (IN SHORT), `explain-more` (LEARN MORE), `explain-close`.
@@ -176,8 +176,15 @@ Behaviour:
 - The page reloads itself when `/api/board` reports a different version than the one first loaded.
 - Stardate: year.dayOfYear (e.g. 2026.313).
 
+### Workouts panel (1.8.0)
+- `workouts-panel` (s4 on wide screens), top right of the first row, beside `body-battery-panel`. Heading button `explain-workouts` (key `workouts`). Switch: three buttons `workouts-tab-today` (Today), `workouts-tab-yesterday` (Yesterday), `workouts-tab-last7` (7 days), each with `aria-pressed` "true" on the chosen one and "false" on the others. `workouts-summary`: one line, count · total time · distance · calories (e.g. `2 workouts · 1 h 25 · 9.4 km · 780 kcal`). `workouts-list`: rows newest first, each with type tag, day and time, name, duration and distance; a row is `class="act"`, `id="wk-act-<activityId>"`, `data-id`, and pressing it opens `activity-detail-panel` (same behaviour as the rows in `activities-list`).
+- Empty states (the summary and list show only the text): `No workouts today`, `No workouts yesterday`, `No workouts in the last 7 days`.
+- Storage: the choice is kept in `localStorage` key `ams-garmin-board.workoutsRange`, values `today`, `yesterday`, `last7`; default and fallback for any other value or when storage fails: `today`.
+- Data: `recentWorkouts` in the board JSON (below). The panel makes no extra Garmin call; it uses the 90 days of activities the board already fetches. It always uses the real today, independent of the month picked with `month-prev` / `month-next`.
+- Layout (12 columns, from 1251 px wide): row 1 = `chrono-panel` s3, `steps-panel` s3, `body-battery-panel` s2, `workouts-panel` s4. The "Cardio · today" panel (`heart-panel`) moved down beside water and weight: row Cardio s4, Water (`hydration-panel`) s4, Mass (`weight-panel`) s4. Row Sleep / HRV / Sleep debt = s4 / s3 / s5. `stress-panel` s12. `resting-trend-panel` s12 on mid-size windows. Narrower windows keep their earlier stacking.
+
 ### explain.js format
-Plain script, no import or export. Sets `globalThis.AMS_EXPLAIN = { <key>: { title, summary, more } }` for all 31 keys above (since 1.4.0 the keys rhythm, plan, resting-trend, hydration and stress are at the end; titles WEEKLY RHYTHM, THIS WEEK'S PLAN, RESTING PULSE · 90 DAYS, WATER, STRESS; the entries year, sleep, red-alert and targets gained a paragraph or sentence). `title`: uppercase short title. `summary`: one or two sentences, shown under IN SHORT. `more`: array of 3 to 6 paragraphs, shown under LEARN MORE. The page opens `explain-sheet` from the button whose id is `explain-<key>`. Loadable in Node with `import()` (the tests do this).
+Plain script, no import or export. Sets `globalThis.AMS_EXPLAIN = { <key>: { title, summary, more } }` for all 32 keys above (since 1.8.0 also `workouts`, title WORKOUTS, 6 paragraphs) (since 1.4.0 the keys rhythm, plan, resting-trend, hydration and stress are at the end; titles WEEKLY RHYTHM, THIS WEEK'S PLAN, RESTING PULSE · 90 DAYS, WATER, STRESS; the entries year, sleep, red-alert and targets gained a paragraph or sentence). `title`: uppercase short title. `summary`: one or two sentences, shown under IN SHORT. `more`: array of 3 to 6 paragraphs, shown under LEARN MORE. The page opens `explain-sheet` from the button whose id is `explain-<key>`. Loadable in Node with `import()` (the tests do this).
 
 ### Routes
 Loopback listener on 127.0.0.1 always; see "LAN gate" for the second listener.
@@ -205,6 +212,13 @@ Hover (Mac) or press and hold (iPhone) on a number shows a small card with its h
 
 ### Board JSON (`/api/board`)
 Unchanged from 1.1.0: `ok, version, generatedAt, date, monthStart, weekStart, link { ok, tokenExpiresAt }, today { … }, month { days, steps, avgSteps, stepGoalDays, daysWithData, distanceM, floorsUp, intensityMinutes, restingHrAvg, restingHrMin, restingHrMax }, week { start, intensityMinutes, goal }, activities { count, seconds, distanceM, calories, elevationGain, byType, list [ { id, name, type, start, seconds, distanceM, calories, avgHr, maxHr, elevationGain, trainingEffect, aerobic, anaerobic, load } ] }, sleep, hrv, weight, warnings`. Since 1.6.0 also `history` and `updated` (see Peek card). Resting pulse figures use finished days only. Intensity minutes = moderate + 2 × vigorous. Stress −1 becomes null. Weight comes in grams and is shown in kg with one decimal.
+
+Added in 1.8.0:
+```
+recentWorkouts: { today, yesterday, last7 }   // each:
+  { from: 'YYYY-MM-DD', to: 'YYYY-MM-DD', count, seconds, distanceM, calories, list }
+```
+`today` = today only; `yesterday` = yesterday only; `last7` = the 7 days ending today (today included). `list` holds the same workout objects as `activities.list`, newest first; `count` = `list.length`; `seconds`, `distanceM` and `calories` are the sums over the list (a missing value counts as 0). Built from the 90 days of activities already fetched, so the Garmin calls per board build are unchanged.
 
 Added in 1.2.0:
 ```
@@ -301,7 +315,7 @@ Everything except the daily summaries is a side call: a failure becomes a warnin
 - VO2 max shows "—" with a note while Garmin's Personal API delivers no `vO2MaxValue` on activities.
 
 ### Storage
-Directory (injectable `storeDir`): `~/Library/Application Support/AMS Garmin MCP/board/`. Files: `settings.json` (targets, plan, notify and access code), `captains-log.json`, `travel.json`, `alerts-notified.json` (since 1.4.0: `{ date, keys }`, the alerts already notified today). Writes are atomic (temporary file, then rename). Browser: only `localStorage` key `ams-garmin-board.scheme`. Nothing of this is in the repository.
+Directory (injectable `storeDir`): `~/Library/Application Support/AMS Garmin MCP/board/`. Files: `settings.json` (targets, plan, notify and access code), `captains-log.json`, `travel.json`, `alerts-notified.json` (since 1.4.0: `{ date, keys }`, the alerts already notified today). Writes are atomic (temporary file, then rename). Browser: `localStorage` keys `ams-garmin-board.scheme` and (since 1.8.0) `ams-garmin-board.workoutsRange` (`today` | `yesterday` | `last7`, default `today`). Nothing of this is in the repository.
 
 ### LAN gate
 - The loopback listener always runs. When an access code is set, a second listener on 0.0.0.0 (same port) accepts the home network.

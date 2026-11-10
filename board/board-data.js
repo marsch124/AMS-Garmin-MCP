@@ -215,6 +215,23 @@ function activityView(raw) {
   };
 }
 
+/** 1.8.0: workouts of today, yesterday and the rolling last 7 days (today included), newest first. */
+export function recentWorkoutsView(acts, today) {
+  const period = (from, to) => {
+    const list = acts.filter((a) => a.date && a.date >= from && a.date <= to);
+    return {
+      from, to,
+      count: list.length,
+      seconds: sum(list, (a) => a.seconds),
+      distanceM: sum(list, (a) => a.distanceM),
+      calories: sum(list, (a) => a.calories),
+      list,
+    };
+  };
+  const y = addDays(today, -1);
+  return { today: period(today, today), yesterday: period(y, y), last7: period(addDays(today, -6), today) };
+}
+
 function activitiesView(list) {
   const byType = {};
   for (const a of list) {
@@ -850,6 +867,7 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
       goal: weeklyGoal,
     },
     activities: activitiesView(monthActs),
+    recentWorkouts: recentWorkoutsView(acts, today),
     sleep,
     hrv: hrvView(hrvRaw),
     weight: weightView(weightRaw),

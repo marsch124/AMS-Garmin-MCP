@@ -434,17 +434,17 @@ test('1.4 K: index.html carries every new element id', async () => {
   const html = await read('board', 'public', 'index.html');
   assert.deepEqual(NEW_IDS.filter((id) => !html.includes(`id="${id}"`)), []);
 });
-test('1.4 K: the footer shows the package version and the page has exactly 30 explain buttons', async () => {
+test('1.4 K: the footer shows the package version and the page has exactly 31 explain buttons', async () => {
   const html = await read('board', 'public', 'index.html');
   const { version } = JSON.parse(await read('package.json'));
   assert.match(html, new RegExp(`id="footer-version"[^>]*>[^<]*${version.replace(/\./g, '\\.')}`));
   const buttons = [...html.matchAll(/id="explain-[a-z-]+"/g)].filter((m) => !/explain-(sheet|title|summary|more|close)"/.test(m[0]));
-  assert.equal(buttons.length, 30);
+  assert.equal(buttons.length, 31);
 });
 test('1.4 K: the new panels come after the log and before the month navigation', async () => {
   const html = await read('board', 'public', 'index.html');
   const at = (id) => html.indexOf(`id="${id}"`);
-  const order = ['log-panel', 'plan-panel', 'rhythm-panel', 'resting-trend-panel', 'stress-panel', 'hydration-panel', 'month-nav'].map(at);
+  const order = ['log-panel', 'plan-panel', 'rhythm-panel', 'resting-trend-panel', 'stress-panel', 'month-nav'].map(at);
   assert.ok(order.every((n) => n >= 0), 'all present');
   assert.deepEqual([...order].sort((a, b) => a - b), order);
 });

@@ -235,6 +235,18 @@ globalThis.AMS_EXPLAIN = {
       "A workout with a very high heart rate for the effort, chest pain or dizziness is a reason to stop and ask a doctor."
     ]
   },
+  "workouts": {
+    title: "WORKOUTS",
+    summary: "Your workouts of today, yesterday or the last 7 days, newest first, with one line of totals. Press a row to open its splits, heart-rate curve and map.",
+    more: [
+      "Use the three buttons at the top of the panel to choose the time: TODAY, YESTERDAY or 7 DAYS. 7 DAYS means the last seven days, today included. The board remembers your choice on this device.",
+      "The line under the buttons adds up the workouts you see: how many there are, the total time, the distance and the calories. Each row shows a type tag, the day and time, the name, the duration and the distance.",
+      "Press a row to open the detail panel with kilometre splits, the heart-rate curve and, where there is GPS, the track on a map.",
+      "If you did nothing in that time, the panel says so: no workouts today, no workouts yesterday, or no workouts in the last 7 days. A rest day is part of good training.",
+      "The panel always looks at the real today, whichever month you have picked with the arrows. The list further down shows the whole month. Both come from the workouts the board already loads from Garmin Connect, so there are no extra calls.",
+      "Weight sessions show no distance, so judge them by time and heart rate. A workout with chest pain or dizziness is a reason to stop and ask a doctor."
+    ]
+  },
   "month-totals": {
     title: "MONTH TOTALS",
     summary: "The month in numbers, with an arrow and percent or difference against last month up to the same day.",

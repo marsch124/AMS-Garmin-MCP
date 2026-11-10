@@ -105,24 +105,16 @@
       </div>
     </section>
 
-    <section class="panel p-c7 s4" id="heart-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-heart">CARDIO · TODAY</button><span class="line"></span></div>
-      <div class="panel-body heart">
-        <div class="dial" id="resting-hr" data-peek="resting-hr"></div>
-        <div class="heart-side">
-          <div class="kv-row">
-            <div class="kv"><span class="k">Min</span><span class="v" id="hr-min" data-peek="hr-min">—</span></div>
-            <div class="kv"><span class="k">Max</span><span class="v" id="hr-max" data-peek="hr-max">—</span></div>
-            <div class="kv"><span class="k">Month avg</span><span class="v" id="hr-month-avg">—</span></div>
-          </div>
-          <div class="sub-label">Stress</div>
-          <div class="hbar" id="stress-bar"></div>
-          <div class="kv-row">
-            <div class="kv"><span class="k">Avg</span><span class="v" id="stress-avg" data-peek="stress">—</span></div>
-            <div class="kv"><span class="k">Max</span><span class="v" id="stress-max" data-peek="stress-max">—</span></div>
-            <div class="kv"><span class="k">Breaths</span><span class="v" id="respiration-value" data-peek="respiration">—</span></div>
-          </div>
+    <section class="panel p-c1 s4" id="workouts-panel">
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-workouts">WORKOUTS</button><span class="line"></span></div>
+      <div class="panel-body">
+        <div class="wk-tabs" role="group" aria-label="Which days">
+          <button type="button" class="wk-tab" id="workouts-tab-today" data-range="today" aria-pressed="true">Today</button>
+          <button type="button" class="wk-tab" id="workouts-tab-yesterday" data-range="yesterday" aria-pressed="false">Yesterday</button>
+          <button type="button" class="wk-tab" id="workouts-tab-last7" data-range="last7" aria-pressed="false">7 days</button>
         </div>
+        <div class="totals-line" id="workouts-summary">—</div>
+        <div class="act-list wk-list" id="workouts-list"></div>
       </div>
     </section>
 
@@ -169,23 +161,53 @@
       </div>
     </section>
 
-    <section class="panel p-c4 s3" id="sleep-panel">
+    <section class="panel p-c4 s4" id="sleep-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-sleep">SLEEP · LAST NIGHT</button><span class="line"></span></div>
       <div class="strip" id="sleep-strip" hidden></div>
       <div class="panel-body" id="sleep-body" data-peek="sleep"><div class="nodata">—</div></div>
       <div class="nudge" id="sleep-nudge" hidden></div>
     </section>
 
-    <section class="panel p-c5 s2" id="hrv-panel">
+    <section class="panel p-c5 s3" id="hrv-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-hrv">HRV · NIGHT</button><span class="line"></span></div>
       <div class="panel-body" id="hrv-body"><div class="nodata">—</div></div>
     </section>
 
-    <section class="panel p-c3 s3" id="sleep-debt-panel">
+    <section class="panel p-c3 s5" id="sleep-debt-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-sleep-debt">SLEEP DEBT · 7 NIGHTS</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="big-row"><div class="big"><span class="v" id="sleep-debt-value">—</span><span class="k" id="sleep-debt-note">Need against actual</span></div></div>
         <div class="chart" id="sleep-debt-chart"></div>
+      </div>
+    </section>
+
+    <section class="panel p-c7 s4" id="heart-panel">
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-heart">CARDIO · TODAY</button><span class="line"></span></div>
+      <div class="panel-body heart">
+        <div class="dial" id="resting-hr" data-peek="resting-hr"></div>
+        <div class="heart-side">
+          <div class="kv-row">
+            <div class="kv"><span class="k">Min</span><span class="v" id="hr-min" data-peek="hr-min">—</span></div>
+            <div class="kv"><span class="k">Max</span><span class="v" id="hr-max" data-peek="hr-max">—</span></div>
+            <div class="kv"><span class="k">Month avg</span><span class="v" id="hr-month-avg">—</span></div>
+          </div>
+          <div class="sub-label">Stress</div>
+          <div class="hbar" id="stress-bar"></div>
+          <div class="kv-row">
+            <div class="kv"><span class="k">Avg</span><span class="v" id="stress-avg" data-peek="stress">—</span></div>
+            <div class="kv"><span class="k">Max</span><span class="v" id="stress-max" data-peek="stress-max">—</span></div>
+            <div class="kv"><span class="k">Breaths</span><span class="v" id="respiration-value" data-peek="respiration">—</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel p-c5 s4" id="hydration-panel">
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-hydration">WATER · TODAY</button><span class="line"></span></div>
+      <div class="panel-body hydration-body">
+        <div class="gauge" id="hydration-gauge" data-peek="hydration"></div>
+        <div class="chart" id="hydration-days"></div>
+        <div class="sub-label" id="hydration-note"></div>
       </div>
     </section>
 
@@ -298,7 +320,7 @@
       </div>
     </section>
 
-    <section class="panel p-c3 s8" id="stress-panel">
+    <section class="panel p-c3 s12" id="stress-panel">
       <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-stress">STRESS · TODAY AND 4 WEEKS</button><span class="line"></span><span class="chip head-chip" id="stress-word">—</span></div>
       <div class="panel-body stress-body">
         <div class="stress-today">
@@ -307,15 +329,6 @@
         </div>
         <div class="chart" id="stress-days-chart"></div>
         <div class="sub-label" id="stress-note"></div>
-      </div>
-    </section>
-
-    <section class="panel p-c5 s4" id="hydration-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-hydration">WATER · TODAY</button><span class="line"></span></div>
-      <div class="panel-body hydration-body">
-        <div class="gauge" id="hydration-gauge" data-peek="hydration"></div>
-        <div class="chart" id="hydration-days"></div>
-        <div class="sub-label" id="hydration-note"></div>
       </div>
     </section>
 
@@ -421,7 +434,7 @@
       <button type="button" class="seg btn c2" id="kiosk-button" title="Full screen (F)">FULL SCREEN</button>
       <button type="button" class="seg btn c1" id="refresh-button" title="Refresh (R)">REFRESH</button>
       <button type="button" class="seg btn c3 round" id="help-button" title="How it works and what's new (?)">?</button>
-      <span class="seg end version c2" id="footer-version">1.7.0</span>
+      <span class="seg end version c2" id="footer-version">1.8.0</span>
     </div>
   </footer>
 

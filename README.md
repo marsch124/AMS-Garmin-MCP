@@ -31,7 +31,8 @@ The board is a live instrument panel for your Garmin data, in the style of a Sta
 - Stress: today's word from Garmin, how the day divides into rest and stress, and 4 weeks of daily averages.
 - Water: litres logged today against your goal, and the last 7 days. It says "no water logged" until you log water in Garmin Connect or on the watch.
 - This month: a bar for every day's steps, a line for resting pulse, and the totals with an arrow against last month up to the same day.
-- Workouts: the list, newest first. Press one to see splits, heart-rate curve and a map of the route.
+- Workouts panel (top right, next to Body Battery, new in 1.8.0): a switch with TODAY, YESTERDAY and 7 DAYS (the last seven days, today included). A line under it gives the number of workouts, the total time, the distance and the calories. Below are the workouts, newest first, each with type, day and time, name, duration and distance. Press a row to see splits, heart-rate curve and a map of the route. With nothing to show it says "No workouts today", "No workouts yesterday" or "No workouts in the last 7 days". The board remembers your last choice on this device. It makes no extra calls to Garmin.
+- Workouts of the month: the list further down, newest first, following the month you picked. Press one to see splits, heart-rate curve and a map of the route.
 - Year: twelve tiles, one per month, with a faint bar for the same month last year and a SAME TIME LAST YEAR line that compares this month and the year so far with a year ago.
 - Link status: green when Garmin answers, red with the reason when not, plus when your key runs out.
 
@@ -141,6 +142,7 @@ Make a new key on the same Garmin page (see above) and run the save-key dialog a
 Your data goes from Garmin straight to Claude on this Mac. The code repository is public so that GitHub runs the tests for free; it contains no data and no keys, and never will.
 
 ## Version
+1.8.0 — 10 Nov 2026
 1.7.0 — 9 Nov 2026
 1.6.0 — 9 Nov 2026
 1.5.1 — 9 Nov 2026

@@ -1,5 +1,36 @@
 # What's new
 
+## 1.8.0 — 10 November 2026
+A new WORKOUTS panel at the top right of the board, next to Body Battery. Switch between today, yesterday and the last 7 days, and press a workout to open its details.
+
+**New**
+- Before: the workouts were only in the long list further down, for the month you were looking at. There was nothing about "today" at the top of the board.
+- New: a WORKOUTS panel at the top right, right next to the Body Battery panel.
+- A three-way switch at the top of the panel: TODAY, YESTERDAY and 7 DAYS. 7 DAYS means the last seven days, today included.
+- One summary line under the switch: the number of workouts, the total time, the distance and the calories, for example "2 workouts · 1 h 25 · 9.4 km · 780 kcal".
+- Below it, the workouts as rows, newest first. Each row shows a type tag, the day and time, the name, the duration and the distance.
+- Press a row and the existing Workout detail panel opens, with the splits, the heart-rate curve and the map, just like from the list further down.
+- When there is nothing to show, the panel says so in words: "No workouts today", "No workouts yesterday" or "No workouts in the last 7 days".
+- The board remembers your last choice on this device (the browser's own memory, key `ams-garmin-board.workoutsRange`). Standard on the first visit is TODAY.
+- Press the heading WORKOUTS and a window explains the panel, in short and in full, like for every other panel.
+- The board's data now carries `recentWorkouts` with three parts (today, yesterday, last7). Each has the first and last day, the count, the total seconds, the distance in metres, the calories and the list of workouts, newest first.
+
+**Changed**
+- Layout on wide windows (1251 px and wider, 12 columns). Before: the top row was Chronometer 3, Steps 3, Body Battery 2 and Cardio 4. Now: Chronometer 3, Steps 3, Body Battery 2 and Workouts 4.
+- The "Cardio · today" panel moved down and now sits beside Water and Mass. That row is Cardio 4, Water 4, Mass 4.
+- The row with Sleep, HRV and Sleep debt is now 4, 3 and 5 columns wide.
+- The Stress panel now spans the full width.
+- The Resting pulse 90 days panel now spans the full width on mid-size windows.
+- The version is now 1.8.0. How it works and this list are updated.
+
+**Good to know**
+- No extra calls to Garmin. The panel uses the 90 days of workouts the board already loads, so the board is just as fast as before.
+- The WORKOUTS panel always shows the real today and the last seven days, whichever month you have picked with the arrows. The long workout list further down still follows the picked month.
+- No numbers, colours or looks changed, and your data is untouched.
+
+**Quality**
+- New tests check the grouping into today, yesterday and the last 7 days, the totals, the order and the empty cases, and find the panel, the three switch buttons, the summary and the list by their identifiers. The layout and the remembered choice are checked too.
+
 ## 1.7.0 — 9 November 2026
 A new, eighth look: "Rebel console". A bright look: pale blue-white screens with navy text, cyan-blue lines and amber numbers, like the computer screens of a rebel base in a space film.
 

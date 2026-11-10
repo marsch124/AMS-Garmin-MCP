@@ -356,7 +356,7 @@ svg text { font-family: var(--font); text-transform: uppercase; }
 @media (max-width: 1250px) {
   .seg.info.token { display: none; }
   #chrono-panel, #steps-panel, #body-battery-panel { grid-column: span 4; }
-  #heart-panel, #intensity-panel { grid-column: span 6; }
+  #workouts-panel, #heart-panel, #intensity-panel { grid-column: span 6; }
   #energy-panel { grid-column: span 3; }
   #bb-curve-panel { grid-column: span 5; }
   #fitness-panel { grid-column: span 4; }
@@ -373,8 +373,8 @@ svg text { font-family: var(--font); text-transform: uppercase; }
   #month-hr-panel { grid-column: span 12; }
   #month-totals-panel { grid-column: span 4; }
   #plan-panel, #rhythm-panel { grid-column: span 6; }
-  #resting-trend-panel { grid-column: span 7; }
-  #hydration-panel { grid-column: span 5; }
+  #resting-trend-panel { grid-column: span 12; }
+  #hydration-panel { grid-column: span 6; }
   #stress-panel { grid-column: span 12; }
   .act { grid-template-columns: 58px 100px minmax(0, 1fr) 82px 72px 72px; }
   .act .te { display: none; }
@@ -389,7 +389,7 @@ svg text { font-family: var(--font); text-transform: uppercase; }
   .elbow, .elbow-bottom { width: 150px; }
   .elbow::after, .elbow-bottom::after { left: 84px; width: 66px; }
   .block { font-size: 12px; }
-  #red-alert, #chrono-panel, #steps-panel, #body-battery-panel, #heart-panel, #intensity-panel, #energy-panel, #bb-curve-panel, #fitness-panel, #sleep-panel, #hrv-panel, #sleep-debt-panel, #weight-panel, #training-panel, #zones-panel, #streaks-panel, #weather-panel, #targets-panel, #log-panel, #plan-panel, #rhythm-panel, #resting-trend-panel, #stress-panel, #hydration-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #month-totals-panel, #activity-detail-panel, #year-panel { grid-column: span 6; }
+  #red-alert, #chrono-panel, #steps-panel, #body-battery-panel, #workouts-panel, #heart-panel, #intensity-panel, #energy-panel, #bb-curve-panel, #fitness-panel, #sleep-panel, #hrv-panel, #sleep-debt-panel, #weight-panel, #training-panel, #zones-panel, #streaks-panel, #weather-panel, #targets-panel, #log-panel, #plan-panel, #rhythm-panel, #resting-trend-panel, #stress-panel, #hydration-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #month-totals-panel, #activity-detail-panel, #year-panel { grid-column: span 6; }
   #red-alert, #bb-curve-panel, #weight-panel, #weather-panel, #log-panel, #resting-trend-panel, #stress-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #activity-detail-panel, #year-panel { grid-column: span 12; }
   .seg.title { font-size: 16px; }
   .seg.info { display: none; }
@@ -410,7 +410,7 @@ svg text { font-family: var(--font); text-transform: uppercase; }
   .frame-bottom { height: auto; }
   .seg.w1, .seg.w2, .seg.w3, .seg.w4, .seg.w6 { display: none; }
   .panels { grid-column: 1; padding-left: 0; }
-  #red-alert, #chrono-panel, #steps-panel, #body-battery-panel, #heart-panel, #intensity-panel, #energy-panel, #bb-curve-panel, #fitness-panel, #sleep-panel, #hrv-panel, #sleep-debt-panel, #weight-panel, #training-panel, #zones-panel, #streaks-panel, #weather-panel, #targets-panel, #log-panel, #plan-panel, #rhythm-panel, #resting-trend-panel, #stress-panel, #hydration-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #month-totals-panel, #activity-detail-panel, #year-panel { grid-column: span 12; }
+  #red-alert, #chrono-panel, #steps-panel, #body-battery-panel, #workouts-panel, #heart-panel, #intensity-panel, #energy-panel, #bb-curve-panel, #fitness-panel, #sleep-panel, #hrv-panel, #sleep-debt-panel, #weight-panel, #training-panel, #zones-panel, #streaks-panel, #weather-panel, #targets-panel, #log-panel, #plan-panel, #rhythm-panel, #resting-trend-panel, #stress-panel, #hydration-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #month-totals-panel, #activity-detail-panel, #year-panel { grid-column: span 12; }
   .stress-body { flex-direction: column; }
   .stress-body .stress-today { width: auto; }
   .hydration-body { flex-direction: column; align-items: stretch; }
@@ -663,6 +663,17 @@ svg text.t-hero { font-family: var(--font); text-transform: uppercase; letter-sp
 .peek-avg, .peek-empty { margin-top: 6px; color: var(--dim); white-space: pre-line; }
 .peek-updated { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--edge, rgba(255,255,255,.1)); color: var(--dim); }
 @media print { #peek-card { display: none !important; } }
+
+/* ---------- 1.8.0 · Workouts panel (today / yesterday / 7 days) ---------- */
+.wk-tabs { display: flex; gap: 4px; margin-bottom: 8px; }
+.wk-tab { flex: 1; font: 600 13px/26px var(--prose); color: var(--pc); background: transparent; border: 1px solid var(--pc); border-radius: 13px; padding: 0 8px; cursor: pointer; }
+.wk-tab[aria-pressed="true"] { background: var(--pc); color: var(--ink); }
+#workouts-list .act { grid-template-columns: 52px 74px minmax(0, 1fr) 64px 64px; gap: 6px; font-size: 14px; }
+#workouts-list .act .when, #workouts-list .act .n-dist { display: inline; }
+@media (max-width: 560px) {
+  #workouts-list .act { grid-template-columns: 42px 60px minmax(0, 1fr) 54px 50px; gap: 5px; font-size: 13px; }
+}
+[data-scheme="rebel"] .wk-tab { border-radius: 0; }
 
 /* ---------- 1.7.0 · Rebel console (bright) ---------- */
 /* An eighth look, Martin's pick: pale cool blue-white, deep navy text, cyan-blue lines and headings, amber main numbers
