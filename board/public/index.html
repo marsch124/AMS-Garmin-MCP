@@ -11,7 +11,7 @@
   // Apply the remembered look before the first paint.
   (function () {
     try {
-      // 1.12: every browser moves to the Health summary look once; after that the chosen look is remembered.
+      // 1.12: every browser moves to the Health look once; after that the chosen look is remembered.
       if (localStorage.getItem('ams-garmin-board.lookMove') !== '1.12') {
         localStorage.setItem('ams-garmin-board.scheme', 'health');
         localStorage.setItem('ams-garmin-board.lookMove', '1.12');
@@ -448,7 +448,7 @@
       <span class="seg info c3"><span class="k">Sync</span><span id="last-refresh">—</span></span>
       <span class="seg info token c1"><span class="k">Token</span><span id="token-expiry">—</span></span>
       <select class="seg c3" id="palette-select" title="Look">
-        <option value="health">Health summary</option>
+        <option value="health">Health</option>
         <option value="calm-dusk">Calm · dusk</option>
         <option value="calm-dark">Calm · dark</option>
         <option value="calm-day">Calm · day</option>
@@ -464,7 +464,7 @@
       <button type="button" class="seg btn c2" id="kiosk-button" title="Full screen (F)">Full screen</button>
       <button type="button" class="seg btn c1" id="refresh-button" title="Refresh (R)">Refresh</button>
       <button type="button" class="seg btn c3 round" id="help-button" title="How it works and what's new (?)">?</button>
-      <span class="seg end version c2" id="footer-version">1.12.0</span>
+      <span class="seg end version c2" id="footer-version">1.12.1</span>
     </div>
   </footer>
 

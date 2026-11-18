@@ -1,4 +1,4 @@
-/* AMS Garmin Board — an LCARS-inspired instrument board. Nine looks. 1.7.0 adds the bright Rebel console; 1.12.0 adds Health summary, the standard look (block near the end).
+/* AMS Garmin Board — an LCARS-inspired instrument board. Nine looks. 1.7.0 adds the bright Rebel console; 1.12.0 adds Health, the standard look (block near the end).
    1.5.0: Calm & spacious — panels on soft cards, bigger numbers, small words in normal letters (the block near the end). */
 
 :root {
@@ -721,7 +721,7 @@ svg text.t-hero { font-family: var(--font); text-transform: uppercase; letter-sp
 .gym-progress-note { margin: 2px 0 0; overflow-wrap: anywhere; }
 [data-scheme="rebel"] .gym-entry[data-name], [data-scheme="rebel"] .gym-progress { border-radius: 0; }
 
-/* ---------- 1.12.0 · Health summary ---------- */
+/* ---------- 1.12.0 · Health ---------- */
 /* A ninth look and the standard one, Martin's pick: grouped cards with 20 px corners on a soft grey background
    (night: dark grey cards on black, following the Mac's or iPhone's appearance), system type with rounded numbers,
    headings in normal letters in the panel's own colour, grey captions, hairlines, thick round rings and bars.

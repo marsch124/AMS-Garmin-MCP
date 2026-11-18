@@ -1887,7 +1887,7 @@
   document.addEventListener('visibilitychange', () => { if (!document.hidden) load(false); });
 
   applyScheme(document.documentElement.getAttribute('data-scheme') || 'health', false);
-  // The Health summary look follows the Mac's or iPhone's day and night: draw the instruments again in the new colours.
+  // The Health look follows the Mac's or iPhone's day and night: draw the instruments again in the new colours.
   try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (board) render(board); }); } catch { /* old browser */ }
   tickClocks();
   setInterval(tickClocks, 1000);

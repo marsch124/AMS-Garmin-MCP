@@ -1,4 +1,4 @@
-// AMS Garmin Board 1.12.0 — ninth look "Health summary" (id health), now the standard look.
+// AMS Garmin Board 1.12.0 — ninth look "Health" (id health), now the standard look.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -71,9 +71,9 @@ test('1.12 E: board.css defines the health look in day and in night', async () =
   assert.ok(night.text.includes('--bg: #000000') && night.text.includes('--card: #1c1c1e'));
 });
 
-test('1.12 F: the Health summary section is calm: rounded panels, no glow, no capitals, no frame', async () => {
+test('1.12 F: the Health section is calm: rounded panels, no glow, no capitals, no frame', async () => {
   const css = await read('board', 'public', 'board.css');
-  const a = css.indexOf('1.12.0 · Health summary');
+  const a = css.indexOf('1.12.0 · Health');
   const b = css.indexOf('1.7.0 · Rebel console (bright)');
   assert.ok(a >= 0 && b >= 0 && a < b, 'markers in order');
   // A capital first letter (::first-letter) is allowed: it turns words that arrive in capitals into normal sentences.

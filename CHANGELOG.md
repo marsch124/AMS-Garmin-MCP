@@ -1,10 +1,16 @@
 # What's new
 
+## 1.12.1 — 18 November 2026
+The new look has a shorter name.
+
+**Changed**
+- Before: the new standard look was called "Health summary" in the look menu at the bottom. Now: it is called "Health". Nothing else changed; the look itself, the 8 other looks and your saved choice stay as they were.
+
 ## 1.12.0 — 18 November 2026
-The board has a new look, "Health summary", like Apple's Health app, and it is now the standard look.
+The board has a new look, "Health", like Apple's Health app, and it is now the standard look.
 
 **New**
-- Before: the board had 8 looks, and the standard look was Calm Dusk (the Star Trek style frame with capital letters). Now: 9 looks. "Health summary" is the ninth and it is the first in the colour switcher in the footer.
+- Before: the board had 8 looks, and the standard look was Calm Dusk (the Star Trek style frame with capital letters). Now: 9 looks. "Health" is the ninth and it is the first in the colour switcher in the footer.
 - New: panels are white cards with rounded corners on a soft grey background. At night they are dark grey cards on black. The look follows the day and night setting of your Mac or iPhone by itself, and the board redraws its drawings when that setting changes.
 - New: headings are written in normal letters, not capitals, in the colour of their panel. Numbers are big and rounded in the panel's colour, small captions are grey, rows are divided by hairlines, and rings and bars are thick with round ends. There is no glow and no heavy shadow.
 - New: one strong colour per panel: steps pink-red, intensity and workouts orange, Body Battery and water blue, sleep indigo, gym purple, heart red, clock and weight teal.
@@ -12,13 +18,13 @@ The board has a new look, "Health summary", like Apple's Health app, and it is n
 - The explanation sheets, settings, report, share card, "How it works" and "What's new", the Peek card, the workout detail and the code page all work as before, in the new look.
 
 **Changed**
-- Before: the standard look for a new browser was Calm Dusk, and your own choice was the bright Rebel console. Now: the standard look is Health summary.
-- Once, the first time each browser opens version 1.12, it is moved to Health summary. After that, the look you choose is remembered as before. To go back, choose another look in the colour switcher; the 8 old looks (Calm Dusk, Calm Dark, Calm Day, Ice, Ember, Forest, Graphite and Rebel console) are still there and look exactly as before.
+- Before: the standard look for a new browser was Calm Dusk, and your own choice was the bright Rebel console. Now: the standard look is Health.
+- Once, the first time each browser opens version 1.12, it is moved to Health. After that, the look you choose is remembered as before. To go back, choose another look in the colour switcher; the 8 old looks (Calm Dusk, Calm Dark, Calm Day, Ice, Ember, Forest, Graphite and Rebel console) are still there and look exactly as before.
 - To allow normal-letter headings, the heading words are now written in normal letters in the page's source ("Steps · today"). The old looks still show them in capitals, so they look the same as before.
 
 **How it works**
-- The new look is `data-scheme="health"`, option "Health summary" at the top of the switcher. A fresh browser starts with it. A small script at the top of the page checks the note `ams-garmin-board.lookMove`; if it is not `1.12` it sets `ams-garmin-board.scheme` to `health` and stores `1.12`, so the move happens only once.
-- All the styling sits in one block, "1.12.0 · Health summary", in the board's style file. Nothing in the data changed.
+- The new look is `data-scheme="health"`, option "Health" at the top of the switcher. A fresh browser starts with it. A small script at the top of the page checks the note `ams-garmin-board.lookMove`; if it is not `1.12` it sets `ams-garmin-board.scheme` to `health` and stores `1.12`, so the move happens only once.
+- All the styling sits in one block, "1.12.0 · Health", in the board's style file. Nothing in the data changed.
 - New tests (test/board-1.12.test.js) check the version and this entry, the ninth option first in the switcher, the standard look, the one-time move, the colours of the look and the day and night rule.
 
 ## 1.11.0 — 18 November 2026
