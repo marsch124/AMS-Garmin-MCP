@@ -140,10 +140,12 @@ async function sendFile(res, urlPath, headOnly = false) {
 function codePage(message = '') {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AMS Garmin Board · Code</title>
-<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#3d3a44;color:#f7efe4;font-family:'Antonio','Arial Narrow','Helvetica Neue',Arial,sans-serif;text-transform:uppercase;letter-spacing:.04em}
-form{display:flex;flex-direction:column;gap:14px;width:min(320px,86vw)}h1{font-size:22px;margin:0;color:#ff9966}p{margin:0;font-size:14px;color:#b3a899}
-input{font:inherit;font-size:22px;padding:10px 14px;border-radius:999px;border:0;background:#524e59;color:#f7efe4;text-align:center;letter-spacing:.2em}
-button{font:inherit;font-size:16px;font-weight:700;padding:10px 18px;border-radius:999px;border:0;background:#ff9966;color:#1a171c;cursor:pointer}.err{color:#cc6666}</style></head>
+<style>:root{color-scheme:light dark;--bg:#f2f2f7;--card:#ffffff;--text:#000000;--dim:#6c6c70;--field:#ececf1;--c:#0a84c6;--on:#ffffff;--err:#e0352b}
+@media (prefers-color-scheme:dark){:root{--bg:#000000;--card:#1c1c1e;--text:#ffffff;--dim:#98989f;--field:#2c2c2e;--c:#40c8e0;--on:#000000;--err:#ff453a}}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Helvetica,Arial,sans-serif}
+form{display:flex;flex-direction:column;gap:12px;width:min(320px,86vw);background:var(--card);border-radius:20px;padding:20px;box-sizing:border-box}h1{font-size:20px;margin:0;color:var(--c)}p{margin:0;font-size:14px;color:var(--dim)}
+input{font:inherit;font-size:20px;padding:9px 14px;border-radius:10px;border:0;background:var(--field);color:var(--text);text-align:center;letter-spacing:.2em}
+button{font:inherit;font-size:16px;font-weight:600;padding:10px 18px;border-radius:999px;border:0;background:var(--c);color:var(--on);cursor:pointer}.err{color:var(--err)}</style></head>
 <body><form method="post" action="/code"><h1>AMS Garmin Board</h1><p>Type the code from Settings on the Mac.</p>
 ${message ? `<p class="err">${message}</p>` : ''}
 <input id="code" name="code" type="password" autocomplete="current-password" autofocus required>

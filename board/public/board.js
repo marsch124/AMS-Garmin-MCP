@@ -9,7 +9,7 @@
   const WEATHER_EVERY_MS = 30 * 60 * 1000;
   const SCHEME_KEY = 'ams-garmin-board.scheme';
   const LOCATION_KEY = 'ams-garmin-board.location';
-  const SCHEMES = ['calm-dusk', 'calm-dark', 'calm-day', 'ice', 'ember', 'forest', 'graphite', 'rebel'];
+  const SCHEMES = ['health', 'calm-dusk', 'calm-dark', 'calm-day', 'ice', 'ember', 'forest', 'graphite', 'rebel'];
   const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
   // ---------- formatting ----------
@@ -528,9 +528,9 @@
     $('clock-utc').textContent = fmtClock(now, 'UTC', false);
     $('stardate').textContent = stardate(now);
     $('week-number').textContent = `Week ${isoWeek(now)}`;
-    $('day-number').textContent = `DAY ${dayOfYear(now)}`;
+    $('day-number').textContent = `Day ${dayOfYear(now)}`;
     $('clock-date').textContent = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'LOCAL';
+    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
     const offsetMin = -now.getTimezoneOffset();
     const sign = offsetMin >= 0 ? '+' : '−';
     $('clock-local-zone').textContent = `${zone.replace(/_/g, ' ')} · UTC${sign}${Math.floor(Math.abs(offsetMin) / 60)}${offsetMin % 60 ? ':' + pad2(Math.abs(offsetMin) % 60) : ''}`;
@@ -541,13 +541,13 @@
   // ---------- rendering the data ----------
 
   const TYPE_TAGS = {
-    running: ['RUN', '--c2'], treadmill_running: ['RUN', '--c2'], trail_running: ['RUN', '--c2'], indoor_running: ['RUN', '--c2'],
-    cycling: ['BIKE', '--c5'], road_biking: ['BIKE', '--c5'], indoor_cycling: ['BIKE', '--c5'], virtual_ride: ['BIKE', '--c5'], mountain_biking: ['BIKE', '--c5'], gravel_cycling: ['BIKE', '--c5'],
-    hiking: ['HIKE', '--c6'], walking: ['WALK', '--c6'],
-    strength_training: ['STR', '--c3'],
-    open_water_swimming: ['SWIM', '--c4'], lap_swimming: ['SWIM', '--c4'], swimming: ['SWIM', '--c4'],
-    yoga: ['YOGA', '--c8'], breathwork: ['BREATH', '--c8'], cardio: ['CARDIO', '--c1'], indoor_cardio: ['CARDIO', '--c1'],
-    elliptical: ['CARDIO', '--c1'], rowing: ['ROW', '--c4'], indoor_rowing: ['ROW', '--c4'], skiing: ['SKI', '--c5'],
+    running: ['Run', '--c2'], treadmill_running: ['Run', '--c2'], trail_running: ['Run', '--c2'], indoor_running: ['Run', '--c2'],
+    cycling: ['Bike', '--c5'], road_biking: ['Bike', '--c5'], indoor_cycling: ['Bike', '--c5'], virtual_ride: ['Bike', '--c5'], mountain_biking: ['Bike', '--c5'], gravel_cycling: ['Bike', '--c5'],
+    hiking: ['Hike', '--c6'], walking: ['Walk', '--c6'],
+    strength_training: ['Str', '--c3'],
+    open_water_swimming: ['Swim', '--c4'], lap_swimming: ['Swim', '--c4'], swimming: ['Swim', '--c4'],
+    yoga: ['Yoga', '--c8'], breathwork: ['Breath', '--c8'], cardio: ['Cardio', '--c1'], indoor_cardio: ['Cardio', '--c1'],
+    elliptical: ['Cardio', '--c1'], rowing: ['Row', '--c4'], indoor_rowing: ['Row', '--c4'], skiing: ['Ski', '--c5'],
   };
   const SWIMS = new Set(['lap_swimming', 'open_water_swimming', 'swimming']);
   const RUNS = new Set(['running', 'treadmill_running', 'trail_running', 'indoor_running', 'track_running', 'virtual_run']);
@@ -555,7 +555,7 @@
   function typeTag(type) {
     const t = TYPE_TAGS[type];
     if (t) return { text: t[0], color: css(t[1]) };
-    return { text: String(type || 'OTHER').replace(/_/g, ' ').slice(0, 6), color: css('--c1') };
+    return { text: sentence(String(type || 'Other')).slice(0, 6), color: css('--c1') };
   }
 
   let board = null;          // the latest /api/board answer
@@ -596,7 +596,7 @@
       value: t.stressAvg, marker: t.stressMax, markerLabel: isNum(t.stressMax) ? `max ${t.stressMax}` : '', label: 'stress',
       segments: [{ from: 0, to: 25, color: css('--c5') }, { from: 25, to: 50, color: css('--c6') }, { from: 50, to: 75, color: css('--c1') }, { from: 75, to: 100, color: css('--c7') }],
     });
-    setText('stress-avg', isNum(t.stressAvg) ? `${t.stressAvg}` : 'UNKNOWN');
+    setText('stress-avg', isNum(t.stressAvg) ? `${t.stressAvg}` : 'Unknown');
     setText('stress-max', isNum(t.stressMax) ? `${t.stressMax}` : '—');
     setText('respiration-value', isNum(t.respirationAvg) ? `${t.respirationAvg} / min` : '—');
 
@@ -638,8 +638,8 @@
     const up = s.end ? fmtClock(new Date(s.end), undefined, false) : '—';
     strip.classList.toggle('first', !!s.firstNight);
     strip.textContent = s.firstNight
-      ? `FIRST NIGHT WITH THE WATCH · WELL DONE · BED ${bed} · UP ${up}`
-      : `LAST NIGHT · BED ${bed} · UP ${up}${s.qualifier ? ` · ${s.qualifier}` : ''}`;
+      ? `First night with the watch · well done · bed ${bed} · up ${up}`
+      : `Last night · bed ${bed} · up ${up}${s.qualifier ? ` · ${String(s.qualifier).toLowerCase()}` : ''}`;
     const total = (s.deepSeconds || 0) + (s.lightSeconds || 0) + (s.remSeconds || 0) + (s.awakeSeconds || 0) || s.seconds || 1;
     const pct = (v) => `${((v || 0) / total) * 100}%`;
     const parts = [['Deep', s.deepSeconds, css('--c4')], ['Light', s.lightSeconds, css('--c5')], ['REM', s.remSeconds, css('--c3')], ['Awake', s.awakeSeconds, css('--c7')]];
@@ -668,7 +668,7 @@
       <div class="big-row"><div class="big"><span class="v">${h.lastNight}</span><span class="k">Last night · ms</span></div></div>
       <div class="kv-row">
         <div class="kv"><span class="k">7-day avg</span><span class="v">${isNum(h.weeklyAvg) ? h.weeklyAvg : '—'}</span></div>
-        <div class="kv"><span class="k">Status</span><span class="v">${escapeHtml(h.status || '—').replace(/_/g, ' ')}</span></div>
+        <div class="kv"><span class="k">Status</span><span class="v">${escapeHtml(h.status ? sentence(h.status) : '—')}</span></div>
         <div class="kv"><span class="k">Baseline</span><span class="v">${isNum(h.baselineLow) && isNum(h.baselineHigh) ? `${h.baselineLow}–${h.baselineHigh}` : '—'}</span></div>
       </div>`;
   }
@@ -805,7 +805,7 @@
     setText('year-note', `${y.year} · ${fmtInt(totalSteps)} steps · ${totalWorkouts} workouts · ${fmtDur(y.months.reduce((a, m) => a + m.trainingSeconds, 0))}`);
     setText('last-year-line', lastYearLine(ly, b));
     const label = $('explain-year');
-    if (label) label.textContent = `THE YEAR ${y.year}`;
+    if (label) label.textContent = `The year ${y.year}`;
   }
 
   /** "SAME TIME LAST YEAR": last year's number, then this year's, with the change. */
@@ -929,11 +929,11 @@
     const logMap = new Map(Object.entries(md.log || {}));
     const logDays = { has: (d) => logMap.has(d), get: (d) => logMap.get(d) };
 
-    setText('explain-month-steps', `STEPS · ${word}`);
-    setText('explain-month-hr', `RESTING PULSE · ${word}`);
-    setText('explain-activities', `MISSION LOG · WORKOUTS IN ${word}`);
-    setText('explain-month-totals', `TOTALS · ${word}`);
-    setText('explain-targets', `MY TARGETS · ${word}`);
+    setText('explain-month-steps', `Steps · ${word}`);
+    setText('explain-month-hr', `Resting pulse · ${word}`);
+    setText('explain-activities', `Mission log · workouts in ${word}`);
+    setText('explain-month-totals', `Totals · ${word}`);
+    setText('explain-targets', `My targets · ${word}`);
     setText('month-label', isCurrent ? `${monthLong(ym)} · so far` : monthLong(ym));
     $('month-next').disabled = isCurrent;
     $('month-today').hidden = isCurrent;
@@ -1167,12 +1167,12 @@
       if (!res.ok || !j.ok) throw new Error(j.error || 'Could not save the line.');
       board.log = j.entries;
       if (!viewYm) { monthData.log = j.entries; renderLog(j.entries, board.date.slice(0, 7)); }
-      button.textContent = 'SAVED';
-      setTimeout(() => { button.textContent = 'SAVE'; }, 1200);
+      button.textContent = 'Saved';
+      setTimeout(() => { button.textContent = 'Save'; }, 1200);
       input.blur();
     } catch (err) {
-      button.textContent = 'FAILED';
-      setTimeout(() => { button.textContent = 'SAVE'; }, 2000);
+      button.textContent = 'Failed';
+      setTimeout(() => { button.textContent = 'Save'; }, 2000);
       console.error(err);
     } finally {
       button.disabled = false;
@@ -1190,7 +1190,7 @@
       renderMonthGroup(monthData);
       return;
     }
-    setText('month-label', `${monthLong(ym)} · LOADING`);
+    setText('month-label', `${monthLong(ym)} · loading`);
     try {
       const res = await fetch(`/api/month?ym=${ym}`, { cache: 'no-store' });
       const j = await res.json();
@@ -1216,7 +1216,7 @@
     for (const row of document.querySelectorAll('.act.selected')) row.classList.remove('selected');
     $(`act-${id}`)?.classList.add('selected');
     panel.hidden = false;
-    setText('detail-title', 'LOADING THE WORKOUT FILE');
+    setText('detail-title', 'Loading the workout file');
     setText('detail-summary', '');
     $('detail-splits').innerHTML = '';
     $('detail-hr-chart').innerHTML = '';
@@ -1226,17 +1226,17 @@
       const res = await fetch(`/api/activity/${id}`, { cache: 'no-store' });
       const j = await res.json();
       if (!res.ok || !j.ok) throw new Error(j.error || `The board server answered ${res.status}.`);
-      setText('detail-title', `${j.name || 'WORKOUT'}`);
+      setText('detail-title', `${j.name || 'Workout'}`);
       setText('detail-summary', [fmtWhen(j.start), fmtDur(j.seconds), j.distanceM > 0 ? fmtKm(j.distanceM) : null, isNum(j.avgHr) ? `${j.avgHr} BPM AVG` : null, isNum(j.maxHr) ? `${j.maxHr} MAX` : null, isNum(j.elevationGain) ? `${fmtInt(j.elevationGain)} M CLIMBED` : null, j.place].filter(Boolean).join(' · '));
       const splits = j.splits || [];
       $('detail-splits').innerHTML = splits.length
         ? `<span class="h">${j.splitsKind === 'laps' ? 'LAP' : 'KM'}</span><span class="h n">TIME</span><span class="h n">DIST</span><span class="h n">HR</span><span class="h n">CLIMB</span>`
           + splits.map((s) => `<span>${s.index}</span><span class="n">${fmtDur(s.seconds)}</span><span class="n">${s.distanceM > 0 ? (s.distanceM / 1000).toLocaleString(LOCALE, { maximumFractionDigits: 2 }) : '—'}</span><span class="n">${isNum(s.avgHr) ? s.avgHr : '—'}</span><span class="n">${isNum(s.ascentM) ? `${s.ascentM} M` : '—'}</span>`).join('')
-        : '<span class="act-empty">NO SPLITS IN THE FILE</span>';
+        : '<span class="act-empty">No splits in the file</span>';
       drawHrCurve($('detail-hr-chart'), j.hr || [], j.altitude || []);
       drawTrace($('detail-map'), j.trace || []);
     } catch (err) {
-      setText('detail-title', `COULD NOT LOAD THE WORKOUT · ${String(err.message || err).toUpperCase()}`);
+      setText('detail-title', `Could not load the workout · ${String(err.message || err)}`);
     }
   }
 
@@ -1258,7 +1258,7 @@
       setText('weather-place', 'Weather unavailable');
       setText('weather-text', String(err.message || err));
     }
-    $('weather-locate-button').textContent = loc ? 'AUTO' : 'LOCATE';
+    $('weather-locate-button').textContent = loc ? 'Auto' : 'Locate';
   }
   function renderWeather(w) {
     const src = { browser: 'this device', workout: 'latest workout', home: 'home' }[w.place?.source] || '';
@@ -1278,14 +1278,14 @@
       loadWeather();
       return;
     }
-    if (!navigator.geolocation) { setText('weather-place', 'NO LOCATION ON THIS DEVICE'); return; }
-    $('weather-locate-button').textContent = 'ASKING';
+    if (!navigator.geolocation) { setText('weather-place', 'No location on this device'); return; }
+    $('weather-locate-button').textContent = 'Asking';
     navigator.geolocation.getCurrentPosition((pos) => {
       try { localStorage.setItem(LOCATION_KEY, JSON.stringify({ lat: pos.coords.latitude, lon: pos.coords.longitude })); } catch { /* ignore */ }
       loadWeather();
     }, () => {
-      setText('weather-place', 'LOCATION NOT ALLOWED · USING THE AUTOMATIC PLACE');
-      $('weather-locate-button').textContent = 'LOCATE';
+      setText('weather-place', 'Location not allowed · using the automatic place');
+      $('weather-locate-button').textContent = 'Locate';
     }, { timeout: 10000, maximumAge: 600000 });
   }
 
@@ -1308,16 +1308,16 @@
     status.classList.remove('online', 'offline', 'syncing');
     if (error) {
       status.classList.add('offline');
-      text.textContent = `GARMIN LINK OFFLINE · ${error}`;
+      text.textContent = `Garmin link offline · ${error}`;
       status.title = error;
       return;
     }
     status.classList.add('online');
     const warnings = b.warnings || [];
-    text.textContent = warnings.length ? `GARMIN LINK ONLINE · ${warnings.length} NOTE${warnings.length > 1 ? 'S' : ''}` : 'GARMIN LINK ONLINE';
+    text.textContent = warnings.length ? `Garmin link online · ${warnings.length} note${warnings.length > 1 ? 's' : ''}` : 'Garmin link online';
     status.title = warnings.join('\n');
     setText('token-expiry', fmtStamp(b.link?.tokenExpiresAt));
-    setText('version-label', b.version ? `BOARD ${b.version}` : 'BOARD');
+    setText('version-label', b.version ? `Board ${b.version}` : 'Board');
     setText('footer-version', b.version || '');
   }
 
@@ -1360,7 +1360,7 @@
     const button = $('refresh-button');
     const status = $('link-status');
     button.disabled = true;
-    button.textContent = 'SYNCING';
+    button.textContent = 'Syncing';
     status.classList.add('syncing');
     try {
       const res = await fetch(`/api/board${force ? '?refresh=1' : ''}`, { cache: 'no-store' });
@@ -1372,11 +1372,11 @@
       $('last-refresh').textContent = fmtClock(new Date());
     } catch (err) {
       renderLink(null, err.message || String(err));
-      $('last-refresh').textContent = `FAILED ${fmtClock(new Date())}`;
+      $('last-refresh').textContent = `Failed ${fmtClock(new Date())}`;
     } finally {
       status.classList.remove('syncing');
       button.disabled = false;
-      button.textContent = 'REFRESH';
+      button.textContent = 'Refresh';
       clearTimeout(timer);
       timer = setTimeout(() => load(false), REFRESH_EVERY_MS);
     }
@@ -1391,7 +1391,7 @@
   function explain(key) {
     const ex = (globalThis.AMS_EXPLAIN || {})[key];
     if (!ex) return;
-    setText('explain-title', ex.title || key.replace(/-/g, ' ').toUpperCase());
+    setText('explain-title', ex.title || sentence(key.replace(/-/g, ' ')));
     setText('explain-summary', ex.summary || '');
     $('explain-more').innerHTML = (ex.more || []).map((p) => `<p>${escapeHtml(p)}</p>`).join('');
     openSheet('explain-sheet');
@@ -1492,7 +1492,7 @@
     openSheet('report-sheet');
     $('report-kind-week').classList.toggle('on', kind === 'week');
     $('report-kind-month').classList.toggle('on', kind === 'month');
-    setText('report-title', kind === 'week' ? 'LAST WEEK' : 'LAST MONTH');
+    setText('report-title', kind === 'week' ? 'Last week' : 'Last month');
     setText('report-text', 'Loading…');
     try {
       const res = await fetch(`/api/report?kind=${kind}`, { cache: 'no-store' });
@@ -1617,8 +1617,8 @@
     a.download = shareFileName();
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-    $('share-save').textContent = 'SAVED';
-    setTimeout(() => { $('share-save').textContent = 'SAVE PNG'; }, 1500);
+    $('share-save').textContent = 'Saved';
+    setTimeout(() => { $('share-save').textContent = 'Save PNG'; }, 1500);
   }
   async function sendShare() {
     const blob = await canvasBlob();
@@ -1630,7 +1630,7 @@
   // ---------- looks, kiosk, keys ----------
 
   function applyScheme(scheme, redraw = true) {
-    if (!SCHEMES.includes(scheme)) scheme = 'calm-dusk';
+    if (!SCHEMES.includes(scheme)) scheme = 'health';
     document.documentElement.setAttribute('data-scheme', scheme);
     $('palette-select').value = scheme;
     try { localStorage.setItem(SCHEME_KEY, scheme); } catch { /* ignore */ }
@@ -1649,7 +1649,7 @@
   function onFullscreenChange() {
     const on = !!(document.fullscreenElement || document.webkitFullscreenElement);
     document.body.classList.toggle('kiosk', on);
-    $('kiosk-button').textContent = on ? 'EXIT FULL SCREEN' : 'FULL SCREEN';
+    $('kiosk-button').textContent = on ? 'Exit full screen' : 'Full screen';
     document.body.classList.remove('idle');
     tickClocks();
   }
@@ -1886,7 +1886,9 @@
   document.addEventListener('mousemove', wake);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) load(false); });
 
-  applyScheme(document.documentElement.getAttribute('data-scheme') || 'calm-dusk', false);
+  applyScheme(document.documentElement.getAttribute('data-scheme') || 'health', false);
+  // The Health summary look follows the Mac's or iPhone's day and night: draw the instruments again in the new colours.
+  try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (board) render(board); }); } catch { /* old browser */ }
   tickClocks();
   setInterval(tickClocks, 1000);
   load(false);

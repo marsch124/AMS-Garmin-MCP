@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-scheme="calm-dusk">
+<html lang="en" data-scheme="health">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,6 +11,11 @@
   // Apply the remembered look before the first paint.
   (function () {
     try {
+      // 1.12: every browser moves to the Health summary look once; after that the chosen look is remembered.
+      if (localStorage.getItem('ams-garmin-board.lookMove') !== '1.12') {
+        localStorage.setItem('ams-garmin-board.scheme', 'health');
+        localStorage.setItem('ams-garmin-board.lookMove', '1.12');
+      }
       var s = localStorage.getItem('ams-garmin-board.scheme');
       if (s && /^[a-z-]+$/.test(s)) document.documentElement.setAttribute('data-scheme', s);
     } catch (e) { /* private window: keep the default */ }
@@ -27,7 +32,7 @@
   <header class="frame-top">
     <div class="elbow c1"></div>
     <div class="bar-top">
-      <span class="seg title c1">AMS GARMIN · BRIDGE</span>
+      <span class="seg title c1">AMS Garmin · Bridge</span>
       <span class="seg c3 w2"></span>
       <span class="seg c2 w6"></span>
       <span class="seg c1 w1"></span>
@@ -36,7 +41,7 @@
       <span class="seg c1 w4"></span>
       <span class="seg c3 w2"></span>
       <span class="seg c2 w1"></span>
-      <span class="seg end c2"><span id="version-label">BOARD</span></span>
+      <span class="seg end c2"><span id="version-label">Board</span></span>
     </div>
   </header>
 
@@ -53,22 +58,22 @@
   <main class="panels">
 
     <section class="panel alert s12" id="red-alert" hidden>
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-red-alert">RED ALERT</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-red-alert">Red alert</button><span class="line"></span></div>
       <div class="panel-body"><div class="alert-text" id="red-alert-text">—</div></div>
     </section>
 
     <section class="panel p-c6 s3" id="chrono-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-chrono">CHRONOMETER</button><span class="line"></span><span class="head-note" id="chrono-note"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-chrono">Chronometer</button><span class="line"></span><span class="head-note" id="chrono-note"></span></div>
       <div class="panel-body chrono">
         <div class="clock-main">
           <div class="clock-time" id="clock-local">--:--:--</div>
-          <div class="clock-sub" id="clock-local-zone">LOCAL</div>
+          <div class="clock-sub" id="clock-local-zone">Local</div>
         </div>
         <div class="clock-row">
           <div class="clock-small"><span class="k">Sweden</span><span class="v" id="clock-home">--:--</span></div>
           <div class="clock-small"><span class="k">UTC</span><span class="v" id="clock-utc">--:--</span></div>
           <div class="clock-small"><span class="k">Stardate</span><span class="v" id="stardate">----.---</span></div>
-          <div class="clock-small"><span class="k" id="week-number">Week --</span><span class="v" id="day-number">DAY ---</span></div>
+          <div class="clock-small"><span class="k" id="week-number">Week --</span><span class="v" id="day-number">Day ---</span></div>
           <div class="clock-small"><span class="k">Sunrise</span><span class="v" id="sunrise-value">—</span></div>
           <div class="clock-small"><span class="k">Sunset</span><span class="v" id="sunset-value">—</span></div>
         </div>
@@ -82,7 +87,7 @@
     </section>
 
     <section class="panel p-c2 s3" id="steps-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-steps">STEPS · TODAY</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-steps">Steps · today</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="gauge" id="steps-gauge" data-peek="steps"></div>
         <div class="chip-row"><span class="chip cmp" id="steps-chip" title="Today against the same weekday four weeks ago">—</span></div>
@@ -95,7 +100,7 @@
     </section>
 
     <section class="panel p-c5 s2" id="body-battery-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-body-battery">BODY BATTERY</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-body-battery">Body Battery</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="thermo" id="body-battery-bar" data-peek="body-battery"></div>
         <div class="kv-row">
@@ -106,7 +111,7 @@
     </section>
 
     <section class="panel p-c1 s4" id="workouts-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-workouts">WORKOUTS</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-workouts">Workouts</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="wk-tabs" role="group" aria-label="Which days">
           <button type="button" class="wk-tab" id="workouts-tab-today" data-range="today" aria-pressed="true">Today</button>
@@ -120,7 +125,7 @@
     </section>
 
     <section class="panel p-c3 s12" id="gym-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-gym">GYM SESSIONS</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-gym">Gym sessions</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="gym-empty" id="gym-empty" hidden>No gym sessions yet — in Workout Companion: Settings → Garmin Board → choose the AMS Garmin folder in iCloud Drive.</div>
         <div class="gym-main" id="gym-main">
@@ -143,7 +148,7 @@
     </section>
 
     <section class="panel p-c1 s3" id="intensity-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-intensity">INTENSITY · WEEK</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-intensity">Intensity · week</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="gauge" id="intensity-gauge" data-peek="intensity"></div>
         <div class="kv-row">
@@ -155,7 +160,7 @@
     </section>
 
     <section class="panel p-c3 s2" id="energy-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-energy">ENERGY · TODAY</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-energy">Energy · today</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="big-row">
           <div class="big"><span class="v" id="calories-value" data-peek="calories">—</span><span class="k">kcal total</span></div>
@@ -169,12 +174,12 @@
     </section>
 
     <section class="panel p-c5 s4" id="bb-curve-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-bb-curve">BODY BATTERY · TODAY'S CURVE</button><span class="line"></span><span class="head-note" id="bb-curve-note"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-bb-curve">Body Battery · today's curve</button><span class="line"></span><span class="head-note" id="bb-curve-note"></span></div>
       <div class="panel-body"><div class="curve" id="bb-curve-chart"></div></div>
     </section>
 
     <section class="panel p-c2 s3" id="fitness-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-fitness">FITNESS</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-fitness">Fitness</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="big-row">
           <div class="big"><span class="v"><span id="vo2max-value">—</span><span class="trend" id="vo2max-trend"></span></span><span class="k">VO2 max</span></div>
@@ -186,19 +191,19 @@
     </section>
 
     <section class="panel p-c4 s4" id="sleep-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-sleep">SLEEP · LAST NIGHT</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-sleep">Sleep · last night</button><span class="line"></span></div>
       <div class="strip" id="sleep-strip" hidden></div>
       <div class="panel-body" id="sleep-body" data-peek="sleep"><div class="nodata">—</div></div>
       <div class="nudge" id="sleep-nudge" hidden></div>
     </section>
 
     <section class="panel p-c5 s3" id="hrv-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-hrv">HRV · NIGHT</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-hrv">HRV · night</button><span class="line"></span></div>
       <div class="panel-body" id="hrv-body"><div class="nodata">—</div></div>
     </section>
 
     <section class="panel p-c3 s5" id="sleep-debt-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-sleep-debt">SLEEP DEBT · 7 NIGHTS</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-sleep-debt">Sleep debt · 7 nights</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="big-row"><div class="big"><span class="v" id="sleep-debt-value">—</span><span class="k" id="sleep-debt-note">Need against actual</span></div></div>
         <div class="chart" id="sleep-debt-chart"></div>
@@ -206,7 +211,7 @@
     </section>
 
     <section class="panel p-c7 s4" id="heart-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-heart">CARDIO · TODAY</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-heart">Cardio · today</button><span class="line"></span></div>
       <div class="panel-body heart">
         <div class="dial" id="resting-hr" data-peek="resting-hr"></div>
         <div class="heart-side">
@@ -227,7 +232,7 @@
     </section>
 
     <section class="panel p-c5 s4" id="hydration-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-hydration">WATER · TODAY</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-hydration">Water · today</button><span class="line"></span></div>
       <div class="panel-body hydration-body">
         <div class="gauge" id="hydration-gauge" data-peek="hydration"></div>
         <div class="chart" id="hydration-days"></div>
@@ -236,7 +241,7 @@
     </section>
 
     <section class="panel p-c6 s4" id="weight-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-weight">MASS · 90 DAYS</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-weight">Mass · 90 days</button><span class="line"></span></div>
       <div class="panel-body weight-body">
         <div class="thermo" id="weight-thermo" data-peek="weight"></div>
         <div class="weight-side">
@@ -251,7 +256,7 @@
     </section>
 
     <section class="panel p-c1 s3" id="training-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-training">TRAINING LOAD</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-training">Training load</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="big-row"><div class="big"><span class="v"><span class="chip" id="training-status">—</span></span><span class="k">The board's reading</span></div></div>
         <div class="hbar" id="training-load-bar"></div>
@@ -264,7 +269,7 @@
     </section>
 
     <section class="panel p-c7 s3" id="zones-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-zones">HEART ZONES · WEEK</button><span class="line"></span><span class="head-note" id="zones-note"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-zones">Heart zones · week</button><span class="line"></span><span class="head-note" id="zones-note"></span></div>
       <div class="panel-body">
         <div class="big-row"><div class="big"><span class="v" id="zones-total">—</span><span class="k" id="zones-total-label">In zones this week</span></div></div>
         <div class="chart" id="zones-chart"></div>
@@ -272,7 +277,7 @@
     </section>
 
     <section class="panel p-c2 s3" id="streaks-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-streaks">STREAKS</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-streaks">Streaks</button><span class="line"></span></div>
       <div class="panel-body grid2">
         <div class="kv"><span class="k">Step goal · now</span><span class="v" id="streak-steps-current">—</span></div>
         <div class="kv"><span class="k">Step goal · best this year</span><span class="v" id="streak-steps-longest">—</span></div>
@@ -282,7 +287,7 @@
     </section>
 
     <section class="panel p-c5 s3" id="weather-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-weather">WEATHER FOR A RUN</button><span class="line"></span><button type="button" class="head-btn" id="weather-locate-button" title="Use this device's location">LOCATE</button></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-weather">Weather for a run</button><span class="line"></span><button type="button" class="head-btn" id="weather-locate-button" title="Use this device's location">Locate</button></div>
       <div class="panel-body">
         <div class="sub-label" id="weather-place">—</div>
         <div class="wx-now"><span class="temp" id="weather-temp">—</span><span class="txt" id="weather-text">—</span></div>
@@ -295,7 +300,7 @@
     </section>
 
     <section class="panel p-c3 s4" id="targets-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-targets">MY TARGETS · MONTH</button><span class="line"></span><button type="button" class="head-btn" id="targets-edit-button">EDIT</button></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-targets">My targets · month</button><span class="line"></span><button type="button" class="head-btn" id="targets-edit-button">Edit</button></div>
       <div class="panel-body">
         <div class="targets" id="targets-list">
           <div class="target" id="target-bar-steps"><span class="tk">Steps</span><span class="bar"><i></i></span><span class="tv">—</span></div>
@@ -310,18 +315,18 @@
     </section>
 
     <section class="panel p-c6 s8" id="log-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-log">CAPTAIN'S LOG</button><span class="line"></span><span class="head-note" id="log-note"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-log">Captain's log</button><span class="line"></span><span class="head-note" id="log-note"></span></div>
       <div class="panel-body">
         <div class="log-row">
           <input type="text" id="log-today-input" maxlength="200" placeholder="How was today? One line." autocomplete="off">
-          <button type="button" id="log-save-button">SAVE</button>
+          <button type="button" id="log-save-button">Save</button>
         </div>
         <div class="log-list" id="log-list"></div>
       </div>
     </section>
 
     <section class="panel p-c1 s4" id="plan-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-plan">THIS WEEK'S PLAN</button><span class="line"></span><button type="button" class="head-btn" id="plan-edit-button">EDIT</button></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-plan">This week's plan</button><span class="line"></span><button type="button" class="head-btn" id="plan-edit-button">Edit</button></div>
       <div class="panel-body">
         <div class="plan-list" id="plan-list"></div>
         <div class="sub-label" id="plan-note"></div>
@@ -329,7 +334,7 @@
     </section>
 
     <section class="panel p-c2 s4" id="rhythm-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-rhythm">WEEKLY RHYTHM · 12 WEEKS</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-rhythm">Weekly rhythm · 12 weeks</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="chart" id="rhythm-chart"></div>
         <div class="sub-label" id="rhythm-note"></div>
@@ -337,7 +342,7 @@
     </section>
 
     <section class="panel p-c7 s4" id="resting-trend-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-resting-trend">RESTING PULSE · 90 DAYS</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-resting-trend">Resting pulse · 90 days</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="chart" id="resting-trend-chart"></div>
         <div class="sub-label" id="resting-trend-note"></div>
@@ -345,7 +350,7 @@
     </section>
 
     <section class="panel p-c3 s12" id="stress-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-stress">STRESS · TODAY AND 4 WEEKS</button><span class="line"></span><span class="chip head-chip" id="stress-word">—</span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-stress">Stress · today and 4 weeks</button><span class="line"></span><span class="chip head-chip" id="stress-word">—</span></div>
       <div class="panel-body stress-body">
         <div class="stress-today">
           <div class="stack" id="stress-stack"></div>
@@ -361,22 +366,22 @@
         <button type="button" class="nav" id="month-prev" title="Previous month (←)">◀</button>
         <span class="month-label" id="month-label">—</span>
         <button type="button" class="nav" id="month-next" title="Next month (→)" disabled>▶</button>
-        <button type="button" class="nav today" id="month-today" hidden>BACK TO THIS MONTH</button>
+        <button type="button" class="nav today" id="month-today" hidden>Back to this month</button>
       </div>
     </section>
 
     <section class="panel p-c2 s7" id="month-steps-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-month-steps">STEPS · THIS MONTH</button><span class="line"></span><span class="head-note" id="month-steps-note"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-month-steps">Steps · this month</button><span class="line"></span><span class="head-note" id="month-steps-note"></span></div>
       <div class="panel-body"><div class="chart" id="month-steps-chart"></div></div>
     </section>
 
     <section class="panel p-c7 s5" id="month-hr-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-month-hr">RESTING PULSE · THIS MONTH</button><span class="line"></span><span class="head-note" id="month-hr-note"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-month-hr">Resting pulse · this month</button><span class="line"></span><span class="head-note" id="month-hr-note"></span></div>
       <div class="panel-body"><div class="chart" id="month-hr-chart"></div></div>
     </section>
 
     <section class="panel p-c1 s8" id="activities-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-activities">MISSION LOG · WORKOUTS THIS MONTH</button><span class="line"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-activities">Mission log · workouts this month</button><span class="line"></span></div>
       <div class="panel-body">
         <div class="totals-line" id="activities-total">—</div>
         <div class="act-list" id="activities-list"></div>
@@ -384,7 +389,7 @@
     </section>
 
     <section class="panel p-c3 s4" id="month-totals-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-month-totals">MONTH TOTALS</button><span class="line"></span><span class="head-note" id="compare-note"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-month-totals">Month totals</button><span class="line"></span><span class="head-note" id="compare-note"></span></div>
       <div class="panel-body">
         <div class="tot-list" id="month-totals">
           <span class="k">Steps</span><span class="v" id="total-steps">—</span><span class="d" id="delta-steps"></span>
@@ -402,7 +407,7 @@
     </section>
 
     <section class="panel p-c5 s12" id="activity-detail-panel" hidden>
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-activity-detail">WORKOUT DETAIL</button><span class="line"></span><button type="button" class="head-btn" id="detail-close">CLOSE</button></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-activity-detail">Workout detail</button><span class="line"></span><button type="button" class="head-btn" id="detail-close">Close</button></div>
       <div class="panel-body">
         <div class="detail-summary"><span id="detail-title">—</span> · <span id="detail-summary"></span></div>
         <div class="detail">
@@ -414,21 +419,21 @@
     </section>
 
     <section class="panel p-c2 s12" id="year-panel">
-      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-year">THE YEAR</button><span class="line"></span><span class="head-note" id="year-note"></span></div>
+      <div class="panel-head"><span class="cap"></span><button type="button" class="label" id="explain-year">The year</button><span class="line"></span><span class="head-note" id="year-note"></span></div>
       <div class="panel-body">
         <div class="tiles" id="year-tiles">
-          <div class="tile" id="year-tile-01"><span class="tm">JAN</span><span class="tk ly" id="year-last-01">—</span></div>
-          <div class="tile" id="year-tile-02"><span class="tm">FEB</span><span class="tk ly" id="year-last-02">—</span></div>
-          <div class="tile" id="year-tile-03"><span class="tm">MAR</span><span class="tk ly" id="year-last-03">—</span></div>
-          <div class="tile" id="year-tile-04"><span class="tm">APR</span><span class="tk ly" id="year-last-04">—</span></div>
-          <div class="tile" id="year-tile-05"><span class="tm">MAY</span><span class="tk ly" id="year-last-05">—</span></div>
-          <div class="tile" id="year-tile-06"><span class="tm">JUN</span><span class="tk ly" id="year-last-06">—</span></div>
-          <div class="tile" id="year-tile-07"><span class="tm">JUL</span><span class="tk ly" id="year-last-07">—</span></div>
-          <div class="tile" id="year-tile-08"><span class="tm">AUG</span><span class="tk ly" id="year-last-08">—</span></div>
-          <div class="tile" id="year-tile-09"><span class="tm">SEP</span><span class="tk ly" id="year-last-09">—</span></div>
-          <div class="tile" id="year-tile-10"><span class="tm">OCT</span><span class="tk ly" id="year-last-10">—</span></div>
-          <div class="tile" id="year-tile-11"><span class="tm">NOV</span><span class="tk ly" id="year-last-11">—</span></div>
-          <div class="tile" id="year-tile-12"><span class="tm">DEC</span><span class="tk ly" id="year-last-12">—</span></div>
+          <div class="tile" id="year-tile-01"><span class="tm">Jan</span><span class="tk ly" id="year-last-01">—</span></div>
+          <div class="tile" id="year-tile-02"><span class="tm">Feb</span><span class="tk ly" id="year-last-02">—</span></div>
+          <div class="tile" id="year-tile-03"><span class="tm">Mar</span><span class="tk ly" id="year-last-03">—</span></div>
+          <div class="tile" id="year-tile-04"><span class="tm">Apr</span><span class="tk ly" id="year-last-04">—</span></div>
+          <div class="tile" id="year-tile-05"><span class="tm">May</span><span class="tk ly" id="year-last-05">—</span></div>
+          <div class="tile" id="year-tile-06"><span class="tm">Jun</span><span class="tk ly" id="year-last-06">—</span></div>
+          <div class="tile" id="year-tile-07"><span class="tm">Jul</span><span class="tk ly" id="year-last-07">—</span></div>
+          <div class="tile" id="year-tile-08"><span class="tm">Aug</span><span class="tk ly" id="year-last-08">—</span></div>
+          <div class="tile" id="year-tile-09"><span class="tm">Sep</span><span class="tk ly" id="year-last-09">—</span></div>
+          <div class="tile" id="year-tile-10"><span class="tm">Oct</span><span class="tk ly" id="year-last-10">—</span></div>
+          <div class="tile" id="year-tile-11"><span class="tm">Nov</span><span class="tk ly" id="year-last-11">—</span></div>
+          <div class="tile" id="year-tile-12"><span class="tm">Dec</span><span class="tk ly" id="year-last-12">—</span></div>
         </div>
         <div class="sub-label" id="last-year-line">—</div>
       </div>
@@ -439,26 +444,27 @@
   <footer class="frame-bottom">
     <div class="elbow-bottom c2"></div>
     <div class="bar-bottom">
-      <span class="seg status c2" id="link-status"><span class="lamp"></span><span class="status-text">GARMIN LINK · STANDBY</span></span>
+      <span class="seg status c2" id="link-status"><span class="lamp"></span><span class="status-text">Garmin link · standby</span></span>
       <span class="seg info c3"><span class="k">Sync</span><span id="last-refresh">—</span></span>
       <span class="seg info token c1"><span class="k">Token</span><span id="token-expiry">—</span></span>
       <select class="seg c3" id="palette-select" title="Look">
-        <option value="calm-dusk">CALM · DUSK</option>
-        <option value="calm-dark">CALM · DARK</option>
-        <option value="calm-day">CALM · DAY</option>
-        <option value="ice">ICE</option>
-        <option value="ember">EMBER</option>
-        <option value="forest">FOREST</option>
-        <option value="graphite">GRAPHITE</option>
-        <option value="rebel">REBEL CONSOLE</option>
+        <option value="health">Health summary</option>
+        <option value="calm-dusk">Calm · dusk</option>
+        <option value="calm-dark">Calm · dark</option>
+        <option value="calm-day">Calm · day</option>
+        <option value="ice">Ice</option>
+        <option value="ember">Ember</option>
+        <option value="forest">Forest</option>
+        <option value="graphite">Graphite</option>
+        <option value="rebel">Rebel console</option>
       </select>
-      <button type="button" class="seg btn c2" id="settings-button" title="Targets and home-network code">SETTINGS</button>
-      <button type="button" class="seg btn c2" id="report-button" title="The week and month in words">REPORT</button>
-      <button type="button" class="seg btn c2" id="share-button" title="Today as a picture (S)">SHARE</button>
-      <button type="button" class="seg btn c2" id="kiosk-button" title="Full screen (F)">FULL SCREEN</button>
-      <button type="button" class="seg btn c1" id="refresh-button" title="Refresh (R)">REFRESH</button>
+      <button type="button" class="seg btn c2" id="settings-button" title="Targets and home-network code">Settings</button>
+      <button type="button" class="seg btn c2" id="report-button" title="The week and month in words">Report</button>
+      <button type="button" class="seg btn c2" id="share-button" title="Today as a picture (S)">Share</button>
+      <button type="button" class="seg btn c2" id="kiosk-button" title="Full screen (F)">Full screen</button>
+      <button type="button" class="seg btn c1" id="refresh-button" title="Refresh (R)">Refresh</button>
       <button type="button" class="seg btn c3 round" id="help-button" title="How it works and what's new (?)">?</button>
-      <span class="seg end version c2" id="footer-version">1.11.0</span>
+      <span class="seg end version c2" id="footer-version">1.12.0</span>
     </div>
   </footer>
 
@@ -475,7 +481,7 @@
 <!-- The explanation of a panel: in short, then the full story -->
 <div class="sheet" id="explain-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="explain-title">
   <div class="sheet-box">
-    <div class="sheet-head"><span class="cap"></span><span class="label" id="explain-title">—</span><span class="line"></span><button type="button" class="seg btn c1 sheet-x" id="explain-close">CLOSE</button></div>
+    <div class="sheet-head"><span class="cap"></span><span class="label" id="explain-title">—</span><span class="line"></span><button type="button" class="seg btn c1 sheet-x" id="explain-close">Close</button></div>
     <div class="sheet-body prose">
       <h3>In short</h3>
       <p id="explain-summary"></p>
@@ -488,7 +494,7 @@
 <!-- How it works and What's new -->
 <div class="sheet" id="help-sheet" hidden role="dialog" aria-modal="true">
   <div class="sheet-box">
-    <div class="sheet-head"><span class="cap"></span><button type="button" class="tab on" id="help-tab-how">HOW IT WORKS</button><button type="button" class="tab" id="help-tab-new">WHAT'S NEW</button><span class="line"></span><button type="button" class="seg btn c1 sheet-x" id="help-close">CLOSE</button></div>
+    <div class="sheet-head"><span class="cap"></span><button type="button" class="tab on" id="help-tab-how">How it works</button><button type="button" class="tab" id="help-tab-new">What's new</button><span class="line"></span><button type="button" class="seg btn c1 sheet-x" id="help-close">Close</button></div>
     <div class="sheet-body prose" id="help-content">Loading…</div>
   </div>
 </div>
@@ -496,7 +502,7 @@
 <!-- Targets and the home-network code -->
 <div class="sheet" id="settings-sheet" hidden role="dialog" aria-modal="true">
   <div class="sheet-box">
-    <div class="sheet-head"><span class="cap"></span><span class="label">SETTINGS</span><span class="line"></span></div>
+    <div class="sheet-head"><span class="cap"></span><span class="label">Settings</span><span class="line"></span></div>
     <form class="sheet-body form" id="settings-form" autocomplete="off">
       <label>Steps a month<input type="number" id="target-steps" min="0" step="1000" inputmode="numeric"></label>
       <label>Workouts a month<input type="number" id="target-workouts" min="0" step="1" inputmode="numeric"></label>
@@ -521,8 +527,8 @@
       <div class="hint" id="settings-error" hidden></div>
     </form>
     <div class="sheet-actions">
-      <button type="button" class="secondary" id="settings-cancel">CANCEL</button>
-      <button type="button" class="primary" id="settings-save">SAVE</button>
+      <button type="button" class="secondary" id="settings-cancel">Cancel</button>
+      <button type="button" class="primary" id="settings-save">Save</button>
     </div>
   </div>
 </div>
@@ -530,7 +536,7 @@
 <!-- The week or month in plain words -->
 <div class="sheet" id="report-sheet" hidden role="dialog" aria-modal="true">
   <div class="sheet-box">
-    <div class="sheet-head"><span class="cap"></span><button type="button" class="tab on" id="report-kind-week">LAST WEEK</button><button type="button" class="tab" id="report-kind-month">LAST MONTH</button><span class="line"></span><button type="button" class="seg btn c1 sheet-x" id="report-close">CLOSE</button></div>
+    <div class="sheet-head"><span class="cap"></span><button type="button" class="tab on" id="report-kind-week">Last week</button><button type="button" class="tab" id="report-kind-month">Last month</button><span class="line"></span><button type="button" class="seg btn c1 sheet-x" id="report-close">Close</button></div>
     <div class="sheet-body prose">
       <h2 id="report-title">—</h2>
       <pre class="report-text" id="report-text">Loading…</pre>
@@ -542,14 +548,14 @@
 <!-- Today as a picture, to save or share -->
 <div class="sheet" id="share-sheet" hidden role="dialog" aria-modal="true">
   <div class="sheet-box share-box">
-    <div class="sheet-head"><span class="cap"></span><span class="label">SHARE TODAY</span><span class="line"></span><button type="button" class="seg btn c1 sheet-x" id="share-close">CLOSE</button></div>
+    <div class="sheet-head"><span class="cap"></span><span class="label">Share today</span><span class="line"></span><button type="button" class="seg btn c1 sheet-x" id="share-close">Close</button></div>
     <div class="sheet-body share-body">
       <canvas id="share-canvas" width="1080" height="1350"></canvas>
       <p class="hint">A picture of today in the current look. SAVE PNG keeps it on this Mac; on the iPhone, SHARE… opens the share sheet. ⌘P prints the whole board.</p>
     </div>
     <div class="sheet-actions">
-      <button type="button" class="secondary" id="share-send" hidden>SHARE…</button>
-      <button type="button" class="primary" id="share-save">SAVE PNG</button>
+      <button type="button" class="secondary" id="share-send" hidden>Share…</button>
+      <button type="button" class="primary" id="share-save">Save PNG</button>
     </div>
   </div>
 </div>

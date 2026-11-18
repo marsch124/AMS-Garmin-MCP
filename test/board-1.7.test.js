@@ -147,12 +147,12 @@ test('1.7 C: rebel shape rules exist and there is no glow', async () => {
   assert.ok(!/filter\s*:\s*[^;]*(blur|drop-shadow)/.test(b), 'no blur or drop-shadow filter');
 });
 
-test('1.7 D: index.html has the rebel option (8 in total) and loads Barlow Condensed', async () => {
+test('1.7 D: index.html has the rebel option (9 in total) and loads Barlow Condensed', async () => {
   const html = await read('board', 'public', 'index.html');
   const sel = html.match(/<select[^>]*id="palette-select"[^>]*>([\s\S]*?)<\/select>/);
   assert.ok(sel, 'palette-select');
   assert.ok(sel[1].includes('<option value="rebel">'), 'rebel option');
-  assert.equal((sel[1].match(/<option\b/g) || []).length, 8);
+  assert.equal((sel[1].match(/<option\b/g) || []).length, 9);
   assert.ok(html.includes('Barlow+Condensed'), 'fonts link');
 });
 

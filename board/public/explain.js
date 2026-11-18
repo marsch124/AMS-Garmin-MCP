@@ -3,7 +3,7 @@
 // General education only. It is not medical advice: for health questions, ask a doctor.
 globalThis.AMS_EXPLAIN = {
   "chrono": {
-    title: "CHRONOMETER",
+    title: "Chronometer",
     summary: "Local time, world time (UTC), the date, the week number, a playful stardate, and sunrise and sunset. Away from home, it also counts your travel days.",
     more: [
       "The clocks tick every second on this Mac. Local time is the time where you are now. World time (UTC) is the common reference time used by pilots, scientists and computers. Sweden is one hour ahead of it in winter and two hours ahead in summer.",
@@ -14,7 +14,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "steps": {
-    title: "STEPS TODAY",
+    title: "Steps today",
     summary: "Your steps so far today as a round gauge against your daily goal, with distance below. A full ring means the goal is reached.",
     more: [
       "Your watch counts steps from the movement of your wrist. Garmin sets a daily goal that adapts to how much you walk. The board shows that goal and fills the ring against it.",
@@ -25,7 +25,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "body-battery": {
-    title: "BODY BATTERY",
+    title: "Body Battery",
     summary: "A bar from 0 to 100 showing how much energy Garmin thinks you have left. The board shows the latest value, today's lowest and today's highest.",
     more: [
       "Body Battery is Garmin's own estimate of your energy reserves. It mixes heart rate variability, stress, sleep and activity. Sleep and rest charge it. Stress and exercise drain it.",
@@ -36,7 +36,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "heart": {
-    title: "HEART",
+    title: "Heart",
     summary: "Your resting, lowest and highest heart rate today on a dial, with stress as a bar. A lower resting rate over time usually means better fitness.",
     more: [
       "Resting heart rate is how many times your heart beats per minute when you are calm, usually measured by the watch during sleep or quiet time. For a fit man of 60, 50 to 65 is common, and 60 to 100 is the normal range for adults.",
@@ -47,7 +47,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "intensity": {
-    title: "INTENSITY MINUTES",
+    title: "Intensity minutes",
     summary: "The minutes of brisk activity this week as a gauge against your weekly goal. Garmin counts a vigorous minute as two.",
     more: [
       "Intensity minutes count the time your heart rate is raised. A moderate minute, such as a brisk walk, counts once. A vigorous minute, such as running or a hard climb, counts twice. The board adds them the same way Garmin does: moderate plus two times vigorous.",
@@ -58,7 +58,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "energy": {
-    title: "ENERGY",
+    title: "Energy",
     summary: "Calories burned today: the total, and the part that comes from activity. Floors climbed are shown here too.",
     more: [
       "Total calories are what your body burns in a day. Most of it is resting calories, the energy you use just staying alive. Active calories are the extra from movement and workouts.",
@@ -69,7 +69,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "bb-curve": {
-    title: "BODY BATTERY TODAY",
+    title: "Body Battery today",
     summary: "Today's Body Battery as a line from midnight until now. Shaded stretches mark sleep and workouts so you can see what charged and what drained you. Each of today's workouts also has a dashed marker with its cost, like \"Run −17\"; press it to open the workout.",
     more: [
       "The line is made from the minute-by-minute values Garmin saves during the day. A rising line is charging, usually in sleep and quiet rest. A falling line is draining, from stress and exercise.",
@@ -80,7 +80,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "fitness": {
-    title: "FITNESS",
+    title: "Fitness",
     summary: "Your VO2 max, Garmin's fitness age, and your real age side by side. Lower fitness age than your real age is a good sign.",
     more: [
       "VO2 max is the most oxygen your body can use during hard effort, in millilitres per kilogram per minute. It is the best single sign of cardio fitness. Garmin estimates it from a run or ride with heart rate. The board shows the value from your latest run or ride that produced one, with the date.",
@@ -91,7 +91,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "sleep": {
-    title: "SLEEP LAST NIGHT",
+    title: "Sleep last night",
     summary: "How long you slept, your score, and the time in deep, light, REM and awake. It stays empty until the watch is worn at night.",
     more: [
       "Garmin finds sleep from movement and heart rate, and splits it into stages. Deep sleep restores the body. REM sleep supports memory and mood. Light sleep is the rest. The score from 0 to 100 combines length, stages and restlessness.",
@@ -114,7 +114,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "sleep-debt": {
-    title: "SLEEP DEBT",
+    title: "Sleep debt",
     summary: "How many hours of sleep you owe over the last seven nights compared with what Garmin says you need. Zero or less means you are caught up.",
     more: [
       "Garmin works out a sleep need for you, a baseline that for you is about 460 minutes, or 7 hours 40 minutes, adjusted for recent activity and naps. Each night the board compares what you slept with that need.",
@@ -125,7 +125,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "weight": {
-    title: "WEIGHT",
+    title: "Weight",
     summary: "Your last weigh-in on a thermometer, and a 90-day line with a 7-day average and your goal. The average shows the real direction.",
     more: [
       "Body weight moves a lot from day to day with water, food and salt, often by one kilogram or more. A single weigh-in tells you little. That is why the board draws the 7-day average as a line through the dots.",
@@ -136,7 +136,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "training": {
-    title: "TRAINING LOAD",
+    title: "Training load",
     summary: "How hard the last week was compared with your usual. The board gives it one word: RECOVERY, MAINTAINING, PRODUCTIVE or OVERREACHING.",
     more: [
       "Garmin gives every workout a load number that shows how much it taxed your body. The board adds them up in two ways. Acute load is the sum of the last 7 days, with today included. Chronic load is the sum of the last 28 days divided by four, so it is your usual weekly load.",
@@ -147,7 +147,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "zones": {
-    title: "HEART-RATE ZONES THIS WEEK",
+    title: "Heart-rate zones this week",
     summary: "How long your workouts this week, since Monday, kept your heart in each of five zones. Early in the week, before the first workout, it shows the last 7 days instead and says so. Most people aim for a lot of easy time and a little hard time.",
     more: [
       "The zones split your heart rate into five bands, from gentle to maximum. The floors come from the watch's settings: where zone 1 starts, where zone 2 starts, and so on up to zone 5, and your maximum heart rate. Change them in Garmin Connect if they are wrong for you.",
@@ -158,7 +158,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "streaks": {
-    title: "STREAKS",
+    title: "Streaks",
     summary: "How many days in a row you reached your step goal and did a workout, plus your longest run this year.",
     more: [
       "A streak counts whole days in a row. For steps, a day counts when you reach the Garmin step goal. For workouts, a day counts when you recorded at least one activity.",
@@ -169,7 +169,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "weather": {
-    title: "WEATHER",
+    title: "Weather",
     summary: "The weather now and for the next 12 hours: temperature, wind, rain and a short word. Use it to plan today's run, swim or hike.",
     more: [
       "The weather comes from the free service Open-Meteo and needs the internet. The board shows it for one place. First choice is the place of your latest workout from the last 10 days. If there is none, it uses your home. You can also press the locate button to use the place your browser shares.",
@@ -180,7 +180,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "targets": {
-    title: "MONTHLY TARGETS",
+    title: "Monthly targets",
     summary: "Your own goals for this month, each with a progress bar. You set them in the settings: steps, workouts, swims, runs, training minutes and distance.",
     more: [
       "Garmin has daily goals, but a month needs goals of its own. These targets are yours. The board stores them on this Mac only. They are not sent to Garmin or anywhere else.",
@@ -192,7 +192,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "log": {
-    title: "CAPTAIN'S LOG",
+    title: "Captain's log",
     summary: "One line a day to remember how the day felt. This month's lines are listed below, newest first.",
     more: [
       "Numbers do not tell everything. A short note such as sore knee, great hike or slept badly gives the numbers a meaning when you look back.",
@@ -203,7 +203,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "month-steps": {
-    title: "STEPS THIS MONTH",
+    title: "Steps this month",
     summary: "One bar for each day's steps, with a line at your goal. Bars that reach the line are goal days.",
     more: [
       "Each bar is one day. The goal line is Garmin's step goal. Days at or above it are goal days, and they are counted in the totals and in your streaks.",
@@ -214,7 +214,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "month-hr": {
-    title: "RESTING PULSE THIS MONTH",
+    title: "Resting pulse this month",
     summary: "Your resting heart rate for each finished day as a line. A line that slowly falls or stays steady is a good sign.",
     more: [
       "Resting heart rate is one of the easiest signs of how your heart and body are doing. Each point is one day, measured by the watch when you are at rest.",
@@ -225,7 +225,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "activities": {
-    title: "WORKOUTS",
+    title: "Workouts",
     summary: "Every workout of the month, newest first, with type, time, distance and heart rate. Press a row to open its splits, heart-rate curve and map. On 7 DAYS a line compares the week with the 7 days before.",
     more: [
       "The list comes from Garmin Connect and includes everything the watch recorded: runs, walks, hikes, swims, strength training and more. The header shows the count and the totals for time, distance, calories and climbing.",
@@ -236,7 +236,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "workouts": {
-    title: "WORKOUTS",
+    title: "Workouts",
     summary: "Your workouts of today, yesterday or the last 7 days, newest first, with one line of totals. Press a row to open its splits, heart-rate curve and map.",
     more: [
       "Use the three buttons at the top of the panel to choose the time: TODAY, YESTERDAY or 7 DAYS. 7 DAYS means the last seven days, today included. The board remembers your choice on this device.",
@@ -248,7 +248,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "gym": {
-    title: "GYM SESSIONS",
+    title: "Gym sessions",
     summary: "Your last gym session from the Workout Companion app on your iPhone: when, where, how long, how many machines and sets, and the weight you moved, with a comparison to the session before.",
     more: [
       "The iPhone app writes a small file into iCloud Drive after every finished gym session. The board reads that file each time it refreshes, so a session appears here a short while after the phone has saved it to iCloud. If the panel says there are no sessions yet, the one-time step is on the phone: in Workout Companion, open Settings, then Garmin Board, and choose the AMS Garmin folder in iCloud Drive.",
@@ -260,7 +260,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "month-totals": {
-    title: "MONTH TOTALS",
+    title: "Month totals",
     summary: "The month in numbers, with an arrow and percent or difference against last month up to the same day.",
     more: [
       "The totals cover steps, average steps per day, goal days, floors, distance, intensity minutes, resting pulse and workouts with their time. They are added up from the daily summaries and the activity list.",
@@ -271,7 +271,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "activity-detail": {
-    title: "WORKOUT DETAIL",
+    title: "Workout detail",
     summary: "One workout opened up: a summary, the splits, the heart-rate curve, and the GPS track if there is one.",
     more: [
       "The board fetches the workout from Garmin Connect when you press the row. It also reads the original file recorded by the watch, which holds the heart rate and the position along the way.",
@@ -282,7 +282,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "year": {
-    title: "YEAR",
+    title: "Year",
     summary: "Twelve tiles, one for each month of the year, with steps, workouts, resting pulse and goal days. Future months are dimmed.",
     more: [
       "Each tile gives the month's steps, number of workouts, average resting pulse, and the days you reached your step goal. It lets you see the shape of your year at a glance.",
@@ -294,7 +294,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "red-alert": {
-    title: "RED ALERT",
+    title: "Red alert",
     summary: "A red bar that shows only when something needs a look: a high resting pulse, a very low Body Battery, or a watch that has not synced for a day.",
     more: [
       "The red alert has three rules. The first fires when a resting pulse is at least 10 percent above the month average. The second fires when Body Battery is below 20. The third fires when the watch has not synced with Garmin for 24 hours.",
@@ -306,7 +306,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "link": {
-    title: "LINK STATUS",
+    title: "Link status",
     summary: "Green means Garmin is answering. Red shows why not. The footer also shows when your key runs out and when the board last refreshed.",
     more: [
       "The board reads your data from Garmin with a personal key that you created on the Garmin website. The link light shows if that connection works right now.",
@@ -317,7 +317,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "rhythm": {
-    title: "WEEKLY RHYTHM",
+    title: "Weekly rhythm",
     summary: "Your average steps for each weekday over the last 12 weeks, Monday to Sunday. The weakest day is marked in red, the strongest in green.",
     more: [
       "For each weekday the board takes every finished day with data over the last 12 weeks and averages the steps. Today is left out because it is not finished. A dashed line shows the average of all days.",
@@ -328,7 +328,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "plan": {
-    title: "THIS WEEK'S PLAN",
+    title: "This week's plan",
     summary: "Your own weekly workout plan, for example 3 runs and 2 strength sessions, with a tick for each one done since Monday.",
     more: [
       "You set how many workouts of each kind you want each week in Settings: runs, strength, swims, rides, hikes, walks and yoga. The plan is stored on this Mac only.",
@@ -339,7 +339,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "resting-trend": {
-    title: "RESTING PULSE · 90 DAYS",
+    title: "Resting pulse · 90 days",
     summary: "Your resting heart rate for each of the last 90 days as dots, with a 7-day average line and the 90-day average dashed.",
     more: [
       "Resting pulse is how fast your heart beats when you are calm, as measured by the watch, usually during sleep. Each dot is one finished day. Today is left out until it is complete.",
@@ -350,7 +350,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "hydration": {
-    title: "WATER",
+    title: "Water",
     summary: "The water you logged today as a gauge against your goal, and the last seven days as small bars. It shows 'no water logged' until you log some.",
     more: [
       "Garmin lets you log drinks in Garmin Connect or on the watch, and sets a daily goal. The board shows the litres logged today against that goal, and a bar for each of the last seven days with the average.",
@@ -361,7 +361,7 @@ globalThis.AMS_EXPLAIN = {
     ]
   },
   "stress": {
-    title: "STRESS",
+    title: "Stress",
     summary: "Garmin's stress reading for today with a word, how your day divides into rest and stress, and the daily average over 4 weeks.",
     more: [
       "Garmin measures stress from heart rate variability, the small changes in time between heartbeats. A calm body shows more variation. A strained one shows less. The scale runs from 0 to 100.",

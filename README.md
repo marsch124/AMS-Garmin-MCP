@@ -4,7 +4,7 @@
 AMS Garmin lets Claude read your own Garmin Connect workouts and health data, using Garmin's official Personal API. You ask in plain words ("how did I sleep last night?") and Claude fetches the answer from Garmin. It only reads. Nothing is ever written to Garmin.
 
 ## The board
-The board is a live instrument panel for your Garmin data, in the style of a Star Trek control screen: soft orange, peach, lavender and red bars on a warm grey background. Since 1.5.0 the look is calm and spacious: every panel sits on its own soft card with rounded corners, the main numbers are bigger, and the small words (captions, notes, chart numbers) are written in normal letters that are easier to read. Headings and big numbers keep the tall capital letters. It opens in your normal browser.
+The board is a live instrument panel for your Garmin data. Since 1.12.0 its standard look is "Health summary", like Apple's Health app: white cards with rounded corners on a soft grey background, big rounded numbers and headings in normal letters, one strong colour per panel. At night it turns to dark grey cards on black; it follows the day and night setting of your Mac or iPhone by itself. The earlier Star Trek style looks (soft orange, peach, lavender and red bars on a warm grey background, with tall capital headings) are still there, in the colour switcher. It opens in your normal browser.
 
 **How to open it**
 - Double-click **AMS Garmin Bridge Board** on your Desktop, or type "AMS Garmin Bridge Board" in Raycast.
@@ -40,7 +40,7 @@ The board is a live instrument panel for your Garmin data, in the style of a Sta
 Every heading is a button. A window opens with the meaning in short, and below it the full story. The "In short" text is kept to a readable width, so its lines break earlier than the full story below. Escape closes it.
 
 **Colours**
-At the bottom there is a colour switcher with eight looks: Calm Dusk (standard), Calm Dark, Calm Day, Ice, Ember, Forest, Graphite and Rebel console (a bright look: pale blue-white screens with navy text, cyan-blue lines, amber numbers, square panels with a cut corner and a faint scan-line texture; inspiration only, no names or logos). It remembers your choice on this Mac.
+At the bottom there is a colour switcher with nine looks: Health summary (standard, first in the list; Apple Health style cards, light by day and dark at night), Calm Dusk, Calm Dark, Calm Day, Ice, Ember, Forest, Graphite and Rebel console (a bright look: pale blue-white screens with navy text, cyan-blue lines, amber numbers, square panels with a cut corner and a faint scan-line texture; inspiration only, no names or logos). Each browser is moved to Health summary once, the first time it opens version 1.12; after that It remembers your choice on this Mac.
 
 **Looking back**
 The arrows beside the month name show earlier months. The right arrow stops at the current month, and a button jumps back to it. The workouts, totals and Captain's log follow the month you picked.

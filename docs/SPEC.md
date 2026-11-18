@@ -97,11 +97,11 @@ Note: `/weight-service/weight/all/{startDate}/{endDate}` has no dedicated tool; 
 - `scripts/install-agents.sh`, `scripts/report.sh` — see "Launch agents".
 
 ### Colour schemes
-Chosen with `<html data-scheme="…">`. `board.css` has one `:root[data-scheme="…"]` block per scheme; the plain `:root` block holds the default (calm-dusk). `--ok` is #66cc99 (#2e8b57 in calm-day). `color-scheme` is light for calm-day and rebel, dark for the others.
+Chosen with `<html data-scheme="…">`. `board.css` has one `:root[data-scheme="…"]` block per scheme; the plain `:root` block still holds calm-dusk, but since 1.12.0 the default scheme is `health` (see "Health summary (1.12.0)"). `--ok` is #66cc99 (#2e8b57 in calm-day). `color-scheme` is light for calm-day and rebel, dark for the others.
 
 | scheme | bg | ink | text | dim | track | grid | c1 | c2 | c3 | c4 | c5 | c6 | c7 | c8 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| calm-dusk (default) | #3d3a44 | #1a171c | #f7efe4 | #cdc3b5 | #524e59 | #5e5964 | #ff9966 | #ffcc99 | #cc99cc | #ff9966 | #ffcc99 | #ffcc99 | #cc6666 | #ffcc99 |
+| calm-dusk | #3d3a44 | #1a171c | #f7efe4 | #cdc3b5 | #524e59 | #5e5964 | #ff9966 | #ffcc99 | #cc99cc | #ff9966 | #ffcc99 | #ffcc99 | #cc6666 | #ffcc99 |
 | calm-dark | #000000 | #000000 | #f3e9dc | #b0a496 | #1d1a17 | #2a2520 | #ff9966 | #ffcc99 | #cc99cc | #ff9966 | #ffcc99 | #ffcc99 | #cc6666 | #ffcc99 |
 | calm-day | #f1ebe3 | #fff8f0 | #2b2420 | #6b6056 | #e0d6c9 | #d4c8b8 | #e0702e | #c9873a | #8e62a0 | #e0702e | #c9873a | #c9873a | #b84a4a | #c9873a |
 | ice | #05080f | #000000 | #e6f0fa | #9aa9bd | #0f1724 | #182236 | #8fd3ff | #5aa9e6 | #b8c7d9 | #5aa9e6 | #8fd3ff | #e0f0ff | #ff6b6b | #b8c7d9 |
@@ -114,8 +114,21 @@ Since 1.5.0 each scheme also defines `--card` (panel surface), `--edge` (hairlin
 Eighth scheme, `data-scheme="rebel"`, shown as "Rebel console" in `palette-select`; remembered under `ams-garmin-board.scheme` like the others. Inspired by rebel computer screens in a space film; the app never shows a franchise, character name or logo. Mock-up: `docs/looks/star-wars-options.html`, column A.
 - Variables (`--bg`, `--card`, `--edge`, `--shadow`, `--text`, `--dim`, `--track`, `--ink`, `--c1` … `--c7`, `--font`; exact values in `board.css`, block "1.7.0 · Rebel console"): bright look, `color-scheme: light` like calm-day: pale cool blue-white background (#e6eef5) with near-white cards, deep navy text, cyan-blue lines and headings, amber main numbers and diamond markers. The scheme also sets `--r` and `--grid`. `--font` is "Barlow Condensed" with a condensed system fallback.
 - Shape rules under `[data-scheme="rebel"]`: `.panel` has square corners and a chamfered top-left corner (`clip-path`) with a thin cyan-blue edge; the panel heading is a cyan-blue line with a small amber diamond marker instead of the rounded pill; frame segments (top bar, left blocks, footer) are square; headings and big numbers use condensed uppercase lettering in `--font`; `body::after` draws a very faint horizontal scan-line texture over the page with `pointer-events: none`. No glow: no `text-shadow`, no blur or drop-shadow filter in this block.
-- The Peek card and the sheets follow the scheme through the variables. The other seven schemes are unchanged. `package.json` and the footer version are 1.7.0.
+- The Peek card and the sheets follow the scheme through the variables. The other seven schemes are unchanged. `package.json` and the footer version were 1.7.0 at that release.
 - Tests: `test/board-1.7.test.js` (version and first CHANGELOG entry; every variable in the rebel block; `clip-path` on the panel and the `body::after` rule; no glow; eight options and the `Barlow+Condensed` fonts link; README and CHANGELOG; the served page carries `value="rebel"`).
+
+### Health summary (1.12.0)
+Ninth scheme, `data-scheme="health"`, shown as "Health summary" (`<option value="health">Health summary</option>`, first in `#palette-select`). It is the standard look: `<html data-scheme="health">` and the fallback in `applyScheme` in `board.js`. Before 1.12.0 there were 8 looks and the standard was calm-dusk; now there are 9 and the standard is health. Look: like Apple's Health summary.
+- One-time move: the small inline script in the `<head>` of `index.html` checks `localStorage` `ams-garmin-board.lookMove`; when it is not `1.12` it sets `ams-garmin-board.scheme` to `health` and stores `ams-garmin-board.lookMove` = `1.12`. Every browser is therefore moved once on its first load of 1.12 (the Mac user's saved choice was rebel). After that the chosen look is remembered under `ams-garmin-board.scheme` as before; the 8 old looks stay selectable and unchanged.
+- Day/night: the scheme follows the system setting by itself with `@media (prefers-color-scheme: dark)` inside the scheme; `board.js` redraws its drawings when the appearance changes.
+- Day variables: `--bg` #f2f2f7 (cards `--card` white), `--c1` #f08000, `--c2` #ff2d55, `--c3` #a550d8, `--c4` #5856d6, `--c5` #0a84c6, `--c6` #0e9aa7, `--c7` #e0352b, `--c8` #8e8e93, `--ok` #22a447, `--text` #000000, `--dim` #6c6c70, `--track` #ececf1, `--grid` #e5e5ea.
+- Night variables: `--bg` #000000, `--card` #1c1c1e, `--c1` #ff9f0a, `--c2` #ff375f, `--c3` #bf5af2, `--c4` #7d7aff, `--c5` #40c8e0, `--c6` #5fd3cf, `--c7` #ff453a, `--c8` #98989f, `--ok` #32d74b, `--text` #ffffff, `--dim` #98989f, `--track` #2c2c2e, `--grid` #38383a.
+- One strong colour per panel: steps pink-red (`--c2`), intensity and workouts orange (`--c1`), Body Battery and water blue (`--c5`), sleep indigo (`--c4`), gym purple (`--c3`), heart red (`--c7`), clock and weight teal (`--c6`).
+- All in the CSS block "1.12.0 · Health summary" in `board/public/board.css`, placed before the "1.7.0 · Rebel console (bright)" block, which stays last before print. It does: grouped cards with 20 px corners; system type (-apple-system, SF Pro Rounded for numbers); headings in normal sentence case in the panel's own colour, no capitals, no letter-spacing, no heading bar or cap decorations; big rounded numbers in the panel colour; small grey captions; hairline separators between rows; thick round-capped rings and bars; compact spacing; no glow, no neon, no heavy shadows. The LCARS frame is gone in this look: no left column, no elbows, no coloured bar segments; the top is a plain title line and the footer is a row of small capsule buttons (same buttons, same functions).
+- Sheets (explanations, settings, report, share, how it works / what's new), the Peek card, the workout detail and the code page work as before, in the new look.
+- Sentence-case source words: to allow sentence-case headings, the heading words in `index.html` and `board.js` are written in normal letters in the source ("Steps · today"); the 8 old looks still show them in capitals through CSS, so they look the same as before.
+- `package.json` and the footer version are 1.12.0.
+- Tests: `test/board-1.12.test.js`.
 
 ### Typography and panel cards (1.5.0)
 - Every panel is a card: `--card` background, 1 px `--edge` border, 18 px radius, `--shadow`, padding 14–16 px; gaps 20 px vertical, 18 px horizontal. `month-nav` has no card. The panel heading is a pill (coloured cap and label) at the top left; the long coloured line is gone, the right-hand buttons and notes stay.
@@ -125,7 +138,7 @@ Eighth scheme, `data-scheme="rebel"`, shown as "Rebel console" in `palette-selec
 - Notes are sentences (for example "No plan set · Edit to add one"); the steps comparison under the gauge is a plain text line, not a pill.
 - Explain sheet (1.5.1): `#explain-summary { max-width: 60ch; }` — the "In short" paragraph is at most 60 characters wide (about 600 px, down from about 724 px or 90 letters) so it is easier to read; `explain-more` (Learn more) is unchanged.
 
-The footer `<select id="palette-select">` has exactly eight option values (the seven above plus `rebel`, "Rebel console", new in 1.7.0). The choice is saved in `localStorage` under `ams-garmin-board.scheme` and applied before first paint by a small inline script in `<head>`.
+The footer `<select id="palette-select">` has exactly nine option values (since 1.12.0: `health` "Health summary" first, then the eight below: calm-dusk, calm-dark, calm-day, ice, ember, forest, graphite and `rebel` "Rebel console", new in 1.7.0). The choice is saved in `localStorage` under `ams-garmin-board.scheme` and applied before first paint by a small inline script in `<head>`.
 
 ### Page: panels and element ids
 Existing ids (unchanged): `board`, `clock-local`, `clock-utc`, `clock-date`, `stardate`, `steps-gauge`, `steps-value`, `body-battery-bar`, `resting-hr`, `stress-bar`, `intensity-gauge`, `floors-value`, `calories-value`, `month-steps-chart`, `month-hr-chart`, `activities-list`, `activities-total`, `sleep-panel`, `hrv-panel`, `weight-thermo`, `link-status`, `last-refresh`, `refresh-button`, `version-label`.
