@@ -114,14 +114,14 @@
       ticks.push(`<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="${i % 5 === 0 ? color : css('--grid')}" stroke-width="2"/>`);
     }
     host.innerHTML = `
-      <svg viewBox="0 0 200 178" role="img" aria-label="${escapeHtml(big)} ${escapeHtml(unit || '')}">
+      <svg viewBox="0 0 200 190" role="img" aria-label="${escapeHtml(big)} ${escapeHtml(unit || '')}">
         <path d="${arcPath(cx, cy, r, start, start + sweep)}" class="track" fill="none" stroke-width="14" stroke-linecap="round"/>
         ${ratio > 0.002 ? `<path d="${arcPath(cx, cy, r, start, start + sweep * ratio)}" fill="none" stroke="${color}" stroke-width="14" stroke-linecap="round"/>` : ''}
         ${overRatio > 0.002 ? `<path d="${arcPath(cx, cy, r - 22, start, start + sweep * overRatio)}" fill="none" stroke="${over}" stroke-width="5" stroke-linecap="round"/>` : ''}
         ${ticks.join('')}
         <text class="t-hero" x="100" y="104" text-anchor="middle" font-size="40" font-weight="700" fill="${color}">${escapeHtml(big)}</text>
         ${unit ? `<text class="t-unit" x="100" y="124" text-anchor="middle" font-size="12" fill="${css('--dim')}">${escapeHtml(unit)}</text>` : ''}
-        <text class="t-sub" x="100" y="166" text-anchor="middle" font-size="14" fill="${css('--c8')}">${escapeHtml(small || '')}</text>
+        <text class="t-sub" x="100" y="183" text-anchor="middle" font-size="14" fill="${css('--c8')}">${escapeHtml(small || '')}</text>
       </svg>`;
   }
 

@@ -200,6 +200,10 @@ Behaviour:
 - Nothing changes in `workouts-panel` or in the Body Battery curve markers.
 - Tests: `test/board-1.10.test.js`.
 
+### Arc gauge sub line (1.10.1)
+- `drawArcGauge` (steps, intensity week, water and every other arc gauge): the SVG `viewBox` is `0 0 200 190` (was `0 0 200 178`) and the `t-sub` line (for example `33 % of weekly goal`) is at `y="183"` (was `166`). The arc has radius 78 around (100,100) with stroke 18, so its round ends reach down to about y 164 at x 36–54 and 146–164; the line (font-size 14, top about y 171) now sits below them.
+- Tests: `test/board-1.10.1.test.js`.
+
 ### explain.js format
 Plain script, no import or export. Sets `globalThis.AMS_EXPLAIN = { <key>: { title, summary, more } }` for all 33 keys above (since 1.10.0 also `gym`; since 1.8.0 also `workouts`, title WORKOUTS, 6 paragraphs) (since 1.4.0 the keys rhythm, plan, resting-trend, hydration and stress are at the end; titles WEEKLY RHYTHM, THIS WEEK'S PLAN, RESTING PULSE · 90 DAYS, WATER, STRESS; the entries year, sleep, red-alert and targets gained a paragraph or sentence). `title`: uppercase short title. `summary`: one or two sentences, shown under IN SHORT. `more`: array of 3 to 6 paragraphs, shown under LEARN MORE. The page opens `explain-sheet` from the button whose id is `explain-<key>`. Loadable in Node with `import()` (the tests do this).
 

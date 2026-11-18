@@ -1,5 +1,13 @@
 # What's new
 
+## 1.10.1 — 18 November 2026
+The line under the number on the round gauges no longer lies across the ends of the arc.
+
+**Fixed**
+- Before: on the arc gauges (INTENSITY · WEEK, STEPS and the other round gauges) the line under the number, for example "33 % of weekly goal", sat on top of the round ends of the arc and was hard to read, on iPhone and on Mac.
+- Now: the line sits below the arc, clear of both ends.
+- The gauges are a touch taller for this: the drawing is 190 units high instead of 178. Nothing else on the board changed.
+
 ## 1.10.0 — 18 November 2026
 The board has a new GYM SESSIONS panel, fed by your iPhone gym app (AMS Workout Companion).
 

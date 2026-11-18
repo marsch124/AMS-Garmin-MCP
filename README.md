@@ -147,6 +147,7 @@ Make a new key on the same Garmin page (see above) and run the save-key dialog a
 Your data goes from Garmin straight to Claude on this Mac. The code repository is public so that GitHub runs the tests for free; it contains no data and no keys, and never will.
 
 ## Version
+1.10.1 — 18 Nov 2026
 1.10.0 — 18 Nov 2026
 1.8.0 — 10 Nov 2026
 1.7.0 — 9 Nov 2026
