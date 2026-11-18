@@ -1,5 +1,31 @@
 # What's new
 
+## 1.10.0 — 18 November 2026
+The board has a new GYM SESSIONS panel, fed by your iPhone gym app (AMS Workout Companion).
+
+**New**
+- Before: the board knew your gym time only as a strength workout from the watch, with a time and a heart rate but no machines, sets or weights.
+- New: a GYM SESSIONS panel, directly under the WORKOUTS panel and as wide as the page. It shows your latest session in one line, for example "Wed 18 Nov · City gym · 52 min · 3 machines · 9 sets · 4 120 kg", with how it felt (great, good, ok, tired or rough) when you noted it.
+- New: a line under it compares with the session before: "vs the session before: +2 sets · −6 min · +250 kg". A minus sign (−) means less than last time. The line is left out when there is no earlier session.
+- New: the machines of that session, each with the sets you did (for example "55 kg × 12, 11, 10"), a small "best" mark for a new personal best and a small "pain" mark where you noted pain.
+- New: a line for the last 7 days against the 7 days before: "Last 7 days: 3 sessions · 2 h 41 · 11 300 kg — the 7 days before: 2 sessions · …".
+- New: a list of your latest six sessions. Press one, or move to it and press Enter, and its machines are shown instead. The latest session is shown again on the next refresh or reload.
+- New: a text for the panel heading (press GYM SESSIONS): "In short" and "Learn more", in plain words.
+- When there are no sessions yet, the panel says so calmly and tells you the one-time step on the phone: in Workout Companion, Settings, Garmin Board, choose the AMS Garmin folder in iCloud Drive.
+- It looks right in all eight looks, including the bright Rebel console, and fits a phone without sideways scrolling.
+
+**How it works**
+- The iPhone app writes the file `Workout Companion sessions.json` into the folder `AMS Garmin` in iCloud Drive after every finished gym session (up to 60 sessions, newest first). The board reads it fresh each time it builds the page data; the board still keeps its 5-minute memory.
+- A missing, half-written or unreadable file never breaks the board: only this panel shows its empty state.
+- Another file can be named in the board settings (`gymFile`).
+- The board's data now carries `gym` (`available`, `written`, `latest` with `daysAgo` and `vsPrevious`, `recent`, `week`, `prevWeek`), built by the new `gymView`.
+
+**Unchanged**
+- The WORKOUTS panel and the workout markers on the Body Battery curve are exactly as before.
+
+**Fixed**
+- Older tests compared version numbers as text, which would have called 1.10 older than 1.2; they now compare the numbers.
+
 ## 1.9.0 — 10 November 2026
 Your workouts now show up on the Body Battery curve, and the WORKOUTS panel compares this week with the week before.
 

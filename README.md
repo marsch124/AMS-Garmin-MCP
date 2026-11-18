@@ -79,6 +79,11 @@ Run `scripts/install-agents.sh` once. It makes the board start at login and sets
 **Keyboard**
 R refresh · F full screen · S share · left and right arrows previous and next month · ? help · Escape close.
 
+**Gym sessions**
+- The GYM SESSIONS panel sits under WORKOUTS. It shows your latest gym session from the iPhone app (Workout Companion): day, gym, time, machines, sets and weight moved, how it felt, and how it compares with the session before. Under it are the machines with their sets, a mark for a new best and for pain, a line for the last 7 days against the 7 days before, and a list of the latest six sessions. Press one to see its machines.
+- One-time step on the phone: in Workout Companion open Settings, then Garmin Board, and choose the AMS Garmin folder in iCloud Drive. After that every finished session is written there by itself.
+- The board reads the file `Workout Companion sessions.json` from `~/Library/Mobile Documents/com~apple~CloudDocs/AMS Garmin/`. If it is missing or cannot be read, the panel says "No gym sessions yet" and the rest of the board is not affected.
+
 **Help**
 The **?** button opens How it works and What's new.
 
@@ -142,6 +147,7 @@ Make a new key on the same Garmin page (see above) and run the save-key dialog a
 Your data goes from Garmin straight to Claude on this Mac. The code repository is public so that GitHub runs the tests for free; it contains no data and no keys, and never will.
 
 ## Version
+1.10.0 — 18 Nov 2026
 1.8.0 — 10 Nov 2026
 1.7.0 — 9 Nov 2026
 1.6.0 — 9 Nov 2026

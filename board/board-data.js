@@ -6,6 +6,9 @@
 // buildMonth() does the same for one past month.
 
 import { todayLocal, trimActivity, VERSION } from '../src/tools.js';
+import { readFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import { BoardStore, DEFAULT_TARGETS, DEFAULT_PLAN, HOME_ZONE } from './store.js';
 
 const DAY_MS = 86_400_000;
@@ -242,6 +245,82 @@ export function recentWorkoutsView(acts, today) {
       calories: (last7.calories ?? 0) - (prev7.calories ?? 0),
     },
   };
+}
+
+// ---------- 1.10.0: Gym sessions, from the iPhone gym app's file in iCloud Drive ----------
+
+export const DEFAULT_GYM_FILE = join(homedir(), 'Library', 'Mobile Documents', 'com~apple~CloudDocs', 'AMS Garmin', 'Workout Companion sessions.json');
+const GYM_FEELS = ['great', 'good', 'ok', 'tired', 'rough'];
+const gymText = (v, max = 400) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
+const gymNum = (v) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null);
+
+function gymEntry(e) {
+  if (!e || typeof e !== 'object') return null;
+  const name = gymText(e.name, 120);
+  if (!name) return null;
+  return { name, muscle: gymText(e.muscle, 60), sets: gymText(e.sets, 200), setCount: gymNum(e.setCount), topKg: gymNum(e.topKg), pain: e.pain === true };
+}
+
+/** One session from the file, every field checked; null when it has no usable day. */
+function gymSession(s) {
+  if (!s || typeof s !== 'object') return null;
+  const date = typeof s.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s.date) ? s.date : null;
+  if (!date) return null;
+  return {
+    id: gymText(s.id, 80) ?? `${date}-${gymText(s.start, 40) ?? 'x'}`,
+    date,
+    start: gymText(s.start, 40),
+    end: gymText(s.end, 40),
+    minutes: gymNum(s.minutes),
+    gym: gymText(s.gym, 120),
+    title: gymText(s.title, 120),
+    feel: GYM_FEELS.includes(s.feel) ? s.feel : null,
+    notes: gymText(s.notes, 1000),
+    machines: gymNum(s.machines),
+    sets: gymNum(s.sets),
+    liftedKg: gymNum(s.liftedKg),
+    cardioMinutes: gymNum(s.cardioMinutes),
+    bests: (Array.isArray(s.bests) ? s.bests : []).map((b) => gymText(b, 120)).filter(Boolean).slice(0, 40),
+    entries: (Array.isArray(s.entries) ? s.entries : []).map(gymEntry).filter(Boolean).slice(0, 60),
+  };
+}
+
+/** The Gym panel's data. file = the parsed JSON of the gym app (or null when it is missing or unreadable). */
+export function gymView(file, today) {
+  const list = (Array.isArray(file?.sessions) ? file.sessions : []).map(gymSession).filter(Boolean)
+    .sort((a, b) => (b.date + (b.start ?? '')).localeCompare(a.date + (a.start ?? '')))
+    .slice(0, 60);
+  const written = gymText(file?.written, 40);
+  if (!list.length) return { available: false, written, latest: null, recent: [], week: { sessions: 0, minutes: 0, liftedKg: 0 }, prevWeek: { sessions: 0, minutes: 0, liftedKg: 0 } };
+  const diff = (a, b) => (a === null || b === null ? null : a - b);
+  const [first, before] = list;
+  const latest = {
+    ...first,
+    daysAgo: Math.max(0, Math.round((Date.parse(today + 'T00:00:00Z') - Date.parse(first.date + 'T00:00:00Z')) / 86400000)),
+    vsPrevious: before ? { sets: diff(first.sets, before.sets), minutes: diff(first.minutes, before.minutes), liftedKg: diff(first.liftedKg, before.liftedKg) } : null,
+  };
+  const period = (from, to) => {
+    const inside = list.filter((s) => s.date >= from && s.date <= to);
+    return { sessions: inside.length, minutes: sum(inside, (s) => s.minutes), liftedKg: sum(inside, (s) => s.liftedKg) };
+  };
+  return {
+    available: true,
+    written,
+    latest,
+    recent: list.slice(0, 6).map(({ id, date, gym, title, minutes, machines, sets, liftedKg, feel, bests, entries }) => ({ id, date, gym, title, minutes, machines, sets, liftedKg, feel, bests, entries })),
+    week: period(addDays(today, -6), today),
+    prevWeek: period(addDays(today, -13), addDays(today, -7)),
+  };
+}
+
+/** Reads the gym app's file; null for anything wrong (missing, half-written, not JSON). Never throws. */
+export async function readGymFile(path) {
+  try {
+    const data = JSON.parse(await readFile(path, 'utf8'));
+    return data && typeof data === 'object' && !Array.isArray(data) ? data : null;
+  } catch {
+    return null;
+  }
 }
 
 function activitiesView(list) {
@@ -810,7 +889,7 @@ export function historyView(allDays, today, { nights = [], weightPoints = [], hy
   };
 }
 
-export async function buildBoard(client, { today = todayLocal(), now = () => Date.now(), storeDir, store, homeZone = HOME_ZONE } = {}) {
+export async function buildBoard(client, { today = todayLocal(), now = () => Date.now(), storeDir, store, homeZone = HOME_ZONE, gymFile } = {}) {
   const warnings = [];
   const side = async (label, fn, fallback) => {
     try {
@@ -896,6 +975,7 @@ export async function buildBoard(client, { today = todayLocal(), now = () => Dat
     },
     activities: activitiesView(monthActs),
     recentWorkouts: recentWorkoutsView(acts, today),
+    gym: gymView(await readGymFile(gymFile || settings.gymFile || DEFAULT_GYM_FILE), today),
     sleep,
     hrv: hrvView(hrvRaw),
     weight: weightView(weightRaw),

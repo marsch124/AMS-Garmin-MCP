@@ -113,7 +113,8 @@ const post = (url, body) => fetch(url, { method: 'POST', headers: { 'content-typ
 
 // ---------- A. version and docs ----------
 test('1.2 A: package.json version is at least 1.2.0', async () => {
-  assert.ok(JSON.parse(await read('package.json')).version >= '1.2.0');
+  const [maj, min] = JSON.parse(await read('package.json')).version.split('.').map(Number);
+  assert.ok(maj > 1 || (maj === 1 && min >= 2));
 });
 test('1.2 A: CHANGELOG has a 1.2.0 entry', async () => {
   const lines = (await read('CHANGELOG.md')).split('\n');
@@ -147,7 +148,7 @@ test('1.2 B: ice and calm-day carry their own colours', async () => {
 });
 
 // ---------- C. the page ----------
-const KEYS = ['chrono', 'steps', 'body-battery', 'heart', 'intensity', 'energy', 'bb-curve', 'fitness', 'sleep', 'hrv', 'sleep-debt', 'weight', 'training', 'zones', 'streaks', 'weather', 'targets', 'log', 'month-steps', 'month-hr', 'activities', 'month-totals', 'activity-detail', 'year', 'red-alert', 'rhythm', 'plan', 'resting-trend', 'hydration', 'stress', 'workouts', 'link'];
+const KEYS = ['chrono', 'steps', 'body-battery', 'heart', 'intensity', 'energy', 'bb-curve', 'fitness', 'sleep', 'hrv', 'sleep-debt', 'weight', 'training', 'zones', 'streaks', 'weather', 'targets', 'log', 'month-steps', 'month-hr', 'activities', 'month-totals', 'activity-detail', 'year', 'red-alert', 'rhythm', 'plan', 'resting-trend', 'hydration', 'stress', 'workouts', 'gym', 'link'];
 const PAGE_IDS = [
   'board', 'clock-local', 'clock-utc', 'clock-date', 'stardate', 'steps-gauge', 'steps-value', 'body-battery-bar', 'resting-hr', 'stress-bar', 'intensity-gauge', 'floors-value', 'calories-value',
   'month-steps-chart', 'month-hr-chart', 'activities-list', 'activities-total', 'sleep-panel', 'hrv-panel', 'weight-thermo', 'link-status', 'last-refresh', 'refresh-button', 'version-label',
@@ -180,12 +181,12 @@ test('1.2 C: the page carries every element id from the brief', async () => {
   const missing = PAGE_IDS.filter((id) => !html.includes(`id="${id}"`));
   assert.deepEqual(missing, []);
 });
-test('1.2 C: 31 explain buttons, one per key except link', async () => {
+test('1.2 C: 32 explain buttons, one per key except link', async () => {
   const html = await pageHtml();
   const keys = KEYS.filter((k) => k !== 'link');
-  assert.equal(keys.length, 31);
+  assert.equal(keys.length, 32);
   for (const k of keys) assert.ok(html.includes(`id="explain-${k}"`), `explain-${k}`);
-  assert.equal([...html.matchAll(/id="explain-[a-z-]+"/g)].filter((m) => !/explain-(sheet|title|summary|more|close)"/.test(m[0])).length, 31);
+  assert.equal([...html.matchAll(/id="explain-[a-z-]+"/g)].filter((m) => !/explain-(sheet|title|summary|more|close)"/.test(m[0])).length, 32);
 });
 test('1.2 C: palette select offers all 7 schemes', async () => {
   const html = await pageHtml();
@@ -207,7 +208,7 @@ test('1.2 D: /explain.js is served as javascript', async () => {
     await r.text();
   });
 });
-test('1.2 D: explain.js defines all 32 keys with title, summary and 3+ paragraphs', async () => {
+test('1.2 D: explain.js defines all 33 keys with title, summary and 3+ paragraphs', async () => {
   delete globalThis.AMS_EXPLAIN;
   await import(pathToFileURL(join(PUB, 'explain.js')).href);
   const ex = globalThis.AMS_EXPLAIN;

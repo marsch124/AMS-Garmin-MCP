@@ -1031,6 +1031,54 @@
     }).join('');
   }
 
+  // ---------- 1.10.0 Gym sessions: the iPhone gym app's file, right after Workouts ----------
+  const GYM_FEEL = { great: 'felt great', good: 'felt good', ok: 'felt ok', tired: 'felt tired', rough: 'felt rough' };
+  let gymPick = null;   // id of the session whose machines are shown; null = the latest
+  const gymDay = (iso) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+    if (!m) return '—';
+    const d = new Date(+m[1], +m[2] - 1, +m[3]);
+    return `${DAY_NAMES[d.getDay()]} ${+m[3]} ${MONTHS[+m[2] - 1]}`;
+  };
+  const gymSigned = (n, fmt, unit) => (isNum(n) ? `${n > 0 ? '+' : n < 0 ? '−' : '±'}${fmt(Math.abs(n))}${unit}` : null);
+  const gymMin = (m) => (isNum(m) ? (m >= 60 ? fmtDur(m * 60) : `${Math.round(m)} min`) : null);
+  const gymPlural = (n, one, many) => `${fmtInt(n)} ${n === 1 ? one : many}`;
+  function gymEntriesHtml(s) {
+    const list = s?.entries || [];
+    if (!list.length) return '<div class="gym-entry"><span class="gn">No machines saved for this session</span></div>';
+    const bests = new Set(s.bests || []);
+    return list.map((e) => `<div class="gym-entry">
+        <span class="gn">${escapeHtml(e.name)}${e.muscle ? `<small>${escapeHtml(e.muscle)}</small>` : ''}${bests.has(e.name) ? '<span class="gym-mark best" title="New best">best</span>' : ''}${e.pain ? '<span class="gym-mark pain" title="Pain noted">pain</span>' : ''}</span>
+        <span class="gs">${escapeHtml(e.sets || (isNum(e.setCount) ? gymPlural(e.setCount, 'set', 'sets') : ''))}</span>
+      </div>`).join('');
+  }
+  function renderGym(b) {
+    const g = b?.gym;
+    const ok = !!(g && g.available && g.latest);
+    $('gym-empty').hidden = ok;
+    $('gym-main').hidden = !ok;
+    if (!ok) return;
+    const latest = g.latest;
+    const recent = g.recent?.length ? g.recent : [latest];
+    const shown = recent.find((s) => s.id === gymPick) || latest;
+    const sumLine = (s, withFeel) => [gymDay(s.date), s.gym, gymMin(s.minutes), isNum(s.machines) ? gymPlural(s.machines, 'machine', 'machines') : null,
+      isNum(s.sets) ? gymPlural(s.sets, 'set', 'sets') : null, isNum(s.liftedKg) && s.liftedKg > 0 ? `${fmtInt(s.liftedKg)} kg` : null,
+      withFeel && GYM_FEEL[s.feel] ? GYM_FEEL[s.feel] : null].filter(Boolean).join(' · ');
+    setText('gym-summary', sumLine(shown, true) + (shown === latest && isNum(latest.daysAgo) && latest.daysAgo > 0 ? ` · ${latest.daysAgo === 1 ? 'yesterday' : `${latest.daysAgo} days ago`}` : ''));
+    const v = latest.vsPrevious;
+    const cmp = $('gym-compare');
+    const parts = v ? [gymSigned(v.sets, fmtInt, ' sets'), gymSigned(v.minutes, fmtInt, ' min'), gymSigned(v.liftedKg, fmtInt, ' kg')].filter(Boolean) : [];
+    if (shown === latest && parts.length) { cmp.textContent = `vs the session before: ${parts.join(' · ')}`; cmp.hidden = false; } else { cmp.textContent = ''; cmp.hidden = true; }
+    $('gym-entries').innerHTML = gymEntriesHtml(shown);
+    const wk = (p) => `${gymPlural(p.sessions, 'session', 'sessions')}${p.sessions ? ` · ${fmtDur((p.minutes || 0) * 60)} · ${fmtInt(p.liftedKg)} kg` : ''}`;
+    setText('gym-week', `Last 7 days: ${wk(g.week)} — the 7 days before: ${wk(g.prevWeek)}`);
+    $('gym-list').innerHTML = recent.map((s) => `<div class="gym-row${s.id === shown.id ? ' selected' : ''}" id="gym-ses-${escapeHtml(s.id)}" data-id="${escapeHtml(s.id)}" role="button" tabindex="0" aria-pressed="${s.id === shown.id}">
+        <span class="gd">${escapeHtml(gymDay(s.date))}</span>
+        <span class="gt">${escapeHtml(s.title || s.gym || 'Gym session')}</span>
+        <span class="gk">${[gymMin(s.minutes), isNum(s.liftedKg) && s.liftedKg > 0 ? `${fmtInt(s.liftedKg)} kg` : null].filter(Boolean).join(' · ') || '—'}</span>
+      </div>`).join('');
+  }
+
   function renderTargets(targets, m, a, ym, isCurrent) {
     const list = a.list || [];
     const values = {
@@ -1254,6 +1302,7 @@
     renderStress(b);
     renderHydration(b);
     renderWorkouts(b);
+    renderGym(b);
     renderTravel(b.travel);
     if (!viewYm) {
       monthData = { ym: b.date.slice(0, 7), month: b.month, activities: b.activities, compare: b.compare, log: b.log };
@@ -1642,6 +1691,12 @@
   $('workouts-list').addEventListener('keydown', (e) => {
     const row = e.target.closest('.act[data-id]');
     if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openWorkout(row.dataset.id); }
+  });
+  const pickGym = (row) => { if (!row) return; gymPick = row.dataset.id; renderGym(board); };
+  $('gym-list').addEventListener('click', (e) => pickGym(e.target.closest('.gym-row[data-id]')));
+  $('gym-list').addEventListener('keydown', (e) => {
+    const row = e.target.closest('.gym-row[data-id]');
+    if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); pickGym(row); $(`gym-ses-${row.dataset.id}`)?.focus(); }
   });
   for (const r of WORKOUT_RANGES) {
     $(`workouts-tab-${r}`).addEventListener('click', () => {

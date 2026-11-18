@@ -247,6 +247,17 @@ globalThis.AMS_EXPLAIN = {
       "Weight sessions show no distance, so judge them by time and heart rate. A workout with chest pain or dizziness is a reason to stop and ask a doctor."
     ]
   },
+  "gym": {
+    title: "GYM SESSIONS",
+    summary: "Your last gym session from the Workout Companion app on your iPhone: when, where, how long, how many machines and sets, and the weight you moved, with a comparison to the session before.",
+    more: [
+      "The iPhone app writes a small file into iCloud Drive after every finished gym session. The board reads that file each time it refreshes, so a session appears here a short while after the phone has saved it to iCloud. If the panel says there are no sessions yet, the one-time step is on the phone: in Workout Companion, open Settings, then Garmin Board, and choose the AMS Garmin folder in iCloud Drive.",
+      "The top line shows the latest session: the day, the gym, the time, the number of machines and sets, and the total weight lifted (weight times repetitions, added up over all sets). The line under it compares with the session before: for example +2 sets, −6 min and +250 kg. A minus sign means less than last time. Different days train different muscles, so look at the trend over several sessions rather than at one difference.",
+      "Under that you see the machines of the session: the name and the sets you did, such as 55 kg × 12, 11, 10. A small mark means a new personal best on that machine. Another small mark means you noted pain there. Pain that comes back or does not fade is a reason to ask a doctor or a physiotherapist.",
+      "The line about the last 7 days adds up your sessions, the time and the weight lifted, and sets that against the 7 days before. The list on the right shows your latest sessions. Press one, or move to it and press Enter, to see its machines.",
+      "Gym time also shows up on your Garmin watch as a strength workout, but the watch cannot know the machines or the weights. That is what this panel adds. The two are not added together, and nothing is changed in the WORKOUTS panel or on the Body Battery curve."
+    ]
+  },
   "month-totals": {
     title: "MONTH TOTALS",
     summary: "The month in numbers, with an arrow and percent or difference against last month up to the same day.",

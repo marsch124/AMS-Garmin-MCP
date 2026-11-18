@@ -375,7 +375,7 @@ svg text { font-family: var(--font); text-transform: uppercase; }
   #plan-panel, #rhythm-panel { grid-column: span 6; }
   #resting-trend-panel { grid-column: span 12; }
   #hydration-panel { grid-column: span 6; }
-  #stress-panel { grid-column: span 12; }
+  #stress-panel, #gym-panel { grid-column: span 12; }
   .act { grid-template-columns: 58px 100px minmax(0, 1fr) 82px 72px 72px; }
   .act .te { display: none; }
   .tiles { grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -390,7 +390,7 @@ svg text { font-family: var(--font); text-transform: uppercase; }
   .elbow::after, .elbow-bottom::after { left: 84px; width: 66px; }
   .block { font-size: 12px; }
   #red-alert, #chrono-panel, #steps-panel, #body-battery-panel, #workouts-panel, #heart-panel, #intensity-panel, #energy-panel, #bb-curve-panel, #fitness-panel, #sleep-panel, #hrv-panel, #sleep-debt-panel, #weight-panel, #training-panel, #zones-panel, #streaks-panel, #weather-panel, #targets-panel, #log-panel, #plan-panel, #rhythm-panel, #resting-trend-panel, #stress-panel, #hydration-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #month-totals-panel, #activity-detail-panel, #year-panel { grid-column: span 6; }
-  #red-alert, #bb-curve-panel, #weight-panel, #weather-panel, #log-panel, #resting-trend-panel, #stress-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #activity-detail-panel, #year-panel { grid-column: span 12; }
+  #red-alert, #gym-panel, #bb-curve-panel, #weight-panel, #weather-panel, #log-panel, #resting-trend-panel, #stress-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #activity-detail-panel, #year-panel { grid-column: span 12; }
   .seg.title { font-size: 16px; }
   .seg.info { display: none; }
   .seg.btn { padding: 0 10px; font-size: 13px; }
@@ -410,7 +410,7 @@ svg text { font-family: var(--font); text-transform: uppercase; }
   .frame-bottom { height: auto; }
   .seg.w1, .seg.w2, .seg.w3, .seg.w4, .seg.w6 { display: none; }
   .panels { grid-column: 1; padding-left: 0; }
-  #red-alert, #chrono-panel, #steps-panel, #body-battery-panel, #workouts-panel, #heart-panel, #intensity-panel, #energy-panel, #bb-curve-panel, #fitness-panel, #sleep-panel, #hrv-panel, #sleep-debt-panel, #weight-panel, #training-panel, #zones-panel, #streaks-panel, #weather-panel, #targets-panel, #log-panel, #plan-panel, #rhythm-panel, #resting-trend-panel, #stress-panel, #hydration-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #month-totals-panel, #activity-detail-panel, #year-panel { grid-column: span 12; }
+  #red-alert, #chrono-panel, #steps-panel, #body-battery-panel, #workouts-panel, #gym-panel, #heart-panel, #intensity-panel, #energy-panel, #bb-curve-panel, #fitness-panel, #sleep-panel, #hrv-panel, #sleep-debt-panel, #weight-panel, #training-panel, #zones-panel, #streaks-panel, #weather-panel, #targets-panel, #log-panel, #plan-panel, #rhythm-panel, #resting-trend-panel, #stress-panel, #hydration-panel, #month-nav, #month-steps-panel, #month-hr-panel, #activities-panel, #month-totals-panel, #activity-detail-panel, #year-panel { grid-column: span 12; }
   .stress-body { flex-direction: column; }
   .stress-body .stress-today { width: auto; }
   .hydration-body { flex-direction: column; align-items: stretch; }
@@ -679,6 +679,35 @@ svg text.t-hero { font-family: var(--font); text-transform: uppercase; letter-sp
 .bb-wk:focus { outline: none; }
 .bb-wk:focus text, .bb-wk:hover text { text-decoration: underline; }
 
+/* ---------- 1.10.0 · Gym sessions (from the iPhone gym app's file) ---------- */
+#gym-panel .panel-body { text-transform: none; letter-spacing: 0; }
+.gym-main { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 14px 22px; }
+.gym-left, .gym-right { min-width: 0; }
+.gym-summary { font-size: 16px; margin-bottom: 4px; overflow-wrap: anywhere; }
+.gym-compare, .gym-week { margin: 0 0 8px; overflow-wrap: anywhere; }
+.gym-empty { font: 15px/1.45 var(--prose); color: var(--dim); text-transform: none; letter-spacing: 0; }
+.gym-entries { display: flex; flex-direction: column; gap: 3px; }
+.gym-entry { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: baseline; font: 14px/26px var(--prose); text-transform: none; letter-spacing: 0; }
+.gym-entry .gn { color: var(--text); font-weight: 600; overflow-wrap: anywhere; }
+.gym-entry .gn small { color: var(--dim); font-weight: 400; margin-left: 6px; }
+.gym-entry .gs { color: var(--c8); text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.gym-mark { display: inline-block; font-size: 11px; line-height: 16px; padding: 0 6px; border-radius: 8px; margin-left: 6px; color: var(--ink); background: var(--c2); vertical-align: 1px; }
+.gym-mark.pain { background: var(--c7); }
+.gym-list { display: flex; flex-direction: column; gap: 3px; }
+.gym-row { display: grid; grid-template-columns: 86px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 2px 8px; border: 1px solid transparent; border-radius: 8px; cursor: pointer; font: 14px/24px var(--prose); text-transform: none; letter-spacing: 0; }
+.gym-row .gd { color: var(--dim); white-space: nowrap; }
+.gym-row .gt { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gym-row .gk { color: var(--c8); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gym-row:hover, .gym-row:focus { outline: none; border-color: var(--pc); }
+.gym-row.selected { border-color: var(--pc); background: color-mix(in srgb, var(--pc) 14%, transparent); }
+@media (max-width: 860px) { .gym-main { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) {
+  .gym-row { grid-template-columns: 78px minmax(0, 1fr) auto; font-size: 13px; }
+  .gym-entry { font-size: 13px; }
+}
+[data-scheme="rebel"] .gym-mark, [data-scheme="rebel"] .gym-row { border-radius: 0; }
+[data-scheme="rebel"] .gym-mark { color: #fff; }
+
 /* ---------- 1.7.0 · Rebel console (bright) ---------- */
 /* An eighth look, Martin's pick: pale cool blue-white, deep navy text, cyan-blue lines and headings, amber main numbers
    and diamond markers, square frames with a cut top-left corner, condensed lettering, very faint scan lines. Inspiration only. */
@@ -716,7 +745,7 @@ svg text.t-hero { font-family: var(--font); text-transform: uppercase; letter-sp
   .lcars { display: block; padding: 0; min-height: 0; }
   .panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; padding: 0; }
   .panel { break-inside: avoid; page-break-inside: avoid; grid-column: span 1 !important; border: 1px solid #ddd; border-radius: 8px; padding: 4px; background: #fff !important; box-shadow: none !important; }
-  #red-alert, #bb-curve-panel, #month-steps-panel, #month-hr-panel, #activities-panel, #year-panel, #stress-panel, #resting-trend-panel, #log-panel { grid-column: span 2 !important; }
+  #red-alert, #bb-curve-panel, #month-steps-panel, #month-hr-panel, #activities-panel, #year-panel, #stress-panel, #resting-trend-panel, #log-panel, #gym-panel { grid-column: span 2 !important; }
   .panel-head .label { background: #eee !important; color: #111 !important; }
   .kv .v, .big .v, .tile .tv, .tot-list .v, .clock-small .v, .chrono .clock-time { color: #111 !important; }
   .kv .k, .big .k, .sub-label, .tile .tk, .tot-list .k { color: #555 !important; }

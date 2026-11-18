@@ -67,13 +67,14 @@ export class BoardStore {
     const plan = readCounts(raw?.plan, DEFAULT_PLAN, PLAN_KEYS);
     const notify = raw?.notify !== false;
     const accessCode = typeof raw?.accessCode === 'string' && raw.accessCode.trim() ? raw.accessCode.trim() : '';
-    return { targets, plan, notify, accessCode };
+    const gymFile = typeof raw?.gymFile === 'string' && raw.gymFile.trim() ? raw.gymFile.trim().replace(/^~(?=\/)/, homedir()) : '';
+    return { targets, plan, notify, accessCode, gymFile };
   }
 
   /** Merges targets, plan, notify and/or accessCode into the saved settings. Returns the new settings. */
   async saveSettings(patch = {}) {
     const current = await this.settings();
-    const next = { targets: { ...current.targets }, plan: { ...current.plan }, notify: current.notify, accessCode: current.accessCode };
+    const next = { targets: { ...current.targets }, plan: { ...current.plan }, notify: current.notify, accessCode: current.accessCode, gymFile: current.gymFile };
     mergeCounts(next.targets, patch.targets, TARGET_KEYS, 'target');
     mergeCounts(next.plan, patch.plan, PLAN_KEYS, 'plan');
     if (patch.notify !== undefined) {
@@ -85,6 +86,10 @@ export class BoardStore {
       const code = patch.accessCode.trim();
       if (code && (code.length < 3 || code.length > 64)) throw new RangeError('The access code needs 3 to 64 characters.');
       next.accessCode = code;
+    }
+    if (patch.gymFile !== undefined) {
+      if (typeof patch.gymFile !== 'string') throw new RangeError('The gym file path must be text.');
+      next.gymFile = patch.gymFile.trim().slice(0, 500);
     }
     await this.#write('settings.json', next);
     return next;
