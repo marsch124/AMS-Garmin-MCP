@@ -291,7 +291,7 @@ export function gymView(file, today) {
     .sort((a, b) => (b.date + (b.start ?? '')).localeCompare(a.date + (a.start ?? '')))
     .slice(0, 60);
   const written = gymText(file?.written, 40);
-  if (!list.length) return { available: false, written, latest: null, recent: [], week: { sessions: 0, minutes: 0, liftedKg: 0 }, prevWeek: { sessions: 0, minutes: 0, liftedKg: 0 } };
+  if (!list.length) return { available: false, written, latest: null, recent: [], machines: [], week: { sessions: 0, minutes: 0, liftedKg: 0 }, prevWeek: { sessions: 0, minutes: 0, liftedKg: 0 } };
   const diff = (a, b) => (a === null || b === null ? null : a - b);
   const [first, before] = list;
   const latest = {
@@ -308,9 +308,35 @@ export function gymView(file, today) {
     written,
     latest,
     recent: list.slice(0, 6).map(({ id, date, gym, title, minutes, machines, sets, liftedKg, feel, bests, entries }) => ({ id, date, gym, title, minutes, machines, sets, liftedKg, feel, bests, entries })),
+    machines: gymMachines(list),
     week: period(addDays(today, -6), today),
     prevWeek: period(addDays(today, -13), addDays(today, -7)),
   };
+}
+
+/** 1.11.0: every machine's top weight per session, oldest first, for the progress line. list = sessions, newest first. */
+function gymMachines(list) {
+  const byName = new Map();
+  for (const s of [...list].reverse()) {
+    const perSession = new Map();
+    for (const e of s.entries) {
+      const had = perSession.get(e.name);
+      if (!had || (e.topKg ?? -1) > (had.topKg ?? -1)) perSession.set(e.name, e);
+    }
+    for (const [name, e] of perSession) {
+      const m = byName.get(name) ?? { name, muscle: null, points: [] };
+      if (e.muscle) m.muscle = e.muscle;
+      m.points.push({ date: s.date, topKg: e.topKg, sets: e.sets });
+      byName.set(name, m);
+    }
+  }
+  return [...byName.values()].map((m) => {
+    const points = m.points.slice(-20);
+    const lifted = points.filter((p) => p.topKg !== null && p.topKg > 0);
+    const firstKg = lifted.length ? lifted[0].topKg : null;
+    const lastKg = lifted.length ? lifted[lifted.length - 1].topKg : null;
+    return { name: m.name, muscle: m.muscle, points, firstKg, lastKg, changeKg: lifted.length >= 2 ? lastKg - firstKg : null, sessions: points.length };
+  }).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /** Reads the gym app's file; null for anything wrong (missing, half-written, not JSON). Never throws. */

@@ -708,6 +708,19 @@ svg text.t-hero { font-family: var(--font); text-transform: uppercase; letter-sp
 [data-scheme="rebel"] .gym-mark, [data-scheme="rebel"] .gym-row { border-radius: 0; }
 [data-scheme="rebel"] .gym-mark { color: #fff; }
 
+/* ---------- 1.11.0 · Progress per machine (press a machine in Gym sessions) ---------- */
+.gym-entry[data-name] { cursor: pointer; padding: 0 8px; margin: 0 -8px; border: 1px solid transparent; border-radius: 8px; }
+.gym-entry[data-name]:hover, .gym-entry[data-name]:focus { outline: none; border-color: var(--pc); }
+.gym-entry.selected { border-color: var(--pc); background: color-mix(in srgb, var(--pc) 14%, transparent); }
+.gym-progress { margin-top: 8px; padding: 8px 10px; border: 1px solid var(--edge, var(--grid)); border-radius: 10px; }
+.gym-progress[hidden] { display: none; }
+.gym-progress-title { font: 600 14px/20px var(--prose); color: var(--pc); text-transform: none; letter-spacing: 0; overflow-wrap: anywhere; }
+.gym-progress-chart { max-width: 420px; }
+.gym-progress-chart svg { display: block; width: 100%; height: auto; }
+.gym-progress-chart svg text { font-family: var(--prose); }
+.gym-progress-note { margin: 2px 0 0; overflow-wrap: anywhere; }
+[data-scheme="rebel"] .gym-entry[data-name], [data-scheme="rebel"] .gym-progress { border-radius: 0; }
+
 /* ---------- 1.7.0 · Rebel console (bright) ---------- */
 /* An eighth look, Martin's pick: pale cool blue-white, deep navy text, cyan-blue lines and headings, amber main numbers
    and diamond markers, square frames with a cut top-left corner, condensed lettering, very faint scan lines. Inspiration only. */

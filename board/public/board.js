@@ -1034,6 +1034,7 @@
   // ---------- 1.10.0 Gym sessions: the iPhone gym app's file, right after Workouts ----------
   const GYM_FEEL = { great: 'felt great', good: 'felt good', ok: 'felt ok', tired: 'felt tired', rough: 'felt rough' };
   let gymPick = null;   // id of the session whose machines are shown; null = the latest
+  let gymMachine = null;   // 1.11.0: name of the machine whose progress line is shown; null = none
   const gymDay = (iso) => {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
     if (!m) return '—';
@@ -1047,10 +1048,46 @@
     const list = s?.entries || [];
     if (!list.length) return '<div class="gym-entry"><span class="gn">No machines saved for this session</span></div>';
     const bests = new Set(s.bests || []);
-    return list.map((e) => `<div class="gym-entry">
+    return list.map((e, i) => `<div class="gym-entry${e.name === gymMachine ? ' selected' : ''}" id="gym-entry-${i}" data-name="${escapeHtml(e.name)}" role="button" tabindex="0" aria-pressed="${e.name === gymMachine}" title="Show progress on this machine">
         <span class="gn">${escapeHtml(e.name)}${e.muscle ? `<small>${escapeHtml(e.muscle)}</small>` : ''}${bests.has(e.name) ? '<span class="gym-mark best" title="New best">best</span>' : ''}${e.pain ? '<span class="gym-mark pain" title="Pain noted">pain</span>' : ''}</span>
         <span class="gs">${escapeHtml(e.sets || (isNum(e.setCount) ? gymPlural(e.setCount, 'set', 'sets') : ''))}</span>
       </div>`).join('');
+  }
+  /** 1.11.0: the chosen machine's top weight over its sessions, as a small line with a note under it. */
+  function renderGymProgress(g) {
+    const box = $('gym-progress');
+    const m = gymMachine ? (g.machines || []).find((x) => x.name === gymMachine) : null;
+    box.hidden = !m;
+    if (!m) return;
+    const kg = (v) => `${fmt1(v).replace(/[.,]0$/, '')} kg`;
+    const lifted = m.points.filter((p) => isNum(p.topKg) && p.topKg > 0);
+    setText('gym-progress-title', `${m.name} · ${lifted.length ? 'top weight' : 'last sessions'}`);
+    const chart = $('gym-progress-chart');
+    const sessions = gymPlural(m.sessions, 'session', 'sessions');
+    if (lifted.length >= 2) {
+      const W = 320, H = 96, L = 8, R = 44, T = 14, B = 20;
+      const lo = Math.min(...lifted.map((p) => p.topKg)), hi = Math.max(...lifted.map((p) => p.topKg));
+      const span = hi - lo || 1;
+      const x = (i) => L + ((W - L - R) * i) / (lifted.length - 1);
+      const y = (v) => (hi === lo ? (T + H - B) / 2 : H - B - ((v - lo) / span) * (H - T - B));
+      const color = css('--c3');
+      const pts = lifted.map((p, i) => `${f1(x(i))},${f1(y(p.topKg))}`).join(' ');
+      const last = lifted[lifted.length - 1];
+      chart.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${escapeHtml(m.name)}: top weight over ${lifted.length} sessions">
+          <line x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}" stroke="${css('--grid')}" stroke-width="1"/>
+          <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          ${lifted.map((p, i) => `<circle cx="${f1(x(i))}" cy="${f1(y(p.topKg))}" r="${i === lifted.length - 1 ? 4 : 2.5}" fill="${color}"><title>${escapeHtml(gymDay(p.date))}: ${escapeHtml(kg(p.topKg))}</title></circle>`).join('')}
+          <text x="${f1(x(lifted.length - 1) + 8)}" y="${f1(y(last.topKg) + 4)}" font-size="12" font-weight="700" fill="${color}">${escapeHtml(kg(last.topKg))}</text>
+          <text x="${L}" y="${H - 5}" font-size="10" fill="${css('--dim')}">${escapeHtml(gymDay(lifted[0].date))}</text>
+          <text x="${W - R}" y="${H - 5}" font-size="10" text-anchor="end" fill="${css('--dim')}">${escapeHtml(gymDay(last.date))}</text>
+        </svg>`;
+      chart.hidden = false;
+      setText('gym-progress-note', `${kg(m.firstKg)} → ${kg(m.lastKg)} · ${gymSigned(m.changeKg, (v) => fmt1(v).replace(/[.,]0$/, ''), ' kg')} since ${gymDay(lifted[0].date)} · ${sessions}`);
+    } else {
+      chart.innerHTML = ''; chart.hidden = true;
+      const lastOnes = m.points.slice(-4).reverse().map((p) => `${gymDay(p.date)}: ${p.sets || (isNum(p.topKg) && p.topKg > 0 ? kg(p.topKg) : 'done')}`).join(' · ');
+      setText('gym-progress-note', m.sessions < 2 ? `Only one session so far · ${lastOnes}` : `${sessions} · ${lastOnes}`);
+    }
   }
   function renderGym(b) {
     const g = b?.gym;
@@ -1069,7 +1106,9 @@
     const cmp = $('gym-compare');
     const parts = v ? [gymSigned(v.sets, fmtInt, ' sets'), gymSigned(v.minutes, fmtInt, ' min'), gymSigned(v.liftedKg, fmtInt, ' kg')].filter(Boolean) : [];
     if (shown === latest && parts.length) { cmp.textContent = `vs the session before: ${parts.join(' · ')}`; cmp.hidden = false; } else { cmp.textContent = ''; cmp.hidden = true; }
+    if (gymMachine && !(shown.entries || []).some((e) => e.name === gymMachine)) gymMachine = null;
     $('gym-entries').innerHTML = gymEntriesHtml(shown);
+    renderGymProgress(g);
     const wk = (p) => `${gymPlural(p.sessions, 'session', 'sessions')}${p.sessions ? ` · ${fmtDur((p.minutes || 0) * 60)} · ${fmtInt(p.liftedKg)} kg` : ''}`;
     setText('gym-week', `Last 7 days: ${wk(g.week)} — the 7 days before: ${wk(g.prevWeek)}`);
     $('gym-list').innerHTML = recent.map((s) => `<div class="gym-row${s.id === shown.id ? ' selected' : ''}" id="gym-ses-${escapeHtml(s.id)}" data-id="${escapeHtml(s.id)}" role="button" tabindex="0" aria-pressed="${s.id === shown.id}">
@@ -1694,6 +1733,13 @@
   });
   const pickGym = (row) => { if (!row) return; gymPick = row.dataset.id; renderGym(board); };
   $('gym-list').addEventListener('click', (e) => pickGym(e.target.closest('.gym-row[data-id]')));
+  const pickGymMachine = (row) => { if (!row) return; gymMachine = gymMachine === row.dataset.name ? null : row.dataset.name; const id = row.id; renderGym(board); $(id)?.focus(); };
+  $('gym-entries').addEventListener('click', (e) => pickGymMachine(e.target.closest('.gym-entry[data-name]')));
+  $('gym-entries').addEventListener('keydown', (e) => {
+    const row = e.target.closest('.gym-entry[data-name]');
+    if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); pickGymMachine(row); }
+    if (e.key === 'Escape' && gymMachine) { gymMachine = null; renderGym(board); }
+  });
   $('gym-list').addEventListener('keydown', (e) => {
     const row = e.target.closest('.gym-row[data-id]');
     if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); pickGym(row); $(`gym-ses-${row.dataset.id}`)?.focus(); }

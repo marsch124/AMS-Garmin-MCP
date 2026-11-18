@@ -200,6 +200,11 @@ Behaviour:
 - Nothing changes in `workouts-panel` or in the Body Battery curve markers.
 - Tests: `test/board-1.10.test.js`.
 
+### Progress per machine (1.11.0)
+- `gymView(file, today).machines`: array, one item per machine name found in the file's sessions (all sessions, up to 60), `{ name, muscle, points: [{ date 'YYYY-MM-DD', topKg number|null, sets string|null }], firstKg, lastKg, changeKg, sessions }`. `points` oldest first, one per session containing the machine (same machine twice in a session: the higher `topKg` is kept), at most the latest 20. `sessions` = number of points. `firstKg` / `lastKg` = `topKg` of the first / last point with `topKg` > 0 (null when none). `changeKg` = `lastKg` − `firstKg`, null when fewer than 2 points have `topKg` > 0. Sorted by `name` with `localeCompare`. Missing or empty file: `[]`.
+- Page: each row in `gym-entries` is a `<button>` with id `gym-entry-<n>`, class `gym-entry` and `data-name`. Pressing it shows `gym-progress` (hidden by default) under the entries, containing `gym-progress-title` (`<name> · top weight`), `gym-progress-chart` (small SVG line) and `gym-progress-note` (`25 kg → 30 kg · +5 kg since Mon 9 Nov · 6 sessions`; a machine without weights shows its last entries as words; one session: `Only one session so far`). Pressing the same row again, or Escape, closes it.
+- Tests: `test/board-1.11.test.js`.
+
 ### Arc gauge sub line (1.10.1)
 - `drawArcGauge` (steps, intensity week, water and every other arc gauge): the SVG `viewBox` is `0 0 200 190` (was `0 0 200 178`) and the `t-sub` line (for example `33 % of weekly goal`) is at `y="183"` (was `166`). The arc has radius 78 around (100,100) with stroke 18, so its round ends reach down to about y 164 at x 36–54 and 146–164; the line (font-size 14, top about y 171) now sits below them.
 - Tests: `test/board-1.10.1.test.js`.

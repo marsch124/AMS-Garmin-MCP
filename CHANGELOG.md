@@ -1,5 +1,20 @@
 # What's new
 
+## 1.11.0 — 18 November 2026
+The GYM SESSIONS panel now shows how each machine has developed.
+
+**New**
+- Before: the panel showed single sessions; to see whether you got stronger on a machine you had to compare sessions by eye.
+- New: every machine row in the panel can be pressed. A small line chart opens under the list with the top weight you used on that machine, session by session (the latest 20 sessions that include it).
+- New: under the chart one line sums it up, for example "25 kg → 30 kg · +5 kg since Mon 9 Nov · 6 sessions". With only one session it says "Only one session so far".
+- New: a machine without weights, such as a bike, shows its last entries in words instead of a chart.
+- New: press the same row again, or press Escape, to close the chart.
+- If the same machine appears twice in one session, the higher weight counts.
+
+**How it works**
+- The board's data `gym` now carries `machines`: one item per machine name found in the sessions of the file (up to 60 sessions), sorted by name, with `points` (date, top weight, sets; oldest first), `firstKg`, `lastKg`, `changeKg` and `sessions`. Without a file it is an empty list.
+- Nothing else on the board changed.
+
 ## 1.10.1 — 18 November 2026
 The line under the number on the round gauges no longer lies across the ends of the arc.
 
