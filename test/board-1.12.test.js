@@ -88,3 +88,11 @@ test('1.12 G: the old looks are untouched', async () => {
   assert.ok(blocks(css, ':root {')[0].text.includes('--bg: #3d3a44'));
   assert.ok(blocks(css, ':root[data-scheme="rebel"]')[0].text.includes('--bg: #e6eef5'));
 });
+
+test('1.12.2 H: the look menu is a "User interface" button with the looks listed under that heading', async () => {
+  const html = await read('board', 'public', 'index.html');
+  assert.match(html, /<label class="seg c3 look-pick" id="look-pick"[^>]*><span id="look-pick-label">User interface<\/span><select id="palette-select"/);
+  assert.match(html, /<optgroup label="User interface">\s*<option value="health">/);
+  const css = await read('board', 'public', 'board.css');
+  assert.match(css, /\.look-pick select \{[^}]*opacity: 0/);
+});

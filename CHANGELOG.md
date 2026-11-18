@@ -1,5 +1,13 @@
 # What's new
 
+## 1.12.2 — 18 November 2026
+The look menu at the bottom now says what it is: "User interface".
+
+**Changed**
+- Before: the button for choosing a look showed only the name of the current look (for example "Health"), so it was not clear that it was a menu.
+- Now: the button says "User interface". Press it and all 9 looks are listed underneath, under the heading "User interface", with a tick at the one in use: Health, Calm · Dusk, Calm · Dark, Calm · Day, Ice, Ember, Forest, Graphite and Rebel console.
+- Choosing a look works as before and is remembered.
+
 ## 1.12.1 — 18 November 2026
 The new look has a shorter name.
 

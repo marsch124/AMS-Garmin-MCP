@@ -117,6 +117,9 @@ Eighth scheme, `data-scheme="rebel"`, shown as "Rebel console" in `palette-selec
 - The Peek card and the sheets follow the scheme through the variables. The other seven schemes are unchanged. `package.json` and the footer version were 1.7.0 at that release.
 - Tests: `test/board-1.7.test.js` (version and first CHANGELOG entry; every variable in the rebel block; `clip-path` on the panel and the `body::after` rule; no glow; eight options and the `Barlow+Condensed` fonts link; README and CHANGELOG; the served page carries `value="rebel"`).
 
+### Look menu "User interface" (1.12.2)
+The footer look menu is `<label class="seg c3 look-pick" id="look-pick">` with the words "User interface" (`look-pick-label`) and, invisibly on top of it (`opacity: 0`, covering the whole button), the native `<select id="palette-select" aria-label="User interface">`. Its nine options sit inside one `<optgroup label="User interface">`. The button never shows the name of the current look; the opened native list ticks it. `applyScheme` and the storage keys are unchanged. Styles: `.look-pick` (base, after `select.seg`), `[data-scheme="health"] .look-pick`, and the rebel square-corner list.
+
 ### Health (1.12.0)
 Name: called "Health summary" in 1.12.0; renamed "Health" in 1.12.1 (option label, CSS block comment "1.12.0 · Health", docs and test). The id `health` did not change.
 Ninth scheme, `data-scheme="health"`, shown as "Health" (`<option value="health">Health</option>`, first in `#palette-select`). It is the standard look: `<html data-scheme="health">` and the fallback in `applyScheme` in `board.js`. Before 1.12.0 there were 8 looks and the standard was calm-dusk; now there are 9 and the standard is health. Look: like Apple's Health.

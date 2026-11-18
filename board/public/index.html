@@ -447,7 +447,8 @@
       <span class="seg status c2" id="link-status"><span class="lamp"></span><span class="status-text">Garmin link · standby</span></span>
       <span class="seg info c3"><span class="k">Sync</span><span id="last-refresh">—</span></span>
       <span class="seg info token c1"><span class="k">Token</span><span id="token-expiry">—</span></span>
-      <select class="seg c3" id="palette-select" title="Look">
+      <label class="seg c3 look-pick" id="look-pick" title="Choose the look of the board"><span id="look-pick-label">User interface</span><select id="palette-select" aria-label="User interface">
+        <optgroup label="User interface">
         <option value="health">Health</option>
         <option value="calm-dusk">Calm · dusk</option>
         <option value="calm-dark">Calm · dark</option>
@@ -457,14 +458,15 @@
         <option value="forest">Forest</option>
         <option value="graphite">Graphite</option>
         <option value="rebel">Rebel console</option>
-      </select>
+      </optgroup>
+      </select></label>
       <button type="button" class="seg btn c2" id="settings-button" title="Targets and home-network code">Settings</button>
       <button type="button" class="seg btn c2" id="report-button" title="The week and month in words">Report</button>
       <button type="button" class="seg btn c2" id="share-button" title="Today as a picture (S)">Share</button>
       <button type="button" class="seg btn c2" id="kiosk-button" title="Full screen (F)">Full screen</button>
       <button type="button" class="seg btn c1" id="refresh-button" title="Refresh (R)">Refresh</button>
       <button type="button" class="seg btn c3 round" id="help-button" title="How it works and what's new (?)">?</button>
-      <span class="seg end version c2" id="footer-version">1.12.1</span>
+      <span class="seg end version c2" id="footer-version">1.12.2</span>
     </div>
   </footer>
 

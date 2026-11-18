@@ -40,7 +40,7 @@ The board is a live instrument panel for your Garmin data. Since 1.12.0 its stan
 Every heading is a button. A window opens with the meaning in short, and below it the full story. The "In short" text is kept to a readable width, so its lines break earlier than the full story below. Escape closes it.
 
 **Colours**
-At the bottom there is a colour switcher with nine looks: Health (standard, first in the list; Apple Health style cards, light by day and dark at night), Calm Dusk, Calm Dark, Calm Day, Ice, Ember, Forest, Graphite and Rebel console (a bright look: pale blue-white screens with navy text, cyan-blue lines, amber numbers, square panels with a cut corner and a faint scan-line texture; inspiration only, no names or logos). Each browser is moved to Health once, the first time it opens version 1.12; after that It remembers your choice on this Mac.
+At the bottom there is a button called "User interface"; press it to choose between nine looks: Health (standard, first in the list; Apple Health style cards, light by day and dark at night), Calm Dusk, Calm Dark, Calm Day, Ice, Ember, Forest, Graphite and Rebel console (a bright look: pale blue-white screens with navy text, cyan-blue lines, amber numbers, square panels with a cut corner and a faint scan-line texture; inspiration only, no names or logos). Each browser is moved to Health once, the first time it opens version 1.12; after that It remembers your choice on this Mac.
 
 **Looking back**
 The arrows beside the month name show earlier months. The right arrow stops at the current month, and a button jumps back to it. The workouts, totals and Captain's log follow the month you picked.
