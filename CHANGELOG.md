@@ -1,5 +1,8 @@
 # What's new
 
+## 1.12.4 — 26 November 2026
+- The weekly and monthly report files (`Week NN · ….md` / `.json`, `latest-week.json`, `latest-month.json`) now go into your folder Documents › 03 Home › 02 IT › 01 SW › AMS Garmin Board instead of a folder "AMS Garmin" at the top of iCloud Drive (your ask: never a folder at the top of iCloud Drive). The reports already there were moved. The notes in Apple Notes are unchanged (folder "AMS Garmin").
+
 ## 1.12.3 — 26 November 2026
 The Gym sessions panel now looks for the Workout Companion app's file in its new folder.
 

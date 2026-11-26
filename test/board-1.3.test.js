@@ -207,8 +207,9 @@ test('1.3 F: explain.js zones summary mentions the last 7 days', async () => {
 });
 
 // ---------- G. report.sh ----------
-test('1.3 G: report.sh saves into iCloud Drive and writes a .json file', async () => {
+test('1.3 G: report.sh saves into his AMS Garmin Board folder and writes a .json file', async () => {
   const s = await read('scripts', 'report.sh');
-  assert.ok(s.includes('Mobile Documents/com~apple~CloudDocs/AMS Garmin'));
+  assert.ok(s.includes('Documents/03 Home/02 IT/01 SW/AMS Garmin Board'));
+  assert.ok(!s.includes('com~apple~CloudDocs/AMS Garmin'), 'never a folder at the top of iCloud Drive (1.12.4)');
   assert.ok(s.includes('.json'));
 });

@@ -65,7 +65,7 @@ Press **F** or the FULL SCREEN button for a calm wall display. The cursor hides 
 Without a code, the board works on this Mac only. Only the Mac can change settings.
 
 **Reports in Apple Notes**
-Every Monday morning, a summary of last week lands in Apple Notes (folder "AMS Garmin"). On the 1st of the month, the summary of last month does too. The REPORT button shows them any time. The report also has a sleep line (average hours over the recorded nights) and a short set of numbers for other apps. Each report is also saved as a text file and a data file in iCloud Drive, folder "AMS Garmin", so you can open it in the Files app on the iPhone. AMS WorkoutCompanion will need its own small update to read it. All of this needs the install step below.
+Every Monday morning, a summary of last week lands in Apple Notes (folder "AMS Garmin") and, as a text file and a data file, in your folder Documents › 03 Home › 02 IT › 01 SW › AMS Garmin Board (iCloud Drive, so the iPhone sees it in Files). On the 1st of the month, the summary of last month does too. The REPORT button shows them any time. The report also has a sleep line (average hours over the recorded nights) and a short set of numbers for other apps. Each report is also saved as a text file and a data file in iCloud Drive, folder "AMS Garmin", so you can open it in the Files app on the iPhone. AMS WorkoutCompanion will need its own small update to read it. All of this needs the install step below.
 
 **Install step (auto-start and reports)**
 Run `scripts/install-agents.sh` once. It makes the board start at login and sets up the Monday and month reports. Run it with `--remove` to undo.

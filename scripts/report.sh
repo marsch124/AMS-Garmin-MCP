@@ -39,14 +39,15 @@ on run argv
   end tell
 end run
 APPLESCRIPT
-  # Also a text file and a JSON file into iCloud Drive, folder "AMS Garmin", for the iPhone (Files) and AMS WorkoutCompanion.
-  ICLOUD="$HOME/Library/Mobile Documents/com~apple~CloudDocs/AMS Garmin"
+  # Also a text file and a JSON file into his folder Documents/03 Home/02 IT/01 SW/AMS Garmin Board (in iCloud Drive, so the
+  # iPhone sees it in Files). Since 1.12.4 (26 Nov 2026, his ask): never a folder at the top of iCloud Drive.
+  ICLOUD="$HOME/Documents/03 Home/02 IT/01 SW/AMS Garmin Board"
   if mkdir -p "$ICLOUD" 2>/dev/null; then
     SAFE="$(printf '%s' "$TITLE" | tr '/:' '--')"
     printf '%s' "$JSON" | "$NODE" -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);process.stdout.write("AMS Garmin · "+j.title+"\n\n"+j.text+"\n")})' > "$ICLOUD/$SAFE.md"
     printf '%s' "$JSON" | "$NODE" -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);process.stdout.write(JSON.stringify({app:"AMS Garmin Board",kind:j.kind,title:j.title,text:j.text,summary:j.summary,writtenAt:new Date().toISOString()},null,2)+"\n")})' > "$ICLOUD/$SAFE.json"
     cp -f "$ICLOUD/$SAFE.json" "$ICLOUD/latest-$KIND.json"
-    echo "Saved the $KIND report to iCloud Drive: AMS Garmin/$SAFE.md and .json"
+    echo "Saved the $KIND report to Documents/03 Home/02 IT/01 SW/AMS Garmin Board: $SAFE.md and .json"
   fi
   touch "$STAMP"
   echo "Wrote the $KIND report to Apple Notes: $TITLE"

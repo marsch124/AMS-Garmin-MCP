@@ -293,7 +293,7 @@ today.stepsCompare: { date, steps, delta, pct|null }   // same weekday 4 weeks a
 sleepDebt.missingRecent: 0..3      // of the last 3 nights, how many have no sleep recorded
 report JSON (/api/report): summary { steps, stepGoalDays, days, workouts, trainingSeconds, distanceKm, restingHrAvg, intensityMinutes, sleepAvgMin }
 ```
-The report text gains a sleep line: average hours over the recorded nights, or "no nights recorded" (`sleepAvgMin` null). `report.sh` also writes `~/Library/Mobile Documents/com~apple~CloudDocs/AMS Garmin/<title>.md` (the report text) and `<title>.json` (the report JSON with `summary`) next to the Apple Notes note, creating the folder if needed. AMS WorkoutCompanion reading these files is a separate release of that app.
+The report text gains a sleep line: average hours over the recorded nights, or "no nights recorded" (`sleepAvgMin` null). `report.sh` also writes `~/Documents/03 Home/02 IT/01 SW/AMS Garmin Board/` (since 1.12.4; before: `iCloud Drive/AMS Garmin/`) (the report text) and `<title>.json` (the report JSON with `summary`) next to the Apple Notes note, creating the folder if needed. AMS WorkoutCompanion reading these files is a separate release of that app.
 
 Added in 1.4.0:
 ```
