@@ -1031,7 +1031,7 @@
     }).join('');
   }
 
-  // ---------- 1.10.0 Gym sessions: the iPhone gym app's file, right after Workouts ----------
+  // ---------- 1.10.0 Gym sessions: the Workout Companion app's file, right after Workouts ----------
   const GYM_FEEL = { great: 'felt great', good: 'felt good', ok: 'felt ok', tired: 'felt tired', rough: 'felt rough' };
   let gymPick = null;   // id of the session whose machines are shown; null = the latest
   let gymMachine = null;   // 1.11.0: name of the machine whose progress line is shown; null = none

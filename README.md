@@ -80,9 +80,9 @@ Run `scripts/install-agents.sh` once. It makes the board start at login and sets
 R refresh · F full screen · S share · left and right arrows previous and next month · ? help · Escape close.
 
 **Gym sessions**
-- The GYM SESSIONS panel sits under WORKOUTS. It shows your latest gym session from the iPhone app (Workout Companion): day, gym, time, machines, sets and weight moved, how it felt, and how it compares with the session before. Under it are the machines with their sets, a mark for a new best and for pain, a line for the last 7 days against the 7 days before, and a list of the latest six sessions. Press one to see its machines.
-- One-time step on the phone: in Workout Companion open Settings, then Garmin Board, and choose the AMS Garmin folder in iCloud Drive. After that every finished session is written there by itself.
-- The board reads the file `Workout Companion sessions.json` from `~/Library/Mobile Documents/com~apple~CloudDocs/AMS Garmin/`. If it is missing or cannot be read, the panel says "No gym sessions yet" and the rest of the board is not affected.
+- The GYM SESSIONS panel sits under WORKOUTS. It shows your latest gym session from the Workout Companion app on the iPhone: day, gym, time, machines, sets and weight moved, how it felt, and how it compares with the session before. Under it are the machines with their sets, a mark for a new best and for pain, a line for the last 7 days against the 7 days before, and a list of the latest six sessions. Press one to see its machines.
+- One-time step on the phone: in Workout Companion open Settings, then Garmin Board, and choose the folder AMS Workout Companion app to Garmin (in iCloud Drive › Documents › 03 Home › 02 IT › 01 SW › AMS Triathlon Training). After that every finished session is written there by itself.
+- The board reads the file `Workout Companion sessions.json` from `~/Documents/03 Home/02 IT/01 SW/AMS Triathlon Training/AMS Workout Companion app to Garmin/`. If it is missing or cannot be read, the panel says "No gym sessions yet" and the rest of the board is not affected.
 
 **Help**
 The **?** button opens How it works and What's new.

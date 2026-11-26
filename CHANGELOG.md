@@ -1,5 +1,13 @@
 # What's new
 
+## 1.12.3 — 26 November 2026
+The Gym sessions panel now looks for the Workout Companion app's file in its new folder.
+
+**Changed**
+- Before: the board read `Workout Companion sessions.json` from the folder AMS Garmin in iCloud Drive, and the texts told you to choose that folder on the phone.
+- Now: the file lives in the folder AMS Workout Companion app to Garmin (iCloud Drive › Documents › 03 Home › 02 IT › 01 SW › AMS Triathlon Training). The board reads it from there, and the empty panel, the guide, the README and the specification all name that folder.
+- The weekly reports are not affected: they are still saved in the folder AMS Garmin in iCloud Drive.
+
 ## 1.12.2 — 18 November 2026
 The look menu at the bottom now says what it is: "User interface".
 

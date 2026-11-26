@@ -687,7 +687,7 @@ svg text.t-hero { font-family: var(--font); text-transform: uppercase; letter-sp
 .bb-wk:focus { outline: none; }
 .bb-wk:focus text, .bb-wk:hover text { text-decoration: underline; }
 
-/* ---------- 1.10.0 · Gym sessions (from the iPhone gym app's file) ---------- */
+/* ---------- 1.10.0 · Gym sessions (from the Workout Companion app's file) ---------- */
 #gym-panel .panel-body { text-transform: none; letter-spacing: 0; }
 .gym-main { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 14px 22px; }
 .gym-left, .gym-right { min-width: 0; }

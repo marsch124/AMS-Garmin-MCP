@@ -1,4 +1,4 @@
-// AMS Garmin Board 1.10.0 — the Gym sessions panel, fed by the iPhone gym app's file. All numbers are invented.
+// AMS Garmin Board 1.10.0 — the Gym sessions panel, fed by the Workout Companion app's file. All numbers are invented.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, writeFile, mkdtemp } from 'node:fs/promises';
@@ -95,7 +95,7 @@ test('1.10 E: index.html has the panel and its ids, right after the Workouts pan
   for (const id of ['gym-panel', 'explain-gym', 'gym-summary', 'gym-compare', 'gym-entries', 'gym-week', 'gym-list', 'gym-empty']) assert.ok(pos(id) > 0, id);
   const end = html.indexOf('</section>', pos('workouts-panel'));
   assert.ok(pos('gym-panel') > end && html.slice(end, pos('gym-panel')).replace(/<\/section>|\s/g, '') === '<sectionclass="panelp-c3s12"', 'gym panel directly after workouts');
-  assert.match(html, /No gym sessions yet — in Workout Companion: Settings → Garmin Board → choose the AMS Garmin folder in iCloud Drive\./);
+  assert.match(html, /No gym sessions yet — in Workout Companion: Settings → Garmin Board → choose the folder AMS Workout Companion app to Garmin \(iCloud Drive › Documents › 03 Home › 02 IT › 01 SW › AMS Triathlon Training\)\./);
   const { version } = JSON.parse(await read('package.json'));
   assert.ok(html.includes(`id="footer-version">${version}<`));
   const css = await read('board', 'public', 'board.css');
@@ -108,4 +108,9 @@ test('1.10 F: explain.js has the gym key', async () => {
   await import(pathToFileURL(join(ROOT, 'board', 'public', 'explain.js')).href + '?gym');
   const ex = globalThis.AMS_EXPLAIN.gym;
   assert.ok(ex && ex.title && ex.summary && ex.more.length >= 3);
+});
+
+test('1.12.3: the default gym file is in the Workout Companion app to Garmin folder', async () => {
+  const { DEFAULT_GYM_FILE } = await import(pathToFileURL(join(ROOT, 'board', 'board-data.js')).href);
+  assert.ok(DEFAULT_GYM_FILE.endsWith('/Documents/03 Home/02 IT/01 SW/AMS Triathlon Training/AMS Workout Companion app to Garmin/Workout Companion sessions.json'));
 });

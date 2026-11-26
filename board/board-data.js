@@ -247,9 +247,9 @@ export function recentWorkoutsView(acts, today) {
   };
 }
 
-// ---------- 1.10.0: Gym sessions, from the iPhone gym app's file in iCloud Drive ----------
+// ---------- 1.10.0: Gym sessions, from the Workout Companion app's file in iCloud Drive ----------
 
-export const DEFAULT_GYM_FILE = join(homedir(), 'Library', 'Mobile Documents', 'com~apple~CloudDocs', 'AMS Garmin', 'Workout Companion sessions.json');
+export const DEFAULT_GYM_FILE = join(homedir(), 'Documents', '03 Home', '02 IT', '01 SW', 'AMS Triathlon Training', 'AMS Workout Companion app to Garmin', 'Workout Companion sessions.json');
 const GYM_FEELS = ['great', 'good', 'ok', 'tired', 'rough'];
 const gymText = (v, max = 400) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : null);
 const gymNum = (v) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null);
@@ -285,7 +285,7 @@ function gymSession(s) {
   };
 }
 
-/** The Gym panel's data. file = the parsed JSON of the gym app (or null when it is missing or unreadable). */
+/** The Gym panel's data. file = the parsed JSON of the Workout Companion app (or null when it is missing or unreadable). */
 export function gymView(file, today) {
   const list = (Array.isArray(file?.sessions) ? file.sessions : []).map(gymSession).filter(Boolean)
     .sort((a, b) => (b.date + (b.start ?? '')).localeCompare(a.date + (a.start ?? '')))
@@ -339,7 +339,7 @@ function gymMachines(list) {
   }).sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** Reads the gym app's file; null for anything wrong (missing, half-written, not JSON). Never throws. */
+/** Reads the Workout Companion app's file; null for anything wrong (missing, half-written, not JSON). Never throws. */
 export async function readGymFile(path) {
   try {
     const data = JSON.parse(await readFile(path, 'utf8'));
