@@ -1,0 +1,542 @@
+<meta charset="utf-8">
+<title>Garmin Board Tour</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Garmin Board Tour: chapter rail on the left, coach + a pretend Mac on the right. Same engine as the other AMS tours.
+   Written for AMS Garmin Bridge Board 1.12.4. Update this tour in the release that changes a taught screen.
+   Every pretend-screen class starts with gb- so it can never clash with the engine's own classes.
+   All figures on the pretend board are invented. */
+:root {
+  --bg: #F2F5F7; --panel: #FFFFFF; --fg: #172026; --muted: #5C6B75; --line: #DCE4E9;
+  --accent: #B5223F; --accent-soft: #FCE6EB; --good: #1E7A49; --good-soft: #E3F4E9; --warn: #A8431A;
+  --logo: #E0352B; --mainb: #C42A45; --shadow: 0 18px 40px rgba(23,32,38,.2);
+  --desk-a: #C9D6E2; --desk-b: #E4DCEB; --menubar: rgba(255,255,255,.8); --menubar-fg: #1B1B1D;
+  --win: #FFFFFF; --win-bar: #ECECEF; --win-fg: #1B1B1D; --win-muted: #6F6F74;
+  --f-display: "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
+  --f-body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --f-mac: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  --f-round: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#12171B; --panel:#1B2227; --fg:#EDF2F5; --muted:#9DAEB8; --line:#2D3940;
+  --accent:#FF8DA3; --accent-soft:#3A1D26; --good:#8FD18F; --good-soft:#1D3320; --warn:#F2A47F; --shadow: 0 18px 40px rgba(0,0,0,.55);
+  --desk-a:#1C2733; --desk-b:#2E2A3A; --menubar: rgba(28,28,32,.8); --menubar-fg:#F2F2F4;
+  --win:#27272B; --win-bar:#323237; --win-fg:#F2F2F4; --win-muted:#A5A5AD;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg:#12171B; --panel:#1B2227; --fg:#EDF2F5; --muted:#9DAEB8; --line:#2D3940;
+  --accent:#FF8DA3; --accent-soft:#3A1D26; --good:#8FD18F; --good-soft:#1D3320; --warn:#F2A47F; --shadow: 0 18px 40px rgba(0,0,0,.55);
+  --desk-a:#1C2733; --desk-b:#2E2A3A; --menubar: rgba(28,28,32,.8); --menubar-fg:#F2F2F4;
+  --win:#27272B; --win-bar:#323237; --win-fg:#F2F2F4; --win-muted:#A5A5AD;
+  color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.45; margin: 0 }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: 230px minmax(0,1fr); gap: 22px; }
+svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none }
+svg.g { fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none }
+
+/* Rail */
+.rail { display: flex; flex-direction: column; gap: 4px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; }
+.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.brand h1 { font-family: var(--f-display); font-size: 19px; line-height: 1.1; margin: 0; text-wrap: balance }
+.brand small { color: var(--muted); font-size: 12px }
+.logo { width: 40px; height: 40px; border-radius: 10px; background: var(--logo); color: #fff; display: grid; place-items: center; flex: none }
+.chap { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 9px; border: 0; background: none; color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.chap:hover { background: var(--accent-soft) }
+.chap:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.chap .n { color: var(--muted); font-size: 12px; margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap }
+.chap.cur { background: var(--accent-soft); color: var(--accent); font-weight: 600 }
+.chap.done .n { color: var(--good) }
+.bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin: 10px 2px 2px }
+.bar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .4s }
+.railnote { color: var(--muted); font-size: 12px; margin: 4px 2px }
+
+/* Coach */
+.coach { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px 16px; align-items: center; }
+.coach .eyebrow { grid-column: 1 / -1; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); font-weight: 600; display: flex; gap: 8px; align-items: center }
+.coach .eyebrow .kind { color: var(--muted); font-weight: 500 }
+.coach h2 { font-family: var(--f-display); font-size: 23px; line-height: 1.2; margin: 0; text-wrap: balance }
+.coach p { margin: 4px 0 0; color: var(--fg); max-width: 66ch }
+.coach .btns { display: flex; gap: 8px; align-items: center }
+.btn { font: inherit; font-weight: 600; border-radius: 9px; padding: 8px 16px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer }
+.btn.main-b { background: var(--mainb); border-color: var(--mainb); color: #fff }
+.btn.main-b:disabled { opacity: .45; cursor: default }
+.btn.ghost { border-color: transparent; color: var(--muted) }
+.answers { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px }
+.ans { font: inherit; padding: 8px 14px; border-radius: 9px; border: 1.5px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; text-align: left }
+.ans:hover { border-color: var(--accent) }
+.ans.right { border-color: var(--good); background: var(--good-soft); color: var(--good); font-weight: 600 }
+.ans.wrong { border-color: var(--warn); color: var(--warn); text-decoration: line-through }
+.feedback { grid-column: 1 / -1; font-weight: 600; color: var(--good); min-height: 1.4em; margin: 0 }
+.feedback.no { color: var(--warn) }
+
+.target { z-index: 2; animation: ring 1.6s ease-in-out infinite; border-radius: 9px }
+@keyframes ring { 0%,100% { box-shadow: 0 0 0 2px #E6B53F, 0 0 0 6px rgba(230,181,63,.35) } 50% { box-shadow: 0 0 0 2px #E6B53F, 0 0 0 11px rgba(230,181,63,0) } }
+
+/* Finish */
+.finish { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px }
+.finish h3 { font-family: var(--f-display); margin: 0 0 8px; font-size: 19px }
+.finish label { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-top: 1px solid var(--line); cursor: pointer }
+.finish input { width: 18px; height: 18px; accent-color: var(--mainb); margin-top: 2px; flex: none }
+.topnote { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 13.5px }
+@media (max-width: 820px) {
+  .wrap { grid-template-columns: minmax(0,1fr) }
+  .rail { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px }
+  .brand { width: 100% }
+  .chap .n { display: none }
+  .railnote, .bar { width: 100% }
+  .coach { grid-template-columns: minmax(0,1fr) }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important } }
+
+.main { display: flex; flex-direction: column; gap: 14px; min-width: 0 }
+
+/* Stage = pretend Mac, 960 x 560, scaled to fit */
+.stagebox { position: relative; width: 100%; aspect-ratio: 960 / 560; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow) }
+.stage { position: absolute; left: 0; top: 0; width: 960px; height: 560px; transform-origin: 0 0; font-family: var(--f-mac); font-size: 12.5px; color: var(--win-fg);
+  background: radial-gradient(120% 90% at 15% 10%, var(--desk-b), transparent 60%), linear-gradient(160deg, var(--desk-a), var(--desk-b)); overflow: hidden }
+.stage button, .stage select { font-family: inherit }
+.gb-mbar { position: absolute; inset: 0 0 auto; height: 24px; background: var(--menubar); display: flex; align-items: center; gap: 16px; padding: 0 12px; color: var(--menubar-fg); font-size: 13px; z-index: 30 }
+.gb-mbar b { font-weight: 700 }
+.gb-app { position: absolute; right: 40px; top: 50px; width: 110px; text-align: center; border: 0; background: none; color: var(--win-fg); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 6px; border-radius: 10px }
+.gb-app span.t { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 15px; background: #E0352B; color: #fff }
+.gb-app span.l { font-size: 12px; line-height: 1.2; text-shadow: 0 1px 2px rgba(255,255,255,.4) }
+.gb-win { position: absolute; left: 24px; top: 34px; width: 912px; height: 512px; border-radius: 11px; overflow: hidden; background: var(--win); box-shadow: var(--shadow); border: 1px solid var(--line); z-index: 10; display: flex; flex-direction: column }
+.gb-tb { height: 34px; flex: none; background: var(--win-bar); display: flex; align-items: center; gap: 8px; padding: 0 10px }
+.gb-lights { display: flex; gap: 6px } .gb-lights i { width: 11px; height: 11px; border-radius: 50%; display: block } .gb-lights i:nth-child(1) { background: #FF5F57 } .gb-lights i:nth-child(2) { background: #FEBC2E } .gb-lights i:nth-child(3) { background: #28C840 }
+.gb-addr { flex: 1; max-width: 360px; margin: 0 auto; height: 22px; border-radius: 6px; background: var(--win); border: 0; color: var(--win-fg); font-size: 12px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px }
+/* the board itself: the "Health" look by default */
+.gb-board { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; background: var(--gb-bg); color: var(--gb-text); font-family: var(--f-round) }
+.lk-health { --gb-bg:#f2f2f7; --gb-card:#fff; --gb-text:#000; --gb-dim:#6c6c70; --gb-track:#ececf1; --gb-grid:#e5e5ea; --c1:#f08000; --c2:#ff2d55; --c3:#a550d8; --c4:#5856d6; --c5:#0a84c6; --c6:#0e9aa7; --c7:#e0352b; --c8:#8e8e93; --gb-ok:#22a447; --gb-edge:#e5e5ea; --gb-r:16px; --gb-caps:none }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .lk-health { --gb-bg:#000; --gb-card:#1c1c1e; --gb-text:#fff; --gb-dim:#98989f; --gb-track:#2c2c2e; --gb-grid:#38383a; --c1:#ff9f0a; --c2:#ff375f; --c3:#bf5af2; --c4:#7d7aff; --c5:#40c8e0; --c6:#5fd3cf; --c7:#ff453a; --c8:#98989f; --gb-ok:#32d74b; --gb-edge:#38383a } }
+:root[data-theme="dark"] .lk-health { --gb-bg:#000; --gb-card:#1c1c1e; --gb-text:#fff; --gb-dim:#98989f; --gb-track:#2c2c2e; --gb-grid:#38383a; --c1:#ff9f0a; --c2:#ff375f; --c3:#bf5af2; --c4:#7d7aff; --c5:#40c8e0; --c6:#5fd3cf; --c7:#ff453a; --c8:#98989f; --gb-ok:#32d74b; --gb-edge:#38383a }
+.lk-dusk { --gb-bg:#3d3a44; --gb-card:#45414c; --gb-text:#f7efe4; --gb-dim:#cdc3b5; --gb-track:#524e59; --gb-grid:#5e5964; --c1:#ff9966; --c2:#ffcc99; --c3:#cc99cc; --c4:#ff9966; --c5:#ffcc99; --c6:#ffcc99; --c7:#cc6666; --c8:#ffcc99; --gb-ok:#66cc99; --gb-edge:rgba(255,255,255,.07); --gb-r:18px; --gb-caps:uppercase }
+.lk-cdark { --gb-bg:#000; --gb-card:#121012; --gb-text:#f3e9dc; --gb-dim:#b0a496; --gb-track:#1d1a17; --gb-grid:#2a2520; --c1:#ff9966; --c2:#ffcc99; --c3:#cc99cc; --c4:#ff9966; --c5:#ffcc99; --c6:#ffcc99; --c7:#cc6666; --c8:#ffcc99; --gb-ok:#66cc99; --gb-edge:rgba(255,255,255,.08); --gb-r:18px; --gb-caps:uppercase }
+.lk-cday { --gb-bg:#f1ebe3; --gb-card:#fff8f0; --gb-text:#2b2420; --gb-dim:#6b6056; --gb-track:#e0d6c9; --gb-grid:#d4c8b8; --c1:#e0702e; --c2:#c9873a; --c3:#8e62a0; --c4:#e0702e; --c5:#c9873a; --c6:#c9873a; --c7:#b84a4a; --c8:#c9873a; --gb-ok:#2e8b57; --gb-edge:rgba(0,0,0,.08); --gb-r:18px; --gb-caps:uppercase }
+.lk-ice { --gb-bg:#05080f; --gb-card:#0c1320; --gb-text:#e6f0fa; --gb-dim:#9aa9bd; --gb-track:#0f1724; --gb-grid:#182236; --c1:#8fd3ff; --c2:#5aa9e6; --c3:#b8c7d9; --c4:#5aa9e6; --c5:#8fd3ff; --c6:#e0f0ff; --c7:#ff6b6b; --c8:#b8c7d9; --gb-ok:#66cc99; --gb-edge:rgba(255,255,255,.07); --gb-r:18px; --gb-caps:uppercase }
+.lk-ember { --gb-bg:#000; --gb-card:#140e07; --gb-text:#ffe9c4; --gb-dim:#b08c58; --gb-track:#1a1208; --gb-grid:#2a1d0c; --c1:#ffb000; --c2:#ff8c00; --c3:#c47a1a; --c4:#ffb000; --c5:#ffd27a; --c6:#ffd27a; --c7:#ff5a36; --c8:#ffd27a; --gb-ok:#66cc99; --gb-edge:rgba(255,255,255,.07); --gb-r:18px; --gb-caps:uppercase }
+.lk-forest { --gb-bg:#0a0f0d; --gb-card:#111a16; --gb-text:#e8efe9; --gb-dim:#9aaaa0; --gb-track:#141c18; --gb-grid:#1e2a24; --c1:#7fbf9e; --c2:#4f9a7a; --c3:#c9b78a; --c4:#4f9a7a; --c5:#9fd6bb; --c6:#c9b78a; --c7:#d98a6a; --c8:#c9b78a; --gb-ok:#66cc99; --gb-edge:rgba(255,255,255,.07); --gb-r:18px; --gb-caps:uppercase }
+.lk-graphite { --gb-bg:#0b0b0c; --gb-card:#151516; --gb-text:#f0f0f0; --gb-dim:#9a9a9a; --gb-track:#1a1a1b; --gb-grid:#262628; --c1:#ff7a59; --c2:#d9d9d9; --c3:#a6a6a6; --c4:#8c8c8c; --c5:#d9d9d9; --c6:#ff7a59; --c7:#ff7a59; --c8:#e6e6e6; --gb-ok:#66cc99; --gb-edge:rgba(255,255,255,.08); --gb-r:18px; --gb-caps:uppercase }
+.lk-rebel { --gb-bg:#e9f1fa; --gb-card:#f7fbff; --gb-text:#12284a; --gb-dim:#52688a; --gb-track:#d5e3f3; --gb-grid:#bcd2ea; --c1:#d98a00; --c2:#1b8fd6; --c3:#1b8fd6; --c4:#12284a; --c5:#1b8fd6; --c6:#1b8fd6; --c7:#c8372d; --c8:#52688a; --gb-ok:#1d9a5b; --gb-edge:#9fbfe0; --gb-r:3px; --gb-caps:uppercase }
+.gb-top { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 7px 14px 3px; font-weight: 700; font-size: 15px; text-transform: var(--gb-caps) }
+.gb-top small { color: var(--gb-dim); font-weight: 500; font-size: 11px }
+.gb-stripe { flex: none; display: flex; height: 8px; gap: 3px; padding: 0 14px } .gb-stripe i { flex: 1; border-radius: 4px } .gb-stripe i:nth-child(1) { background: var(--c1); flex: 2 } .gb-stripe i:nth-child(2) { background: var(--c3) } .gb-stripe i:nth-child(3) { background: var(--c2); flex: 3 } .gb-stripe i:nth-child(4) { background: var(--c1) }
+.gb-alert { flex: none; margin: 4px 14px 0; padding: 5px 12px; border-radius: 10px; background: var(--c7); color: #fff; font-weight: 700; font-size: 12px; display: flex; gap: 8px; align-items: center; text-transform: var(--gb-caps) }
+.gb-pane { flex: 1; min-height: 0; overflow-y: auto; padding: 6px 14px 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-content: start; scrollbar-width: none }
+.gb-pane::-webkit-scrollbar { display: none }
+.gb-card { background: var(--gb-card); border: 1px solid var(--gb-edge); border-radius: var(--gb-r); padding: 9px 12px 10px; min-width: 0; position: relative }
+.gb-card.s2 { grid-column: span 2 } .gb-card.s3 { grid-column: span 3 }
+.gb-h { border: 0; background: none; padding: 0; margin: 0 0 6px; font-weight: 700; font-size: 13px; color: var(--cc); cursor: pointer; text-transform: var(--gb-caps); display: flex; align-items: center; gap: 6px; text-align: left; font-family: inherit }
+.gb-card[data-cc] { }
+.gb-hn { margin-left: auto; font-size: 10px; color: var(--gb-dim); font-weight: 500 }
+.gb-big { font-size: 25px; font-weight: 700; color: var(--cc); line-height: 1.05; font-variant-numeric: tabular-nums }
+.gb-k { font-size: 10.5px; color: var(--gb-dim) }
+.gb-kv { display: flex; gap: 14px; margin-top: 6px } .gb-kv > div { display: flex; flex-direction: column; font-size: 10.5px; color: var(--gb-dim) } .gb-kv b { font-size: 13.5px; color: var(--gb-text); font-weight: 600 }
+.gb-v { cursor: default; border-radius: 5px }
+.gb-chip { display: inline-block; border-radius: 9px; padding: 1px 8px; font-size: 11px; font-weight: 700; background: color-mix(in srgb, var(--cc) 16%, transparent); color: var(--cc) }
+.gb-row2 { display: flex; align-items: center; gap: 12px }
+.gb-tabs { display: flex; gap: 4px; margin-bottom: 4px }
+.gb-wt { border: 0; border-radius: 9px; padding: 2px 9px; font-size: 11px; font-weight: 600; background: var(--gb-track); color: var(--gb-dim); cursor: pointer; text-transform: var(--gb-caps) } .gb-wt.on { background: var(--c1); color: #fff }
+.gb-line { font-size: 11px; color: var(--gb-dim); margin: 2px 0 } .gb-cmp { font-size: 11px; color: var(--c1); font-weight: 600; margin: 2px 0 }
+.gb-wk { display: flex; gap: 8px; align-items: center; padding: 3px 0; border-top: 1px solid var(--gb-grid); font-size: 11px; cursor: pointer }
+.gb-wk i { font-style: normal; font-size: 9px; font-weight: 700; border-radius: 5px; padding: 1px 5px; background: color-mix(in srgb, var(--c1) 18%, transparent); color: var(--c1) } .gb-wk span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis } .gb-wk em { font-style: normal; color: var(--gb-dim) }
+.gb-svg { display: block; width: 100%; height: auto }
+.gb-mkb { position: absolute; border: 0; border-radius: 6px; background: var(--c1); color: #fff; font-size: 10.5px; font-weight: 700; padding: 1px 7px; cursor: pointer }
+.gb-foot { flex: none; display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-top: 1px solid var(--gb-grid); background: var(--gb-bg); font-size: 11px; color: var(--gb-dim) }
+.gb-lamp { display: flex; align-items: center; gap: 5px; border-radius: 12px; padding: 2px 9px; background: color-mix(in srgb, var(--lc) 15%, transparent); color: var(--lc); font-weight: 600; cursor: default }
+.gb-lamp i { width: 8px; height: 8px; border-radius: 50%; background: var(--lc); display: block }
+.gb-fb { border: 0; border-radius: 12px; padding: 3px 10px; background: var(--gb-card); color: var(--gb-text); font-weight: 600; font-size: 11px; cursor: pointer; border: 1px solid var(--gb-edge); text-transform: var(--gb-caps) }
+.gb-sel { border-radius: 12px; border: 1px solid var(--gb-edge); background: var(--gb-card); color: var(--gb-text); font-size: 11px; font-weight: 600; padding: 3px 6px }
+.gb-peek { position: absolute; z-index: 20; width: 220px; background: var(--gb-card); color: var(--gb-text); border: 1px solid var(--gb-edge); border-radius: 12px; box-shadow: 0 8px 26px rgba(0,0,0,.28); padding: 8px 10px; font-size: 11px; pointer-events: none }
+.gb-peek b { font-size: 12px } .gb-pbars { display: flex; align-items: flex-end; gap: 3px; height: 34px; margin: 6px 0 } .gb-pbars i { flex: 1; background: var(--cc); border-radius: 2px 2px 0 0; display: block }
+.gb-sheetbg { position: absolute; inset: 0; z-index: 25; background: rgba(0,0,0,.35); display: grid; place-items: center }
+.gb-sheet { width: 560px; max-height: 420px; overflow: hidden; background: var(--gb-card); color: var(--gb-text); border-radius: var(--gb-r); border: 1px solid var(--gb-edge); box-shadow: 0 14px 40px rgba(0,0,0,.4); display: flex; flex-direction: column; font-family: var(--f-round) }
+.gb-sh { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-bottom: 1px solid var(--gb-grid); font-weight: 700; font-size: 14px; color: var(--cc, var(--gb-text)) } .gb-sh .gb-sp { flex: 1 }
+.gb-sb { padding: 10px 14px; overflow-y: auto; font-size: 12.5px; line-height: 1.45 } .gb-sb h4 { margin: 8px 0 2px; font-size: 12px } .gb-sb p { margin: 3px 0 }
+.gb-sa { display: flex; gap: 8px; justify-content: flex-end; padding: 8px 14px; border-top: 1px solid var(--gb-grid) }
+.gb-prim { border: 0; border-radius: 10px; padding: 5px 16px; font-weight: 700; background: var(--c5); color: #fff; cursor: pointer }
+.gb-sec { border: 1px solid var(--gb-edge); border-radius: 10px; padding: 5px 14px; font-weight: 600; background: var(--gb-card); color: var(--gb-text); cursor: pointer }
+.gb-rep { background: var(--gb-bg); border-radius: 10px; padding: 8px 10px; font: 11.5px/1.5 ui-monospace, Menlo, monospace; white-space: pre-wrap }
+.gb-form { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; font-size: 12px } .gb-form label { display: flex; flex-direction: column; gap: 2px; color: var(--gb-dim) } .gb-form span.f { background: var(--gb-bg); border-radius: 8px; padding: 4px 8px; color: var(--gb-text) }
+.gb-share { width: 130px; height: 162px; margin: 0 auto 6px; border-radius: 10px; background: linear-gradient(160deg, var(--c2), var(--c5)); color: #fff; padding: 10px; font-size: 10px; line-height: 1.5 } .gb-share b { font-size: 16px; display: block }
+.gb-chat { position: absolute; left: 130px; top: 50px; width: 700px; height: 450px; border-radius: 11px; overflow: hidden; background: var(--win); box-shadow: var(--shadow); border: 1px solid var(--line); z-index: 10; display: flex; flex-direction: column }
+.gb-cm { flex: 1; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; font-size: 13.5px; line-height: 1.5 }
+.gb-me { align-self: flex-end; background: #2673C7; color: #fff; padding: 7px 13px; border-radius: 16px; max-width: 70% }
+.gb-ai { align-self: flex-start; background: var(--win-bar); padding: 9px 14px; border-radius: 14px; max-width: 86% }
+.gb-ai small { display: block; color: var(--win-muted); margin-top: 5px }
+.gb-ci { border-top: 1px solid var(--line); padding: 10px 14px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+.gb-cc { border: 1.5px solid var(--line); background: var(--win); color: var(--win-fg); border-radius: 16px; padding: 5px 12px; font-size: 12.5px; cursor: pointer }
+.gb-toast { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: #1b1b1d; color: #fff; padding: 6px 14px; border-radius: 18px; z-index: 40; white-space: nowrap }
+.gb-sel2 { cursor: pointer }
+@media (prefers-reduced-motion: no-preference) { .target { animation: ring 1.6s ease-in-out infinite } }
+</style>
+
+<div class="wrap">
+  <nav class="rail" id="rail" aria-label="Chapters"></nav>
+  <main class="main">
+    <p class="topnote">Practice copy. All the numbers are invented. Nothing here touches your real board or your Garmin data.</p>
+    <section class="coach" id="coach" aria-live="polite"></section>
+    <div class="stagebox" id="stagebox"><div class="stage" id="stage"></div></div>
+    <section class="finish" id="finish" hidden></section>
+  </main>
+</div>
+
+<script>
+/* ---------- Icons: simple hand-drawn line shapes, 24-pt grid, stroke 1.9, round ends, no fill. ---------- */
+const ICON = {
+  heart: 'M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20Z',
+  window: 'M3.5 5h17v14h-17Z M3.5 9h17 M6.5 7h.1 M9 7h.1',
+  sun: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z M12 3v2 M12 19v2 M3 12h2 M19 12h2 M5.6 5.6 7 7 M17 17l1.4 1.4 M5.6 18.4 7 17 M17 7l1.4-1.4',
+  curve: 'M4 4v16h16 M6.5 16c2-6 3.5-7 5.5-4s3.5 1 5.5-5',
+  compare: 'M5 20v-8 M10 20V6 M15 20v-6 M20 20V9', palette: 'M12 4a8 8 0 1 0 0 16c1.3 0 1.8-1 1.3-2-.6-1.2.2-2.2 1.5-2.2H17a3 3 0 0 0 3-3C20 7.2 16.4 4 12 4Z M8 11h.1 M11 8h.1 M15 9h.1',
+  chat: 'M4.5 5.5h15v10h-8l-4 3.5v-3.5h-3Z M8 9.5h8 M8 12.5h5', flag: 'M5 4v17 M5 5h12l-2 3.5 2 3.5H5', phone: 'M3.5 5h17v11h-17Z M8 20h8 M12 16v4',
+  check: 'M5 12.5l5 5 9-10.5', trophy: 'M7.5 3.5h9v5a4.5 4.5 0 0 1-9 0Z M7.5 5H4.5v1.5a3 3 0 0 0 3.3 3 M16.5 5h3v1.5a3 3 0 0 1-3.3 3 M12 13v3.5 M9.5 16.5h5l1 4h-7Z',
+  lock: 'M7 11h10v9H7Z M9 11V8a3 3 0 0 1 6 0v3'
+};
+const icon = (n, cls = 'i') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICON[n]}"/></svg>`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- The pretend board: every figure is invented ---------- */
+const N = v => Math.round(v).toLocaleString('en-US');
+const LOOKS = [['health', 'Health'], ['dusk', 'Calm · dusk'], ['cdark', 'Calm · dark'], ['cday', 'Calm · day'], ['ice', 'Ice'], ['ember', 'Ember'], ['forest', 'Forest'], ['graphite', 'Graphite'], ['rebel', 'Rebel console']];
+const LOOKNAME = Object.fromEntries(LOOKS);
+const START = () => ({ open: true, look: 'health', explain: null, peek: null, wk: 'today', detail: false, sheet: null, shtab: 'week', alert: false, chat: false, asked: [], full: false, lamp: 'on', toast: '' });
+let S = START();
+const set = o => { S = Object.assign(START(), o); };
+const scene = set;
+const timers = [];
+const later = (fn, ms) => { const h = setTimeout(fn, ms); timers.push(h); return h; };
+const clearTimers = () => { while (timers.length) clearTimeout(timers.pop()); };
+
+const TOUR_TITLE = 'Garmin Board Tour', TOUR_SUB = 'Learn the board in about 15 minutes', KEY = 'garminboard';
+const RAILNOTE = 'Everything here is a practice copy with invented numbers. Nothing changes on your Mac. Written for AMS Garmin Bridge Board 1.12.4.';
+const FINAL_ICON = 'phone', FINAL_LABEL = 'On your Mac', FINISH_TITLE = 'Now try it on your real Mac';
+const brandHTML = () => `<span class="logo">${icon('heart')}</span>`;
+
+const EXPL = {
+  steps: ['Steps today', 'Your steps so far today as a round gauge against your daily goal, with distance below. A full ring means the goal is reached.', 'Your watch counts steps from the movement of your wrist. Garmin sets a daily goal that adapts to how much you walk. The board shows that goal and fills the ring against it.'],
+  bb: ['Body Battery today', 'Today’s Body Battery as a line from midnight until now. Shaded stretches mark sleep and workouts so you can see what charged and what drained you. Each of today’s workouts also has a dashed marker with its cost, like “Run −17”; press it to open the workout.', 'The line is made from the minute-by-minute values Garmin saves during the day. A rising line is charging, usually in sleep and quiet rest. A falling line is draining, from stress and exercise.'],
+  training: ['Training load', 'How hard the last week was compared with your usual. The board gives it one word: RECOVERY, MAINTAINING, PRODUCTIVE or OVERREACHING.', 'The ratio is acute divided by chronic. Under 0.8 is RECOVERY. From 0.8 up to 1.0 is MAINTAINING. From 1.0 up to 1.3 is PRODUCTIVE. Above 1.3 is OVERREACHING. The words are the board’s own reading, a rule of thumb.'],
+  workouts: ['Workouts', 'Your workouts of today, yesterday or the last 7 days, newest first, with one line of totals. Press a row to open its splits, heart-rate curve and map.', 'Use the three buttons at the top of the panel to choose the time: TODAY, YESTERDAY or 7 DAYS. The board remembers your choice on this device.'],
+  intensity: ['Intensity minutes', 'The minutes of brisk activity this week as a gauge against your weekly goal. Garmin counts a vigorous minute as two.', 'The count is for the current week, from Monday. Garmin’s default goal is 150 minutes a week.']
+};
+const PEEK = { steps: ['Steps', '7,420', [6100, 8800, 9400, 5200, 10300, 7900, 7420], '30-day average 8,150', '90-day high 14,320 · 8 Nov · low 2,980 · 3 Nov'], bb: ['Body Battery', '58', [78, 85, 92, 70, 88, 81, 58], '30-day average 74', '90-day high 98 · 2 Nov · low 19 · 14 Oct'], intensity: ['Intensity minutes', '96', [20, 35, 0, 45, 30, 60, 96], '30-day average 31', '90-day high 96 · 26 Nov · low 0 · 3 Nov'] };
+
+/* The Body Battery curve: hours 0 to 24, invented readings */
+const BBP = [[0, 62], [1, 66], [3, 80], [5, 90], [6.7, 92], [7.5, 89], [8.17, 86], [8.83, 69], [10, 72], [12, 66], [14.58, 58]];
+const WK = {
+  today: { sum: '1 workout · 36 min · 5,4 km · 412 kcal', rows: [['RUN', 'Thu 08:10', 'Morning run', '36 min', '5,4 km']] },
+  yesterday: { sum: '2 workouts · 1 h 20 · 2,6 km · 390 kcal', rows: [['GYM', 'Wed 18:05', 'Upper body', '52 min', ''], ['WALK', 'Wed 12:30', 'Lunch walk', '28 min', '2,6 km']] },
+  last7: { sum: '5 workouts · 4 h 12 · 31,4 km · 2,140 kcal', cmp: 'vs the 7 days before: +2 workouts · +1 h 10 · +5,1 km', rows: [['RUN', 'Thu 08:10', 'Morning run', '36 min', '5,4 km'], ['GYM', 'Wed 18:05', 'Upper body', '52 min', ''], ['WALK', 'Wed 12:30', 'Lunch walk', '28 min', '2,6 km'], ['RIDE', 'Sun 10:00', 'Easy ride', '1 h 20', '21,0 km'], ['RUN', 'Tue 07:30', 'Tempo run', '56 min', '9,8 km']] }
+};
+
+/* ---------- Drawing ---------- */
+const hd = (id, cc, title, key, note) => `<button class="gb-h" style="--cc:var(${cc})" data-act="explain" data-id="${key || ''}" data-t="head-${id}">${title}</button>${note ? `<span class="gb-hn">${note}</span>` : ''}`;
+const card = (id, cc, title, key, body, cls, note) => `<section class="gb-card ${cls || ''}" style="--cc:var(${cc})" data-t="card-${id}"><div style="display:flex;align-items:baseline">${hd(id, cc, title, key, note)}</div>${body}</section>`;
+function ring(v, max, cc, size) {
+  const r = size / 2 - 7, c = 2 * Math.PI * r, f = Math.min(1, v / max);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform:rotate(-90deg);flex:none"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--gb-track)" stroke-width="9"/><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(${cc})" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c * f} ${c}"/></svg>`;
+}
+function bbCurve() {
+  const W = 560, H = 118, X = t => 8 + t / 24 * (W - 16), Y = v => H - 14 - v / 100 * (H - 22);
+  const d = BBP.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1)).join(' ');
+  const grid = [0, 6, 12, 18, 24].map(h => `<line x1="${X(h)}" x2="${X(h)}" y1="4" y2="${H - 14}" stroke="var(--gb-grid)"/><text x="${X(h)}" y="${H - 3}" font-size="9" fill="var(--gb-dim)" text-anchor="middle">${String(h).padStart(2, '0')}</text>`).join('');
+  const sleep = `<g><rect x="${X(0)}" y="4" width="${X(6.7) - X(0)}" height="${H - 18}" fill="var(--c4)" opacity=".16"/><text x="${X(3.3)}" y="16" font-size="9" fill="var(--c4)" text-anchor="middle" font-weight="700">Sleep +30</text></g>`;
+  const wo = `<g><rect x="${X(8.17)}" y="4" width="${X(8.83) - X(8.17)}" height="${H - 18}" fill="var(--c1)" opacity=".2"/><line x1="${X(8.17)}" x2="${X(8.17)}" y1="4" y2="${H - 14}" stroke="var(--c1)" stroke-dasharray="3 3"/>
+    </g>`;
+  const now = BBP[BBP.length - 1];
+  const pc = (a, b) => (a / b * 100).toFixed(2) + '%';
+  return `<div style="position:relative"><svg class="gb-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Body Battery today">${grid}${sleep}${wo}<path d="${d}" fill="none" stroke="var(--c5)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${X(now[0])}" cy="${Y(now[1])}" r="4" fill="var(--c5)"/></svg>
+    <div data-t="sleep-band" style="position:absolute;left:${pc(X(0), W)};width:${pc(X(6.7) - X(0), W)};top:${pc(4, H)};height:${pc(H - 18, H)};pointer-events:none;border-radius:4px"></div>
+    <button class="gb-mkb" style="left:${pc(X(8.17) + 3, W)};top:${pc(22, H)}" data-act="marker" data-t="marker">Run \u221217</button></div>`;
+}
+function workoutsCard() {
+  const w = WK[S.wk];
+  const tabs = [['today', 'Today'], ['yesterday', 'Yesterday'], ['last7', '7 days']].map(([k, t]) => `<button class="gb-wt ${S.wk === k ? 'on' : ''}" data-act="wk" data-id="${k}" data-t="wk-${k}">${t}</button>`).join('');
+  return card('workouts', '--c1', 'Workouts', 'workouts', `<div class="gb-tabs">${tabs}</div><div class="gb-line" data-t="wk-sum">${w.sum}</div>${w.cmp ? `<div class="gb-cmp" data-t="wk-compare">${w.cmp}</div>` : ''}${w.rows.map((r, i) => `<div class="gb-wk" data-act="detail" data-id="${i}" data-t="wk-row-${i}"><i>${r[0]}</i><span>${r[2]}</span><em>${r[1]} · ${r[3]}${r[4] ? ' · ' + r[4] : ''}</em></div>`).join('')}`);
+}
+function detailCard() {
+  const sp = [5.8, 5.7, 5.6, 5.9, 5.5], hrs = [118, 142, 151, 156, 160, 158, 149, 150, 152, 163, 168, 150];
+  return `<section class="gb-card s3" style="--cc:var(--c5)" data-t="detail"><div style="display:flex;align-items:baseline">${hd('detail', '--c5', 'Workout detail · Morning run', 'workouts')}<button class="gb-fb" style="margin-left:auto" data-act="detail-close" data-t="detail-close">Close</button></div>
+    <div style="display:flex;gap:18px;align-items:flex-end"><div style="font-size:11px;min-width:140px"><div class="gb-k">Splits</div>${sp.map((m, i) => `<div>${i + 1} km · ${m.toFixed(1).replace('.', ':')}0</div>`).join('')}</div>
+    <div style="flex:1"><div class="gb-k">Heart rate</div><svg class="gb-svg" viewBox="0 0 240 50"><path d="${hrs.map((h, i) => (i ? 'L' : 'M') + (i * 21.8).toFixed(0) + ' ' + (50 - (h - 100) * .65).toFixed(0)).join(' ')}" fill="none" stroke="var(--c7)" stroke-width="2"/></svg></div>
+    <div style="width:150px;height:64px;border-radius:10px;background:var(--gb-track);display:grid;place-items:center;font-size:10px;color:var(--gb-dim)">map of the route</div></div></section>`;
+}
+function peekCard() {
+  if (!S.peek) return '';
+  const p = PEEK[S.peek], mx = Math.max(...p[2]);
+  return `<div class="gb-peek" style="--cc:var(--c2);left:${S.peekPos.x}px;top:${S.peekPos.y}px"><div style="display:flex;justify-content:space-between"><b>${p[0]}</b><b>${p[1]}</b></div><div class="gb-pbars">${p[2].map(v => `<i style="height:${Math.max(4, Math.round(v / mx * 34))}px"></i>`).join('')}</div><div>${p[3]}</div><div style="color:var(--gb-dim)">${p[4]}</div><div style="color:var(--gb-dim);margin-top:3px">Watch synced 14:12 · board fetched 14:35</div></div>`;
+}
+function sheetHTML() {
+  if (S.explain) { const e = EXPL[S.explain] || EXPL.steps;
+    return `<div class="gb-sheetbg" data-t="sheetbg"><div class="gb-sheet" data-t="explain-sheet"><div class="gb-sh"><span class="gb-sp">${e[0]}</span><button class="gb-fb" data-act="explain-close" data-t="explain-close">Close</button></div><div class="gb-sb"><h4>In short</h4><p>${e[1]}</p><h4>Learn more</h4><p>${e[2]}</p></div></div></div>`; }
+  if (S.sheet === 'report') { const w = S.shtab === 'week';
+    return `<div class="gb-sheetbg"><div class="gb-sheet"><div class="gb-sh"><button class="gb-wt ${w ? 'on' : ''}" data-act="rtab" data-id="week">Last week</button><button class="gb-wt ${!w ? 'on' : ''}" data-act="rtab" data-id="month">Last month</button><span class="gb-sp"></span><button class="gb-fb" data-act="sheet-close" data-t="sheet-close">Close</button></div><div class="gb-sb"><h4>${w ? 'Week 47 · 16 to 22 Nov 2026' : 'October 2026'}</h4><div class="gb-rep" data-t="report-text">${w ? 'Steps: 61,850 (8,836 a day) · goal reached 3 of 7 days\nWorkouts: 4 · 3 h 05 · 21,4 km\nResting pulse: 54 (month average 55)\nSleep: 7,1 h average over 6 recorded nights\nBody Battery: high 94 · low 21' : 'Steps: 258,400 (8,335 a day)\nWorkouts: 17 · 14 h 10 · 96,2 km\nResting pulse: 55\nSleep: 7,0 h average over 28 nights'}</div><p style="color:var(--gb-dim);font-size:11.5px">Every Monday at 07:30 the week lands in Apple Notes (folder “AMS Garmin”), and on the 1st the month.</p></div></div></div>`; }
+  if (S.sheet === 'settings') return `<div class="gb-sheetbg"><div class="gb-sheet"><div class="gb-sh"><span class="gb-sp">Settings</span></div><div class="gb-sb"><div class="gb-form" data-t="settings-form"><label>Steps a month<span class="f">250,000</span></label><label>Workouts a month<span class="f">16</span></label><label>Swims a month<span class="f">4</span></label><label>Runs a month<span class="f">8</span></label><label>Runs a week<span class="f">2</span></label><label>Strength sessions a week<span class="f">2</span></label></div><p style="color:var(--gb-dim);font-size:11.5px">A target of 0 hides that bar. The plan panel ticks each one off as the week goes. Monday starts a new week.</p><p>☐ Mac notification when a red alert fires (once per alert and day)</p><p>Home wi‑fi code (empty = this mac only)</p></div><div class="gb-sa"><button class="gb-sec" data-act="sheet-close" data-t="sheet-close">Cancel</button><button class="gb-prim" data-act="sheet-close">Save</button></div></div></div>`;
+  if (S.sheet === 'share') return `<div class="gb-sheetbg"><div class="gb-sheet" style="width:380px"><div class="gb-sh"><span class="gb-sp">Share today</span><button class="gb-fb" data-act="sheet-close" data-t="sheet-close">Close</button></div><div class="gb-sb"><div class="gb-share" data-t="share-pic"><b>Thursday</b>Steps 7,420<br>Resting pulse 54<br>Body Battery 58<br>Sleep 7 h 05<br>Workouts 1</div><p style="color:var(--gb-dim);font-size:11.5px">A picture of today in the current look. SAVE PNG keeps it on this Mac. ⌘P prints the whole board.</p></div><div class="gb-sa"><button class="gb-prim" data-act="sheet-close">Save PNG</button></div></div></div>`;
+  if (S.sheet === 'help') return `<div class="gb-sheetbg"><div class="gb-sheet"><div class="gb-sh"><button class="gb-wt on">How it works</button><button class="gb-wt">What’s new</button><span class="gb-sp"></span><button class="gb-fb" data-act="sheet-close" data-t="sheet-close">Close</button></div><div class="gb-sb"><h4>The board</h4><p>A live instrument panel for your Garmin data.</p><h4>Press any heading</h4><p>Every heading is a button. A window opens with the meaning in short, and below it the full story.</p></div></div></div>`;
+  return '';
+}
+function boardHTML() {
+  const lk = LOOKNAME[S.look] ? S.look : 'health', health = lk === 'health';
+  const alert = S.alert ? `<div class="gb-alert" data-t="alert"><b>RED ALERT</b><span>Body Battery 17 · under 20</span></div>` : '';
+  const steps = card('steps', '--c2', 'Steps · today', 'steps', `<div class="gb-row2">${ring(7420, 10000, '--c2', 72)}<div><div class="gb-big"><span class="gb-v" data-peek="steps" data-t="peek-steps">7,420</span></div><div class="gb-k">of 10,000 steps</div></div></div>
+    <div style="margin-top:4px"><span class="gb-chip" data-t="steps-chip" title="Today against the same weekday four weeks ago">▲ +1,310 (+21 %)</span> <span class="gb-k">Thu 29 Oct · 6,110</span></div><div class="gb-kv"><div>Distance<b>5,6 km</b></div><div>Floors<b>9</b></div></div>`);
+  const bb = card('bb', '--c5', 'Body Battery', 'bb', `<div class="gb-big"><span class="gb-v" data-peek="bb" data-t="peek-bb">58</span></div><div style="height:9px;border-radius:5px;background:var(--gb-track);margin:7px 0;overflow:hidden" data-t="bb-bar"><i style="display:block;width:58%;height:100%;background:var(--c5);border-radius:5px"></i></div><div class="gb-kv"><div>Charged<b>+37</b></div><div>Drained<b>−41</b></div></div>`);
+  const curve = card('bbcurve', '--c5', 'Body Battery · today’s curve', 'bb', `<div data-t="bb-curve">${bbCurve()}</div>`, 's2', '186 readings');
+  const train = card('train', '--c1', 'Training load', 'training', `<div style="margin-bottom:6px"><span class="gb-chip" style="font-size:13px" data-t="train-word">PRODUCTIVE</span> <span class="gb-k">The board’s reading</span></div><div style="height:8px;border-radius:4px;background:var(--gb-track);position:relative;margin:5px 0 8px"><i style="position:absolute;left:0;top:0;height:100%;width:71%;background:var(--c1);border-radius:4px"></i><i style="position:absolute;left:62%;top:-3px;height:14px;width:2px;background:var(--gb-text)"></i></div><div class="gb-kv"><div>7 days<b>410</b></div><div>4-week avg<b>360</b></div><div>Ratio<b>1.14</b></div></div>`);
+  const inten = card('int', '--c1', 'Intensity · week', 'intensity', `<div class="gb-row2">${ring(96, 150, '--c1', 66)}<div class="gb-kv" style="margin:0;flex-direction:column;gap:3px"><div>This week<b><span class="gb-v" data-peek="intensity" data-t="peek-int">96</span></b></div><div>Weekly goal<b>150</b></div></div></div>`);
+  const sleep = card('sleep', '--c4', 'Sleep · last night', '', `<div class="gb-big">7 h 05</div><div class="gb-k" style="margin:2px 0 5px">23:10 → 06:20 · <b style="color:var(--c4)">GOOD</b> · score 82</div><div class="gb-kv"><div>Deep<b>1 h 22</b></div><div>REM<b>1 h 36</b></div></div>`);
+  const zones = card('zones', '--c7', 'Heart zones · week', '', `<div class="gb-big">2 h 40</div><div class="gb-k">In zones this week</div><div style="display:flex;height:9px;border-radius:5px;overflow:hidden;margin-top:8px;gap:2px"><i style="flex:3;background:var(--c6)"></i><i style="flex:5;background:var(--c5)"></i><i style="flex:3;background:var(--c1)"></i><i style="flex:1;background:var(--c7)"></i></div>`);
+  const detail = S.detail ? detailCard() : '';
+  const lamp = S.lamp === 'on' ? `<span class="gb-lamp" style="--lc:var(--gb-ok)" data-t="link-status"><i></i>Garmin link online</span>` : `<span class="gb-lamp" style="--lc:var(--c7)" data-t="link-status"><i></i>Garmin link offline · key expired</span>`;
+  const sel = `<select class="gb-sel" data-act="look" data-t="look-select" aria-label="User interface">${LOOKS.map(([k, n]) => `<option value="${esc(n)}" ${k === lk ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
+  return `<div class="gb-win lk-${lk}" data-t="window">
+    <div class="gb-tb"><div class="gb-lights"><i></i><i></i><i></i></div><div class="gb-addr" data-t="address">${icon('lock').replace('class="i"', 'class="g" width="11" height="11"')} 127.0.0.1:7788</div></div>
+    <div class="gb-board"><div class="gb-top"><span>AMS Garmin · Bridge</span><small>Board 1.12.4</small></div>${health ? '' : '<div class="gb-stripe"><i></i><i></i><i></i><i></i></div>'}${alert}
+      <div class="gb-pane" data-keep>${steps}${bb}${workoutsCard()}${curve}${train}${inten}${sleep}${zones}${detail}</div>
+      <div class="gb-foot">${lamp}<span>Sync 14:35</span><span>Token 61 days</span><span style="flex:1"></span>${sel}<button class="gb-fb" data-act="settings" data-t="settings-button">Settings</button><button class="gb-fb" data-act="report" data-t="report-button">Report</button><button class="gb-fb" data-act="share" data-t="share-button">Share</button><button class="gb-fb" data-act="kiosk" data-t="kiosk">Full screen</button><button class="gb-fb" data-act="refresh" data-t="refresh">Refresh</button><button class="gb-fb" data-act="help" data-t="help-button">?</button><span>1.12.4</span></div>
+      ${peekCard()}${sheetHTML()}</div></div>`;
+}
+function chatHTML() {
+  const A = { sleep: ['How did I sleep last night?', 'You slept 7 h 05 min, from 23:10 to 06:20. Garmin’s score is 82 (GOOD): deep 1 h 22, light 3 h 51, REM 1 h 36, awake 16 min. Your HRV was 52 ms, close to your usual.'], bb: ['Body Battery this week.', 'Mornings reached 85 to 94 and evenings fell to 21 to 38. Tuesday, the day of the tempo run, was the lowest. It is Garmin’s own estimate: a hint, not a diagnosis.'], wt: ['My weight trend.', 'Your 7-day average went from 78,4 to 77,9 kg in 4 weeks, a slow fall of about 0,1 kg a week.'] };
+  const msgs = S.asked.map(k => `<div class="gb-me">${A[k][0]}</div><div class="gb-ai" data-t="answer-${k}">${A[k][1]}<small>Read from Garmin Connect. Nothing was written.</small></div>`).join('');
+  return `<div class="gb-chat" data-t="chat"><div class="gb-tb"><div class="gb-lights"><i></i><i></i><i></i></div><div class="gb-addr" style="max-width:200px">Claude</div></div>
+    <div class="gb-cm">${S.asked.length ? '' : '<div class="gb-ai">Ask me about your Garmin data. I can only read it: nothing is ever written to Garmin.</div>'}${msgs}</div>
+    <div class="gb-ci" data-t="chat-chips">${Object.keys(A).map(k => `<button class="gb-cc" data-act="ask" data-id="${k}" data-t="ask-${k}">${A[k][0]}</button>`).join('')}</div></div>`;
+}
+function renderStage() {
+  const st = document.getElementById('stage');
+  const old = st.querySelector('.gb-pane'); if (old) renderStage.top = old.scrollTop;
+  st.innerHTML = `<div class="gb-mbar"><b>●</b><b>Browser</b><span>File</span><span>Edit</span><span>View</span><span style="flex:1"></span><span>Thu 14:35</span></div>
+    ${S.open || S.chat ? '' : `<button class="gb-app" data-act="open" data-t="app-icon" aria-label="AMS Garmin Bridge Board"><span class="t">${icon('heart').replace('class="i"', 'class="g" width="38" height="38"')}</span><span class="l">AMS Garmin Bridge Board</span></button>`}
+    ${S.chat ? chatHTML() : S.open ? boardHTML() : ''}${S.toast ? `<div class="gb-toast">${esc(S.toast)}</div>` : ''}`;
+  const pane = st.querySelector('.gb-pane'); if (pane && renderStage.top) pane.scrollTop = renderStage.top;
+  markTarget();
+}
+function bringIntoView(el) {
+  const pane = el.closest('.gb-pane'); if (!pane || pane === el) return;
+  let top = 0, n = el; while (n && n !== pane) { top += n.offsetTop; n = n.offsetParent; }
+  const bot = top + el.offsetHeight;
+  if (top < pane.scrollTop || bot > pane.scrollTop + pane.clientHeight) { pane.scrollTop = Math.max(0, top - 60); renderStage.top = pane.scrollTop; }
+}
+function fallbackTarget() {
+  if (S.explain) return 'explain-close';
+  if (S.sheet) return 'sheet-close';
+  if (!S.open && !S.chat) return 'app-icon';
+  return null;
+}
+function toast(t) { S.toast = t; renderStage(); clearTimeout(toast.h); toast.h = setTimeout(() => { S.toast = ''; renderStage(); }, 2400); }
+
+/* ---------- Actions inside the pretend Mac ---------- */
+const stage = document.getElementById('stage');
+function showPeek(el) {
+  const k = el.dataset.peek; if (S.peek === k) return;
+  const sc = document.getElementById('stagebox').clientWidth / 960, r = el.getBoundingClientRect(), w = stage.querySelector('.gb-board').getBoundingClientRect();
+  S.peek = k; S.peekPos = { x: Math.max(6, Math.min(w.width - 230, (r.left - w.left) / sc + 24)), y: Math.max(30, Math.min(w.height - 150, (r.top - w.top) / sc + 14)) };
+  renderStage(); emit('peek', k);
+}
+stage.addEventListener('mouseover', ev => {
+  const p = ev.target.closest('[data-peek]');
+  if (p) { showPeek(p); return; }
+  if (S.peek && !ev.target.closest('.gb-peek')) { S.peek = null; renderStage(); }
+});
+stage.addEventListener('change', ev => {
+  const el = ev.target.closest('[data-act="look"]'); if (!el) return;
+  const name = el.value, k = (LOOKS.find(l => l[1] === name) || ['health'])[0]; S.look = k; renderStage(); emit('look', name);
+});
+stage.addEventListener('click', ev => {
+  const el = ev.target.closest('[data-act]');
+  if (!el) return;
+  if (el.dataset.act === 'look') return;
+  const p = ev.target.closest('[data-peek]'); if (p && el.dataset.act !== 'explain') showPeek(p);
+  act(el.dataset.act, el.dataset.id);
+});
+function act(a, id) {
+  switch (a) {
+    case 'open': S.open = true; renderStage(); emit('open'); break;
+    case 'explain': S.explain = id || 'steps'; S.peek = null; renderStage(); emit('explain', S.explain); break;
+    case 'explain-close': S.explain = null; renderStage(); emit('explain-close'); break;
+    case 'wk': S.wk = id; renderStage(); emit('wk', id); break;
+    case 'detail': S.detail = true; renderStage(); emit('detail'); break;
+    case 'marker': S.detail = true; renderStage(); { const p = document.querySelector('#stage .gb-pane'); if (p) { p.scrollTop = p.scrollHeight; renderStage.top = p.scrollTop; } } emit('marker'); break;
+    case 'detail-close': S.detail = false; renderStage(); break;
+    case 'report': S.sheet = 'report'; S.shtab = 'week'; renderStage(); emit('report'); break;
+    case 'rtab': S.shtab = id; renderStage(); break;
+    case 'settings': S.sheet = 'settings'; renderStage(); emit('settings'); break;
+    case 'share': S.sheet = 'share'; renderStage(); emit('share'); break;
+    case 'help': S.sheet = 'help'; renderStage(); emit('help'); break;
+    case 'sheet-close': S.sheet = null; renderStage(); emit('sheet-close'); break;
+    case 'kiosk': S.full = !S.full; toast(S.full ? 'Full screen: the cursor hides when still; it dims between 21:00 and 07:00.' : 'Full screen is off.'); emit('kiosk'); break;
+    case 'refresh': toast('Refreshed: Sync 14:36.'); emit('refresh'); break;
+    case 'ask': if (!S.asked.includes(id)) S.asked.push(id); renderStage(); emit('ask', id); break;
+    default: break;
+  }
+}
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape') {
+    if (S.explain) { act('explain-close'); }
+    else if (S.sheet) { act('sheet-close'); }
+    return;
+  }
+  if (ev.target.tagName === 'INPUT' || ev.target.tagName === 'SELECT') return;
+  if (S.open && !S.explain && !S.sheet) { if (ev.key === 'f' || ev.key === 'F') act('kiosk'); else if (ev.key === 's' || ev.key === 'S') act('share'); else if (ev.key === 'r' || ev.key === 'R') act('refresh'); else if (ev.key === '?') act('help'); }
+});
+
+/* ---------- Lessons (see → try → check). Every step's setup resets what that step needs. ---------- */
+const LESSONS = [
+  { title: 'Opening the board', icon: 'window', steps: [
+    { kind: 'look', head: 'A page on your Mac', text: 'The board shows your Garmin data on one page. The page lives on this Mac, at 127.0.0.1:7788, and opens in your normal browser. A small Mac app, AMS Garmin Bridge Board, sits on your Desktop to open it for you.', target: 'app-icon', setup: () => scene({ open: false }) },
+    { kind: 'try', head: 'Open it', text: 'Open AMS Garmin Bridge Board.', hint: 'On your Mac: double-click the app on the Desktop, or type its name in Raycast. After you run the install step once, the board starts by itself when you log in.', target: 'app-icon', setup: () => scene({ open: false }), wait: 'open', ok: 'The board opens in a browser window.' },
+    { kind: 'look', head: 'The address and the Health look', text: 'The address is 127.0.0.1:7788. The standard look is called “Health”, like Apple’s Health app: white cards with rounded corners on a soft grey background. At night it turns to dark grey cards on black by itself.', target: 'address', setup: () => scene({}) },
+    { kind: 'look', head: 'The link at the bottom', text: 'At the bottom left a green lamp says “Garmin link online”: Garmin answers. Beside it are the time of the last Sync and the Token, which tells when your Garmin key runs out. The board refreshes itself every 10 minutes.', target: 'link-status', setup: () => scene({}) },
+    { kind: 'check', head: 'Quick check', text: 'The lamp is red and says “Garmin link offline · key expired”. What does it tell you?', answers: ['Garmin is not answering, and it names the reason', 'Your watch battery is empty', 'The board is in night mode'], right: 0, ok: 'Right. Green: Garmin answers. Red: it says why. A new key fixes an expired one.', setup: () => scene({ lamp: 'off' }) },
+  ]},
+  { title: 'Today', icon: 'sun', steps: [
+    { kind: 'look', head: 'Steps · today', text: 'A ring against your daily goal, with the steps in big numbers. The little chip compares today with the same weekday four weeks ago: ▲ or ▼ and the difference. A “—” means there is no data to compare.', target: 'card-steps', setup: () => scene({}) },
+    { kind: 'try', head: 'Point at a number', text: 'Move the pointer onto the steps number and wait a moment.', hint: 'On an iPhone you press and hold the number instead.', target: 'peek-steps', setup: () => scene({}), wait: 'peek', robot: { type: 'hover' }, ok: 'A small card shows the last 7 days as bars, the 30-day average, and the highest and lowest of the last 90 days. The last line says when the watch synced and when the board fetched. 18 numbers have such a card.' },
+    { kind: 'look', head: 'Body Battery', text: 'A bar from 0 to 100: how much energy Garmin thinks you have left. Below it, how much charged and how much drained today. A red alert comes when it falls under 20.', target: 'card-bb', setup: () => scene({}) },
+    { kind: 'try', head: 'Workouts: Yesterday', text: 'In the Workouts panel press “Yesterday”.', target: 'wk-yesterday', setup: () => scene({}), wait: 'wk', when: d => d === 'yesterday', ok: 'The switch has Today, Yesterday and 7 days. A line under it gives the number of workouts, the total time, the distance and the calories. The board remembers your last choice.' },
+    { kind: 'try', head: 'Press a heading', text: 'Every heading is a button. Press “Steps · today”.', target: 'head-steps', setup: () => scene({}), wait: 'explain', ok: 'A window opens with the meaning in short, and below it the full story.' },
+    { kind: 'try', head: 'Close it again', text: 'Press “Close”.', hint: 'The Escape key closes it too.', target: 'explain-close', setup: () => scene({ explain: 'steps' }), wait: 'explain-close', ok: 'Back on the board.' },
+    { kind: 'look', head: 'The red alert', text: 'A red bar at the top, only when needed: resting pulse 10 percent above the month average, Body Battery under 20, or no watch sync for 24 hours. The Mac also shows a notification the first time an alert fires, once per alert and day.', target: 'alert', setup: () => scene({ alert: true }) },
+  ]},
+  { title: 'The Body Battery curve', icon: 'curve', steps: [
+    { kind: 'look', head: 'Today as a line', text: 'The curve runs from midnight until now. It rises while you charge, in sleep and quiet rest, and falls while stress and exercise drain you. The small note at the top right counts the readings.', target: 'bb-curve', setup: () => scene({}) },
+    { kind: 'look', head: 'Sleep, shaded', text: 'The shaded stretch is last night’s sleep, with the points it charged. A line that never climbs may mean poor sleep, stress, illness, or a watch that was not worn at night.', target: 'sleep-band', setup: () => scene({}) },
+    { kind: 'try', head: 'A workout marker', text: 'Each of today’s workouts has a dashed line at its start and a label. Press the label “Run −17”.', target: 'marker', setup: () => scene({}), wait: 'marker', ok: 'The workout’s details open: the Body Battery it cost, taken from Garmin’s own figure or worked out from the readings before and after.' },
+    { kind: 'look', head: 'Workout detail', text: 'Kilometre splits, the heart-rate curve and, where there is GPS, the route on a map. Pressing a row in the Workouts panel opens the same panel.', target: 'detail', setup: () => scene({ detail: true }) },
+    { kind: 'check', head: 'Quick check', text: 'The marker says “Run −17”. What does it mean?', answers: ['The run cost 17 points of Body Battery', 'The run was 17 minutes long', 'The run was 17 kilometres'], right: 0, ok: 'Right. A hard run or a heavy gym session can cost 15 to 30 points.', setup: () => scene({}) },
+  ]},
+  { title: 'This week against last week', icon: 'compare', steps: [
+    { kind: 'try', head: 'The 7 days', text: 'In the Workouts panel press “7 days”.', target: 'wk-last7', setup: () => scene({}), wait: 'wk', when: d => d === 'last7', ok: 'The last seven days, today included. Under the totals a line compares them with the week before.' },
+    { kind: 'look', head: 'Against the 7 days before', text: '“vs the 7 days before: +2 workouts · +1 h 10 · +5,1 km”. A minus sign means less than the week before. The line is hidden when both weeks have no workouts, and it makes no extra calls to Garmin.', target: 'wk-compare', setup: () => scene({ wk: 'last7' }) },
+    { kind: 'look', head: 'Training load', text: 'The last 7 days against your usual week (the 4-week average). The ratio is the first divided by the second. The board gives it one word: RECOVERY, MAINTAINING, PRODUCTIVE or OVERREACHING.', target: 'card-train', setup: () => scene({}) },
+    { kind: 'try', head: 'Read the words', text: 'Press the heading “Training load”.', target: 'head-train', setup: () => scene({}), wait: 'explain', when: d => d === 'training', ok: 'Under 0.8 is RECOVERY, up to 1.0 MAINTAINING, up to 1.3 PRODUCTIVE, above 1.3 OVERREACHING. The words are the board’s own reading, a rule of thumb.' },
+    { kind: 'look', head: 'Intensity · week', text: 'Minutes of brisk activity since Monday against your weekly goal. A hard minute counts double. Garmin’s default goal is 150 minutes a week.', target: 'card-int', setup: () => scene({}) },
+    { kind: 'check', head: 'Quick check', text: 'The 7 days say 410, the 4-week average says 360, so the ratio is 1.14. Which word does the board show?', answers: ['PRODUCTIVE', 'RECOVERY', 'OVERREACHING'], right: 0, ok: 'Right: from 1.0 up to 1.3 you push a little above your base. That is where fitness grows.', setup: () => scene({}) },
+  ]},
+  { title: 'Looks and tools', icon: 'palette', steps: [
+    { kind: 'look', head: 'The button “User interface”', text: 'At the bottom there is a button called “User interface”. It lists nine looks: Health, Calm · dusk, Calm · dark, Calm · day, Ice, Ember, Forest, Graphite and Rebel console.', target: 'look-select', setup: () => scene({}) },
+    { kind: 'try', head: 'Choose Ice', text: 'Open “User interface” and choose “Ice”.', target: 'look-select', setup: () => scene({}), wait: 'look', when: d => d === 'Ice', robot: { type: 'select', value: 'Ice' }, ok: 'The older looks use capital letters and coloured bars. The board remembers your choice on this Mac.' },
+    { kind: 'try', head: 'Back to Health', text: 'Choose “Health” again.', target: 'look-select', setup: () => scene({ look: 'ice' }), wait: 'look', when: d => d === 'Health', robot: { type: 'select', value: 'Health' }, ok: 'Health is the standard look, first in the list.' },
+    { kind: 'try', head: 'Report', text: 'Press “Report”.', target: 'report-button', setup: () => scene({}), wait: 'report', ok: 'The week and the month in words. Every Monday at 07:30 the week also lands in Apple Notes, and on the 1st the month.' },
+    { kind: 'try', head: 'Settings', text: 'Press “Settings”.', target: 'settings-button', setup: () => scene({}), wait: 'settings', ok: 'Your monthly targets, your weekly plan, the Mac notification switch and the access code for your iPhone. Cancel leaves everything as it was.' },
+    { kind: 'try', head: 'Share', text: 'Press “Share”.', target: 'share-button', setup: () => scene({}), wait: 'share', ok: 'Today as a picture, in the look you use. “Save PNG” keeps it on this Mac. The S key does the same.' },
+    { kind: 'look', head: 'Keys', text: 'R refreshes, F is full screen, S shares, the left and right arrows show earlier and later months, ? opens the help and Escape closes a window. Full screen is a calm wall display: the cursor hides when still and the board dims between 21:00 and 07:00.', target: 'kiosk', setup: () => scene({}) },
+    { kind: 'check', head: 'Quick check', text: 'You want a calm wall display with a dim screen at night. Which button?', answers: ['Full screen', 'Share', 'Refresh'], right: 0, ok: 'Right. Press F or the Full screen button.', setup: () => scene({}) },
+  ]},
+  { title: 'Claude and the signs', icon: 'chat', steps: [
+    { kind: 'look', head: 'Claude can read it too', text: 'The same connection to Garmin lets Claude read your Garmin data. You ask in plain words. It only reads. Nothing is ever written to Garmin.', target: 'chat', setup: () => scene({ open: false, chat: true }) },
+    { kind: 'try', head: 'Ask about last night', text: 'Press “How did I sleep last night?”.', target: 'ask-sleep', setup: () => scene({ open: false, chat: true }), wait: 'ask', when: d => d === 'sleep', ok: 'Claude fetches the answer from Garmin. You can also ask about runs in a month, resting heart rate, weight, stress, or ask for the file of a ride.' },
+    { kind: 'look', head: 'Sign: the lamp', text: 'Green lamp: Garmin answers. Red lamp with words: Garmin does not answer, and the words say why, or your key has run out.', target: 'link-status', setup: () => scene({}) },
+    { kind: 'look', head: 'Sign: one colour per panel', text: 'In the Health look each panel has its own strong colour: steps pink-red, workouts and intensity orange, Body Battery blue, sleep indigo, heart red. Headings and big numbers use it.', target: 'card-steps', setup: () => scene({}) },
+    { kind: 'look', head: 'Sign: marks in the curve', text: 'A shaded stretch is sleep or a workout. A dashed line marks a workout’s start and its label says what it cost. The dot at the end of the line is now.', target: 'bb-curve', setup: () => scene({}) },
+    { kind: 'look', head: 'Sign: red bar', text: 'The red bar at the top appears only when something needs your eye. Red is never used for anything else on the board.', target: 'alert', setup: () => scene({ alert: true }) },
+    { kind: 'check', head: 'Quick check', text: 'A chip on the steps panel says ▲ +1,310 (+21 %). What does it mean?', answers: ['Today is ahead of the same weekday four weeks ago', 'You reached your goal', 'The watch has not synced'], right: 0, ok: 'Right. ▼ means behind, and “—” means there is no data to compare.', setup: () => scene({}) },
+  ]},
+];
+
+/* ---------- Tour engine (reusable) ---------- */
+let ci = 0, si = 0, solved = false, targetOff = false;
+const store = { get(k) { try { return localStorage.getItem(k) } catch { return null } }, set(k, v) { try { localStorage.setItem(k, v) } catch {} } };
+let doneChapters = new Set(JSON.parse(store.get(KEY + '-done') || '[]'));
+
+function emit(name, data) {
+  const st = LESSONS[ci]?.steps[si]; if (!st || solved || st.kind !== 'try') return;
+  if (st.on && st.on[name]) { markTarget(st.on[name]); }
+  if ((st.wait === name || st.alt === name) && (!st.when || st.when(data))) succeed(st.ok);
+}
+function succeed(msg) {
+  solved = true; targetOff = true; const fb = document.getElementById('fb'); if (fb) { fb.textContent = '✓ ' + msg; fb.className = 'feedback'; }
+  const nx = document.getElementById('next'); if (nx) { nx.disabled = false; nx.focus({ preventScroll: true }); }
+  markTarget();
+}
+let curTarget = null;
+function markTarget(t) {
+  if (t !== undefined) curTarget = t;
+  document.querySelectorAll('.target').forEach(e => e.classList.remove('target'));
+  if (!curTarget || targetOff) return;
+  const q = n => document.querySelector(`#stage [data-t="${CSS.escape(n)}"]`);
+  // If the thing to click is out of sight (a stray click closed a page), point at the way back to it.
+  const first = LESSONS[ci] && LESSONS[ci].steps[si] && LESSONS[ci].steps[si].target;
+  const el = q(curTarget) || (first && first !== curTarget ? q(first) : null) || (fallbackTarget() ? q(fallbackTarget()) : null);
+  if (el) { el.classList.add('target'); bringIntoView(el); }
+}
+function renderRail() {
+  const total = LESSONS.reduce((n, l) => n + l.steps.length, 0);
+  const before = LESSONS.slice(0, ci).reduce((n, l) => n + l.steps.length, 0) + si;
+  document.getElementById('rail').innerHTML = `<div class="brand">${brandHTML()}<div><h1>${TOUR_TITLE}</h1><small>${TOUR_SUB}</small></div></div>
+    ${LESSONS.map((l, i) => `<button class="chap ${i === ci ? 'cur' : ''} ${doneChapters.has(i) ? 'done' : ''}" data-ch="${i}">${icon(l.icon)}<span>${l.title}</span><span class="n">${doneChapters.has(i) ? '✓' : l.steps.length + ' steps'}</span></button>`).join('')}
+    <button class="chap ${ci === LESSONS.length ? 'cur' : ''}" data-ch="${LESSONS.length}">${icon(FINAL_ICON)}<span>${FINAL_LABEL}</span></button>
+    <div class="bar"><i style="width:${Math.round(100 * Math.min(before, total) / total)}%"></i></div>
+    <p class="railnote">${RAILNOTE}</p>`;
+}
+document.getElementById('rail').addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (b) goChapter(+b.dataset.ch); });
+
+function goChapter(i) {
+  ci = i; si = 0; clearTimers(); S = START();
+  const L = LESSONS[i]; if (L && L.setup) L.setup();
+  renderStep();
+}
+function renderStep() {
+  renderRail();
+  const coach = document.getElementById('coach'), fin = document.getElementById('finish');
+  if (ci >= LESSONS.length) { renderFinish(); coach.hidden = true; return; }
+  coach.hidden = false; fin.hidden = true;
+  const L = LESSONS[ci], st = L.steps[si];
+  solved = st.kind === 'look'; targetOff = false;
+  clearTimers();
+  if (st.setup) st.setup();
+  S.toast = '';
+  const kindName = { look: 'Look', try: 'Try it', check: 'Check' }[st.kind];
+  coach.innerHTML = `<div class="eyebrow">${icon(L.icon)} ${esc(L.title)} <span class="kind">· ${kindName} · step ${si + 1} of ${L.steps.length}</span></div>
+    <div><h2>${esc(st.head)}</h2><p>${esc(st.text)}</p>${st.hint ? `<p style="color:var(--muted);font-size:13px">${esc(st.hint)}</p>` : ''}</div>
+    <div class="btns">${ci + si > 0 ? '<button class="btn ghost" id="back">Back</button>' : ''}<button class="btn main-b" id="next" ${solved ? '' : 'disabled'}>${si === L.steps.length - 1 ? 'Finish chapter' : 'Next'}</button></div>
+    ${st.kind === 'check' ? `<div class="answers">${st.answers.map((a, i) => `<button class="ans" data-a="${i}">${esc(a)}</button>`).join('')}</div>` : ''}
+    <p class="feedback" id="fb"></p>`;
+  curTarget = st.target || null;
+  renderStage();
+  if (st.kind === 'check') coach.querySelectorAll('.ans').forEach(b => b.onclick = () => {
+    const fb = document.getElementById('fb');
+    if (+b.dataset.a === st.right) { coach.querySelectorAll('.ans').forEach(x => x.disabled = true); b.classList.add('right'); succeed(st.ok); }
+    else { b.classList.add('wrong'); fb.textContent = 'Not quite. Try another answer.'; fb.className = 'feedback no'; }
+  });
+  document.getElementById('next').onclick = next;
+  const bk = document.getElementById('back'); if (bk) bk.onclick = back;
+}
+function next() {
+  const L = LESSONS[ci];
+  if (si < L.steps.length - 1) { si++; renderStep(); return; }
+  doneChapters.add(ci); store.set(KEY + '-done', JSON.stringify([...doneChapters]));
+  goChapter(ci + 1);
+}
+function back() { if (si > 0) { si--; renderStep(); } else if (ci > 0) { goChapter(ci - 1); } }
+
+function renderFinish() {
+  const fin = document.getElementById('finish'); fin.hidden = false;
+  clearTimers(); S = START(); curTarget = null; renderStage();
+  let ticks = JSON.parse(store.get(KEY + '-real') || '[]');
+  fin.innerHTML = `<h3>${FINISH_TITLE}</h3>${FINISH_ITEMS.map((t, i) => `<label><input type="checkbox" id="real-${i}" ${ticks.includes(i) ? 'checked' : ''}><span>${esc(t)}</span></label>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:12px"><button class="btn main-b" id="again">Start the tour again</button></div>`;
+  fin.querySelectorAll('input').forEach((c, i) => c.onchange = () => { ticks = ticks.filter(x => x !== i); if (c.checked) ticks.push(i); store.set(KEY + '-real', JSON.stringify(ticks)); });
+  document.getElementById('again').onclick = () => goChapter(0);
+}
+
+
+const FINISH_ITEMS = ['Open AMS Garmin Bridge Board from your Desktop (or type its name in Raycast). Look at the lamp at the bottom left: green means Garmin answers.',
+  'Hold the pointer over the steps number and read the small card: the last 7 days, the 30-day average, and when the watch synced.',
+  'Press the heading of any panel and read “In short”. Press Escape to close it.',
+  'In the Body Battery curve, press the label of a workout (for example “Run −17”) and read its details.',
+  'In Workouts press “7 days” and read the line “vs the 7 days before”. Then look at Training load and its one word.',
+  'Press “User interface”, try another look, then choose “Health” again.',
+  'Press Report, then Share. Press F for full screen and Escape to leave it.',
+  'Ask Claude “How did I sleep last night?” and compare it with the board.'];
+/* Fit the 960 x 560 pretend Mac into its box */
+function fit() { const box = document.getElementById('stagebox'); document.getElementById('stage').style.transform = `scale(${box.clientWidth / 960})`; }
+new ResizeObserver(fit).observe(document.getElementById('stagebox'));
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') { const n = document.getElementById('next'); if (n && !n.disabled && document.activeElement !== n) n.click(); } });
+goChapter(0); fit();
+</script>
